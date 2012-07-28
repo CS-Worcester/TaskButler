@@ -19,36 +19,52 @@
 
 package edu.worcester.cs499summer2012;
 
+import java.util.ArrayList;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.TextView;
 
 public class MainActivity extends Activity {
 	
 	static final int ADD_TASK_REQUEST = 0;
 
-    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+    	tasks = new ArrayList<Task>(0);
+    	list_view = (ListView) findViewById(R.id.list_tasks);
+    	text_view = (TextView) findViewById(R.id.text_list_size);
+    	text_view.setText(Integer.toString(tasks.size()));        
     }
     
-    public void newTask(View view) {
+    public void onStart() {
+    	super.onStart();
+    }
+    
+    public void getNewTask(View view) {
     	startActivityForResult(new Intent(this, AddTaskActivity.class), 
-    			               ADD_TASK_REQUEST);
+    			ADD_TASK_REQUEST);
     }
     
-    public void onActivityResult(int request_code,
-    		                     int result_code, 
-    		                     Intent intent) {
+    public void onActivityResult(int request_code, int result_code, 
+    		Intent intent) {
     	if (request_code == ADD_TASK_REQUEST && result_code == RESULT_OK) {
-    		Task t = intent.getParcelableExtra(AddTaskActivity.EXTRA_TASK);
-    		updateTaskList(t);
+    		Task task = intent.getParcelableExtra(AddTaskActivity.EXTRA_TASK);
+    		tasks.add(task);
+    		text_view.setText(Integer.toString(tasks.size()));
+    		ArrayAdapter<Task> list_adapter = new ArrayAdapter<Task>(this, 
+        			android.R.layout.simple_list_item_1, android.R.id.text1, 
+        			tasks);
+        	list_view.setAdapter(list_adapter);
     	}
     }
     
-    private void updateTaskList(Task t) {
-    	
-    }
+    private ArrayList<Task> tasks;
+    private ListView list_view;
+    private TextView text_view;
 }

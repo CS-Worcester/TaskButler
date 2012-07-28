@@ -2,20 +2,31 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="horizontal" >
+    android:layout_height="match_parent" >
+    
+    <TextView android:id="@+id/text_list_size_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:text="@string/text_list_size_label" />
+    
+    <TextView android:id="@+id/text_list_size"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@id/text_list_size_label" />
     
     <ListView android:id="@+id/list_tasks"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_ />    
+        android:layout_below="@id/text_list_size_label" />    
     
     <Button android:id="@+id/button_add_task"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:text="@string/button_add_task"
-        android:onClick="newTask" />    "
+        android:onClick="getNewTask" />    
 
 </RelativeLayout>

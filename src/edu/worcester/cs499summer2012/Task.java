@@ -34,6 +34,10 @@ public class Task implements Parcelable {
 		this.task_name = task_name;
 	}
 	
+	public String toString() {
+		return task_name;
+	}
+	
 	public void setTaskName(String task_name) {
 		this.task_name = task_name;
 	}
@@ -69,32 +73,3 @@ public class Task implements Parcelable {
 		task_name = in.readString();
 	}
 }
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-

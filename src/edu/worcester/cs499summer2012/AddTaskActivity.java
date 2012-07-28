@@ -24,6 +24,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 public class AddTaskActivity extends Activity {
 	
@@ -39,9 +40,15 @@ public class AddTaskActivity extends Activity {
     	Intent intent = new Intent(this, MainActivity.class);
     	EditText edit_text = (EditText) findViewById(R.id.edit_task_name);
     	Task task = new Task(edit_text.getText().toString());
-    	intent.putExtra(EXTRA_TASK, task);
-    	setResult(RESULT_OK, intent);
-    	finish();
+    	if (task.getTaskName().compareTo("") != 0) {
+	    	intent.putExtra(EXTRA_TASK, task);
+	    	setResult(RESULT_OK, intent);
+	    	finish();
+    	}
+    	else {
+    		Toast.makeText(getApplicationContext(), "Task needs a name!",
+    				Toast.LENGTH_SHORT).show();
+    	}
     }
     
     public void cancel(View view) {
