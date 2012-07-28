@@ -4,12 +4,18 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="horizontal" >
-
-    <Button
+    
+    <ListView android:id="@+id/list_tasks"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_ />    
+    
+    <Button android:id="@+id/button_add_task"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:text="@string/button_new_task"
-        android:onClick="newTask" />
+        android:text="@string/button_add_task"
+        android:onClick="newTask" />    "
 
 </RelativeLayout>

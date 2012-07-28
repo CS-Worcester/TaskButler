@@ -1,5 +1,5 @@
 /**
- * MainActivity.java
+ * NewTaskActivity.java
  * 
  * Copyright 2012 Jonathan Hasenzahl
  * 
@@ -23,32 +23,29 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.EditText;
 
-public class MainActivity extends Activity {
+public class AddTaskActivity extends Activity {
 	
-	static final int ADD_TASK_REQUEST = 0;
+	public final static String EXTRA_TASK = "edu.worcester.cs499summer2012.TASK";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_add_task);
     }
     
-    public void newTask(View view) {
-    	startActivityForResult(new Intent(this, AddTaskActivity.class), 
-    			               ADD_TASK_REQUEST);
+    public void addTask(View view) {
+    	Intent intent = new Intent(this, MainActivity.class);
+    	EditText edit_text = (EditText) findViewById(R.id.edit_task_name);
+    	Task task = new Task(edit_text.getText().toString());
+    	intent.putExtra(EXTRA_TASK, task);
+    	setResult(RESULT_OK, intent);
+    	finish();
     }
     
-    public void onActivityResult(int request_code,
-    		                     int result_code, 
-    		                     Intent intent) {
-    	if (request_code == ADD_TASK_REQUEST && result_code == RESULT_OK) {
-    		Task t = intent.getParcelableExtra(AddTaskActivity.EXTRA_TASK);
-    		updateTaskList(t);
-    	}
-    }
-    
-    private void updateTaskList(Task t) {
-    	
+    public void cancel(View view) {
+    	setResult(RESULT_CANCELED);
+    	finish();
     }
 }

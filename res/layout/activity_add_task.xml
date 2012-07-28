@@ -15,6 +15,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/text_task_name"
+        android:inputType="textCapSentences"
         android:hint="@string/edit_task_name" />
     
     <Button android:id="@+id/button_cancel"
@@ -25,11 +26,12 @@
         android:text="@string/button_cancel"
         android:onClick="cancel" />
     
-    <Button android:id="@+id/button_add_task"
+    <Button android:id="@+id/button_create_task"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/edit_task_name"
         android:layout_toLeftOf="@id/button_cancel"
-        android:text="@string/button_add_task" />
+        android:text="@string/button_add_task"
+        android:onClick="addTask" />
 
 </RelativeLayout>

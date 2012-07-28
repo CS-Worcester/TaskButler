@@ -6,13 +6,13 @@
     
     <!-- Main Activity -->
     <string name="title_activity_main">Unnamed Task Manager</string>
-    <string name="button_new_task">Create New Task</string>
+    <string name="button_add_task">Create New Task</string>
     
     <!-- New Task Activity -->
-    <string name="title_activity_new_task">Create New Task</string>
+    <string name="title_activity_add_task">Create New Task</string>
     <string name="text_task_name">Task name</string>
     <string name="edit_task_name">Enter task name</string>
-    <string name="button_add_task">Add Task</string>
+    <string name="button_create_task">Create New Task</string>
     <string name="button_cancel">Cancel</string>
     
 </resources>
