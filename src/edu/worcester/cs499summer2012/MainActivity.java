@@ -19,6 +19,11 @@
 
 package edu.worcester.cs499summer2012;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 
 import android.app.Activity;
@@ -28,6 +33,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity extends Activity {
 	
@@ -37,13 +43,19 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
     	tasks = new ArrayList<Task>(0);
-    	list_view = (ListView) findViewById(R.id.list_tasks);
+    	readTasksFromFile();
     	text_view = (TextView) findViewById(R.id.text_list_size);
-    	text_view.setText(Integer.toString(tasks.size()));        
+    	text_view.setText(Integer.toString(tasks.size()));
+    	list_view = (ListView) findViewById(R.id.list_tasks);
+		ArrayAdapter<Task> list_adapter = new ArrayAdapter<Task>(this, 
+    			android.R.layout.simple_list_item_1, android.R.id.text1, 
+    			tasks);
+    	list_view.setAdapter(list_adapter);
     }
     
-    public void onStart() {
-    	super.onStart();
+    public void onStop() {
+    	writeTasksToFile();
+    	super.onStop();
     }
     
     public void getNewTask(View view) {
@@ -61,6 +73,58 @@ public class MainActivity extends Activity {
         			android.R.layout.simple_list_item_1, android.R.id.text1, 
         			tasks);
         	list_view.setAdapter(list_adapter);
+    	}
+    }
+    
+    private void readTasksFromFile() {
+    	//String eol = System.getProperty("line.separator");
+    	BufferedReader file = null;
+    	try {
+    		file = new BufferedReader(new
+    				InputStreamReader(openFileInput("tasks.txt")));
+    		String line;
+    		while ((line = file.readLine()) != null) {
+    			tasks.add(new Task(line));
+    		}
+    	} catch (Exception e) {
+    		e.printStackTrace();
+    	} finally {
+    		if (file != null) {
+    			try {
+    				file.close();
+    			} catch (IOException e) {
+    				e.printStackTrace();
+    			}
+    		}
+    	}
+    	
+    }
+    
+    private void writeTasksToFile() {
+    	String eol = System.getProperty("line.separator");
+    	BufferedWriter file = null;
+    	try {
+    		file = new BufferedWriter(new 
+    				OutputStreamWriter(openFileOutput("tasks.txt", 
+    						MODE_PRIVATE)));
+    		if (tasks.size() > 0) {
+    			for (Task task : tasks) {
+    				file.write(task.getTaskName() + eol);
+    			}
+    		} else {
+        		Toast.makeText(getApplicationContext(), 
+        				"DEBUG: No tasks to save!", Toast.LENGTH_SHORT).show();
+    		}
+    	} catch (Exception e) {
+    		e.printStackTrace();
+    	} finally {
+    		if (file != null) {
+    			try {
+    				file.close();
+    			} catch (IOException e) {
+    				e.printStackTrace();
+    			}
+    		}
     	}
     }
     
