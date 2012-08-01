@@ -17,36 +17,48 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package edu.worcester.cs499summer2012;
+package edu.worcester.cs499summer2012.task;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class Task implements Parcelable {
+public class Task implements Parcelable, Comparable<Task> {
 	
-	// Class methods
+	/* Class methods */
 	
 	public Task() {
-		task_name = "Untitled task";
+		name = "Untitled task";
+		priority = TaskPriority.NORMAL;
 	}
 
 	public Task(String task_name) {
-		this.task_name = task_name;
+		this.name = task_name;
+		priority = TaskPriority.NORMAL;
 	}
 	
 	public String toString() {
-		return task_name;
+		return name;
+	}
+
+	public String getName() {
+		return name;
 	}
 	
-	public void setTaskName(String task_name) {
-		this.task_name = task_name;
+	public void setName(String task_name) {
+		this.name = task_name;
 	}
 	
-	public String getTaskName() {
-		return task_name;
+	public int getPriority() {
+		return priority;
 	}
 	
-	private String task_name;
+	public void setPriority(int priority) {
+		if (priority >= TaskPriority.TRIVIAL && priority <= TaskPriority.URGENT)
+			this.priority = priority;
+	}
+	
+	private String name;
+	private int priority;
 
 	// Methods for implementing Parcelable
 	
@@ -56,7 +68,7 @@ public class Task implements Parcelable {
 	}
 	
 	public void writeToParcel(Parcel out, int flags) {
-		out.writeString(task_name);		
+		out.writeString(name);		
 	}
 	
 	public static final Parcelable.Creator<Task> CREATOR = new Parcelable.Creator<Task>() {
@@ -70,6 +82,23 @@ public class Task implements Parcelable {
 	};
 	
 	private Task(Parcel in) {
-		task_name = in.readString();
+		name = in.readString();
+	}
+	
+	public boolean equals(Object o) {
+		if (o == this)
+			return true;
+		if (o == null)
+			return false;
+		if (o.getClass() != this.getClass())
+			return false;
+		else {
+			Task t = (Task) o;
+			return this.name.equals(t.name);
+		}
+	}
+
+	public int compareTo(Task t) {
+		return this.name.compareTo(t.name);
 	}
 }

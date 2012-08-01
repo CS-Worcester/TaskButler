@@ -17,8 +17,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package edu.worcester.cs499summer2012;
+package edu.worcester.cs499summer2012.activity;
 
+import edu.worcester.cs499summer2012.R;
+import edu.worcester.cs499summer2012.task.Task;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -40,7 +42,7 @@ public class AddTaskActivity extends Activity {
     	Intent intent = new Intent(this, MainActivity.class);
     	EditText edit_text = (EditText) findViewById(R.id.edit_task_name);
     	Task task = new Task(edit_text.getText().toString());
-    	if (task.getTaskName().compareTo("") != 0) {
+    	if (task.getName().compareTo("") != 0) {
 	    	intent.putExtra(EXTRA_TASK, task);
 	    	setResult(RESULT_OK, intent);
 	    	finish();

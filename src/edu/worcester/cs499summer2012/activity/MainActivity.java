@@ -17,14 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package edu.worcester.cs499summer2012;
+package edu.worcester.cs499summer2012.activity;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.util.ArrayList;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -34,6 +33,9 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+import edu.worcester.cs499summer2012.R;
+import edu.worcester.cs499summer2012.task.Task;
+import edu.worcester.cs499summer2012.task.TaskList;
 
 public class MainActivity extends Activity {
 	
@@ -42,7 +44,7 @@ public class MainActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-    	tasks = new ArrayList<Task>(0);
+    	tasks = new TaskList();
     	readTasksFromFile();
     	text_view = (TextView) findViewById(R.id.text_list_size);
     	text_view.setText(Integer.toString(tasks.size()));
@@ -109,7 +111,7 @@ public class MainActivity extends Activity {
     						MODE_PRIVATE)));
     		if (tasks.size() > 0) {
     			for (Task task : tasks) {
-    				file.write(task.getTaskName() + eol);
+    				file.write(task.getName() + eol);
     			}
     		} else {
         		Toast.makeText(getApplicationContext(), 
@@ -128,7 +130,7 @@ public class MainActivity extends Activity {
     	}
     }
     
-    private ArrayList<Task> tasks;
+    private TaskList tasks;
     private ListView list_view;
     private TextView text_view;
 }
