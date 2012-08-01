@@ -36,6 +36,7 @@ public class Task implements Parcelable, Comparable<Task> {
 		priority = TaskPriority.NORMAL;
 	}
 	
+	@Override
 	public String toString() {
 		return name;
 	}
@@ -85,6 +86,7 @@ public class Task implements Parcelable, Comparable<Task> {
 		name = in.readString();
 	}
 	
+	@Override
 	public boolean equals(Object o) {
 		if (o == this)
 			return true;

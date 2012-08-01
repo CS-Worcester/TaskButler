@@ -25,37 +25,46 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 
-import android.app.Activity;
+import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
 import edu.worcester.cs499summer2012.R;
 import edu.worcester.cs499summer2012.adapter.TaskListAdapter;
 import edu.worcester.cs499summer2012.task.Task;
 import edu.worcester.cs499summer2012.task.TaskList;
 
-public class MainActivity extends Activity {
+public class MainActivity extends ListActivity {
 	
 	static final int ADD_TASK_REQUEST = 0;
+	
+    private TaskList tasks;
+    private TaskListAdapter adapter;
 
-    public void onCreate(Bundle savedInstanceState) {
+    @Override
+	public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
     	tasks = new TaskList();
     	readTasksFromFile();
-    	text_view = (TextView) findViewById(R.id.text_list_size);
-    	text_view.setText(Integer.toString(tasks.size()));
-    	list_view = (ListView) findViewById(R.id.list_tasks);
-		TaskListAdapter adapter = new TaskListAdapter(this, tasks);
-    	list_view.setAdapter(adapter);
+		adapter = new TaskListAdapter(this, tasks);
+    	setListAdapter(adapter);
     }
     
-    public void onStop() {
+    @Override
+	public void onStop() {
     	writeTasksToFile();
     	super.onStop();
+    }
+    
+    @Override
+	public void onActivityResult(int request_code, int result_code, 
+    		Intent intent) {
+    	if (request_code == ADD_TASK_REQUEST && result_code == RESULT_OK) {
+    		Task task = intent.getParcelableExtra(AddTaskActivity.EXTRA_TASK);
+    		tasks.add(task);
+    		setListAdapter(adapter);
+    	}
     }
     
     public void getNewTask(View view) {
@@ -63,19 +72,7 @@ public class MainActivity extends Activity {
     			ADD_TASK_REQUEST);
     }
     
-    public void onActivityResult(int request_code, int result_code, 
-    		Intent intent) {
-    	if (request_code == ADD_TASK_REQUEST && result_code == RESULT_OK) {
-    		Task task = intent.getParcelableExtra(AddTaskActivity.EXTRA_TASK);
-    		tasks.add(task);
-    		text_view.setText(Integer.toString(tasks.size()));
-    		TaskListAdapter adapter = new TaskListAdapter(this, tasks);
-        	list_view.setAdapter(adapter);
-    	}
-    }
-    
     private void readTasksFromFile() {
-    	//String eol = System.getProperty("line.separator");
     	BufferedReader file = null;
     	try {
     		file = new BufferedReader(new
@@ -95,7 +92,6 @@ public class MainActivity extends Activity {
     			}
     		}
     	}
-    	
     }
     
     private void writeTasksToFile() {
@@ -109,9 +105,6 @@ public class MainActivity extends Activity {
     			for (Task task : tasks) {
     				file.write(task.getName() + eol);
     			}
-    		} else {
-        		Toast.makeText(getApplicationContext(), 
-        				"DEBUG: No tasks to save!", Toast.LENGTH_SHORT).show();
     		}
     	} catch (Exception e) {
     		e.printStackTrace();
@@ -126,7 +119,4 @@ public class MainActivity extends Activity {
     	}
     }
     
-    private TaskList tasks;
-    private ListView list_view;
-    private TextView text_view;
 }

@@ -6,7 +6,7 @@
     
     <!-- Main Activity -->
     <string name="title_activity_main">CS499Summer2012 Task Manager</string>
-    <string name="text_list_size_label">Number of Tasks:</string>
+    <string name="text_empty_list">No tasks found.\nClick the button below to create a task!</string>
     <string name="button_add_task">Create New Task</string>
     
     <!-- New Task Activity -->
