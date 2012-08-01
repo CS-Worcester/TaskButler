@@ -19,7 +19,7 @@
 
 package edu.worcester.cs499summer2012.adapter;
 
-import android.content.Context;
+import android.app.Activity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,23 +31,39 @@ import edu.worcester.cs499summer2012.task.TaskList;
 
 public class TaskListAdapter extends ArrayAdapter<Task> {
 
-	private final Context context;
+	private final Activity activity;
 	private final TaskList tasks;
 	
-	public TaskListAdapter(Context context, TaskList tasks) {
-		super(context, R.layout.row_layout, tasks);
-		this.context = context;
+	static class ViewHolder {
+		public TextView text;
+	}
+	
+	public TaskListAdapter(Activity activity, TaskList tasks) {
+		super(activity, R.layout.row_layout, tasks);
+		this.activity = activity;
 		this.tasks = tasks;
 	}
 	
 	@Override
-	public View getView(int position, View convertView, ViewGroup parent) {
-		LayoutInflater inflater = (LayoutInflater) 
-				context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		View row_view = inflater.inflate(R.layout.row_layout, parent, false);
-		TextView text_view = (TextView) 
-				row_view.findViewById(R.id.text_row_name);
-		text_view.setText(tasks.get(position).getName());
+	public View getView(int position, View convert_view, ViewGroup parent) {
+		View row_view = convert_view;
+		if (row_view == null) {
+			LayoutInflater inflater = activity.getLayoutInflater();
+			row_view = inflater.inflate(R.layout.row_layout, null);
+			ViewHolder view_holder = new ViewHolder();
+			view_holder.text = (TextView) 
+					row_view.findViewById(R.id.text_row_name);
+			row_view.setTag(view_holder);
+		}
+
+		ViewHolder holder = (ViewHolder) row_view.getTag();
+		holder.text.setText(tasks.get(position).getName());
+		
+		if (!tasks.get(position).getIsCompleted())
+			holder.text.setTextAppearance(getContext(), R.style.text_task_not_completed);
+		else
+			holder.text.setTextAppearance(getContext(), R.style.text_task_completed);
+		
 		return row_view;
 	}
 }

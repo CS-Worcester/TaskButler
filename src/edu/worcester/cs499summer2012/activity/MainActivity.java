@@ -29,6 +29,7 @@ import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ListView;
 import edu.worcester.cs499summer2012.R;
 import edu.worcester.cs499summer2012.adapter.TaskListAdapter;
 import edu.worcester.cs499summer2012.task.Task;
@@ -42,7 +43,7 @@ public class MainActivity extends ListActivity {
     private TaskListAdapter adapter;
 
     @Override
-	public void onCreate(Bundle savedInstanceState) {
+	protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
     	tasks = new TaskList();
@@ -52,13 +53,22 @@ public class MainActivity extends ListActivity {
     }
     
     @Override
-	public void onStop() {
+	protected void onStop() {
     	writeTasksToFile();
     	super.onStop();
     }
     
     @Override
-	public void onActivityResult(int request_code, int result_code, 
+    protected void onListItemClick(ListView list_view, View view, int position, 
+    		long id) {
+    	Task task = (Task) getListAdapter().getItem(position);
+    	task.toggleIsCompleted();
+    	tasks.set(position, task);
+    	setListAdapter(adapter);
+    }
+    
+    @Override
+	protected void onActivityResult(int request_code, int result_code, 
     		Intent intent) {
     	if (request_code == ADD_TASK_REQUEST && result_code == RESULT_OK) {
     		Task task = intent.getParcelableExtra(AddTaskActivity.EXTRA_TASK);

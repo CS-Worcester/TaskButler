@@ -48,7 +48,7 @@ public class AddTaskActivity extends Activity {
 	    	finish();
     	}
     	else {
-    		Toast.makeText(getApplicationContext(), "Task needs a name!",
+    		Toast.makeText(this, "Task needs a name!", 
     				Toast.LENGTH_SHORT).show();
     	}
     }

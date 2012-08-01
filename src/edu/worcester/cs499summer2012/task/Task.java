@@ -22,46 +22,43 @@ package edu.worcester.cs499summer2012.task;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class Task implements Parcelable, Comparable<Task> {
+public class Task implements Parcelable {
+	
+	private String name;
+	private int priority;
+	private boolean is_completed;
 	
 	/* Class methods */
 	
 	public Task() {
 		name = "Untitled task";
 		priority = TaskPriority.NORMAL;
+		is_completed = false;
 	}
 
 	public Task(String task_name) {
 		this.name = task_name;
 		priority = TaskPriority.NORMAL;
+		is_completed = false;
 	}
-	
+
 	@Override
-	public String toString() {
-		return name;
+	public boolean equals(Object o) {
+		if (o == this)
+			return true;
+		if (o == null)
+			return false;
+		if (o.getClass() != this.getClass())
+			return false;
+		else {
+			Task t = (Task) o;
+			return this.name.equals(t.name);
+		}
 	}
 
-	public String getName() {
-		return name;
-	}
-	
-	public void setName(String task_name) {
-		this.name = task_name;
-	}
-	
-	public int getPriority() {
-		return priority;
-	}
-	
-	public void setPriority(int priority) {
-		if (priority >= TaskPriority.TRIVIAL && priority <= TaskPriority.URGENT)
-			this.priority = priority;
-	}
-	
-	private String name;
-	private int priority;
-
-	// Methods for implementing Parcelable
+	/*
+	 * Parcelable Methods
+	 */
 	
 	public int describeContents() {
 		// TODO Auto-generated method stub
@@ -86,21 +83,36 @@ public class Task implements Parcelable, Comparable<Task> {
 		name = in.readString();
 	}
 	
-	@Override
-	public boolean equals(Object o) {
-		if (o == this)
-			return true;
-		if (o == null)
-			return false;
-		if (o.getClass() != this.getClass())
-			return false;
-		else {
-			Task t = (Task) o;
-			return this.name.equals(t.name);
-		}
+	/*
+	 * Getters and Setters
+	 */
+	
+	public String getName() {
+		return name;
 	}
-
-	public int compareTo(Task t) {
-		return this.name.compareTo(t.name);
+	
+	public void setName(String task_name) {
+		this.name = task_name;
+	}
+	
+	public int getPriority() {
+		return priority;
+	}
+	
+	public void setPriority(int priority) {
+		if (priority >= TaskPriority.TRIVIAL && priority <= TaskPriority.URGENT)
+			this.priority = priority;
+	}
+	
+	public boolean getIsCompleted() {
+		return is_completed;
+	}
+	
+	public void setIsCompleted(boolean is_completed) {
+		this.is_completed = is_completed;
+	}
+	
+	public void toggleIsCompleted() {
+		is_completed = is_completed ? false : true;
 	}
 }
