@@ -29,11 +29,11 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import edu.worcester.cs499summer2012.R;
+import edu.worcester.cs499summer2012.adapter.TaskListAdapter;
 import edu.worcester.cs499summer2012.task.Task;
 import edu.worcester.cs499summer2012.task.TaskList;
 
@@ -49,10 +49,8 @@ public class MainActivity extends Activity {
     	text_view = (TextView) findViewById(R.id.text_list_size);
     	text_view.setText(Integer.toString(tasks.size()));
     	list_view = (ListView) findViewById(R.id.list_tasks);
-		ArrayAdapter<Task> list_adapter = new ArrayAdapter<Task>(this, 
-    			android.R.layout.simple_list_item_1, android.R.id.text1, 
-    			tasks);
-    	list_view.setAdapter(list_adapter);
+		TaskListAdapter adapter = new TaskListAdapter(this, tasks);
+    	list_view.setAdapter(adapter);
     }
     
     public void onStop() {
@@ -71,10 +69,8 @@ public class MainActivity extends Activity {
     		Task task = intent.getParcelableExtra(AddTaskActivity.EXTRA_TASK);
     		tasks.add(task);
     		text_view.setText(Integer.toString(tasks.size()));
-    		ArrayAdapter<Task> list_adapter = new ArrayAdapter<Task>(this, 
-        			android.R.layout.simple_list_item_1, android.R.id.text1, 
-        			tasks);
-        	list_view.setAdapter(list_adapter);
+    		TaskListAdapter adapter = new TaskListAdapter(this, tasks);
+        	list_view.setAdapter(adapter);
     	}
     }
     
