@@ -33,6 +33,7 @@ import android.widget.ListView;
 import edu.worcester.cs499summer2012.R;
 import edu.worcester.cs499summer2012.adapter.TaskListAdapter;
 import edu.worcester.cs499summer2012.task.Task;
+import edu.worcester.cs499summer2012.task.TaskCompletionComparator;
 import edu.worcester.cs499summer2012.task.TaskList;
 
 public class MainActivity extends ListActivity {
@@ -63,6 +64,7 @@ public class MainActivity extends ListActivity {
     protected void onListItemClick(ListView list_view, View view, int position, 
     		long id) {
     	tasks.get(position).toggleIsCompleted();
+    	adapter.sort(new TaskCompletionComparator());
     	adapter.notifyDataSetChanged();
     }
     
@@ -71,7 +73,7 @@ public class MainActivity extends ListActivity {
     		Intent intent) {
     	if (request_code == ADD_TASK_REQUEST && result_code == RESULT_OK) {
     		Task task = intent.getParcelableExtra(AddTaskActivity.EXTRA_TASK);
-    		tasks.add(task);
+    		tasks.add(0, task);
     		adapter.notifyDataSetChanged();
     	}
     }
