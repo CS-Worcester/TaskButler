@@ -37,10 +37,11 @@ import edu.worcester.cs499summer2012.task.TaskList;
 
 public class MainActivity extends ListActivity {
 	
-	static final int ADD_TASK_REQUEST = 0;
+	public static final int ADD_TASK_REQUEST = 0;
 	
     private TaskList tasks;
     private TaskListAdapter adapter;
+    private final String TASK_FILE_NAME = "tasks";
 
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -84,10 +85,10 @@ public class MainActivity extends ListActivity {
     	BufferedReader file = null;
     	try {
     		file = new BufferedReader(new
-    				InputStreamReader(openFileInput("tasks.txt")));
+    				InputStreamReader(openFileInput(TASK_FILE_NAME)));
     		String line;
     		while ((line = file.readLine()) != null) {
-    			tasks.add(Task.getTaskFromString(line));
+    			tasks.add(Task.parseTask(line));
     		}
     	} catch (Exception e) {
     		e.printStackTrace();
@@ -107,7 +108,7 @@ public class MainActivity extends ListActivity {
     	BufferedWriter file = null;
     	try {
     		file = new BufferedWriter(new 
-    				OutputStreamWriter(openFileOutput("tasks.txt", 
+    				OutputStreamWriter(openFileOutput(TASK_FILE_NAME, 
     						MODE_PRIVATE)));
     		if (tasks.size() > 0) {
     			for (Task task : tasks) {

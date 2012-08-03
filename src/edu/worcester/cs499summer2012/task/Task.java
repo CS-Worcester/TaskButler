@@ -25,15 +25,16 @@ import android.os.Parcelable;
 public class Task implements Parcelable {
 	
 	/*
-	 * Static fields
+	 * Static fields and methods
 	 */
 	
 	public static final int NAME = 0;
 	public static final int IS_COMPLETED = 1;
 	public static final int PRIORITY = 2;
+	private static final String DIV = "%%";
 	
-	public static Task getTaskFromString(String string) {
-		String[] tokens = string.split(",");
+	public static Task parseTask(String string) {
+		String[] tokens = string.split(DIV);
 		return new Task(tokens[NAME], 
 				Boolean.parseBoolean(tokens[IS_COMPLETED]),
     			Integer.parseInt(tokens[PRIORITY]));
@@ -89,8 +90,8 @@ public class Task implements Parcelable {
 	
 	@Override
 	public String toString() {
-		return new String(name + ',' + Boolean.toString(is_completed) + ',' + 
-				Integer.toString(priority) + ',');
+		return new String(name + DIV + Boolean.toString(is_completed) + DIV + 
+				Integer.toString(priority));
 	}
 
 	/*
@@ -103,7 +104,9 @@ public class Task implements Parcelable {
 	}
 	
 	public void writeToParcel(Parcel out, int flags) {
-		out.writeString(toString());
+		out.writeString(name);
+		out.writeString(Boolean.toString(is_completed));
+		out.writeInt(priority);
 	}
 	
 	public static final Parcelable.Creator<Task> CREATOR = new Parcelable.Creator<Task>() {
@@ -117,7 +120,9 @@ public class Task implements Parcelable {
 	};
 	
 	private Task(Parcel in) {
-		this(getTaskFromString(in.readString()));
+		name = in.readString();
+		is_completed = Boolean.parseBoolean(in.readString());
+		priority = in.readInt();
 	}
 	
 	/*
