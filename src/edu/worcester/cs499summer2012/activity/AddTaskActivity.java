@@ -42,7 +42,7 @@ public class AddTaskActivity extends Activity {
     	Intent intent = new Intent(this, MainActivity.class);
     	EditText edit_text = (EditText) findViewById(R.id.edit_task_name);
     	Task task = new Task(edit_text.getText().toString());
-    	if (task.getName().compareTo("") != 0) {
+    	if (!task.getName().equals("")) {
 	    	intent.putExtra(EXTRA_TASK, task);
 	    	setResult(RESULT_OK, intent);
 	    	finish();

@@ -89,7 +89,7 @@ public class MainActivity extends ListActivity {
     				InputStreamReader(openFileInput("tasks.txt")));
     		String line;
     		while ((line = file.readLine()) != null) {
-    			tasks.add(new Task(line));
+    			tasks.add(Task.getTaskFromString(line));
     		}
     	} catch (Exception e) {
     		e.printStackTrace();
@@ -113,7 +113,7 @@ public class MainActivity extends ListActivity {
     						MODE_PRIVATE)));
     		if (tasks.size() > 0) {
     			for (Task task : tasks) {
-    				file.write(task.getName() + eol);
+    				file.write(task + eol);
     			}
     		}
     	} catch (Exception e) {

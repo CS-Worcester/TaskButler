@@ -28,6 +28,7 @@ import android.widget.TextView;
 import edu.worcester.cs499summer2012.R;
 import edu.worcester.cs499summer2012.task.Task;
 import edu.worcester.cs499summer2012.task.TaskList;
+import edu.worcester.cs499summer2012.task.TaskPriority;
 
 public class TaskListAdapter extends ArrayAdapter<Task> {
 
@@ -35,7 +36,8 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 	private final TaskList tasks;
 	
 	static class ViewHolder {
-		public TextView text;
+		public TextView name;
+		public TextView priority;
 	}
 	
 	public TaskListAdapter(Activity activity, TaskList tasks) {
@@ -51,18 +53,23 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 			LayoutInflater inflater = activity.getLayoutInflater();
 			row_view = inflater.inflate(R.layout.row_layout, null);
 			ViewHolder view_holder = new ViewHolder();
-			view_holder.text = (TextView) 
+			view_holder.name = (TextView) 
 					row_view.findViewById(R.id.text_row_name);
+			view_holder.priority = (TextView)
+					row_view.findViewById(R.id.text_row_priority);
 			row_view.setTag(view_holder);
 		}
 
 		ViewHolder holder = (ViewHolder) row_view.getTag();
-		holder.text.setText(tasks.get(position).getName());
+		Task task = tasks.get(position);
+		holder.name.setText(task.getName());
+		holder.priority.setText(TaskPriority.LABELS[task.getPriority()]);
+		//holder.priority.setText(Integer.toString(task.getPriority()));
 		
 		if (!tasks.get(position).getIsCompleted())
-			holder.text.setTextAppearance(getContext(), R.style.text_task_not_completed);
+			holder.name.setTextAppearance(getContext(), R.style.text_task_not_completed);
 		else
-			holder.text.setTextAppearance(getContext(), R.style.text_task_completed);
+			holder.name.setTextAppearance(getContext(), R.style.text_task_completed);
 		
 		return row_view;
 	}

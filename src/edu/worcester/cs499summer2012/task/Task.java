@@ -24,23 +24,54 @@ import android.os.Parcelable;
 
 public class Task implements Parcelable {
 	
-	private String name;
-	private int priority;
-	private boolean is_completed;
+	/*
+	 * Static fields
+	 */
 	
-	/* Class methods */
+	public static final int NAME = 0;
+	public static final int IS_COMPLETED = 1;
+	public static final int PRIORITY = 2;
+	
+	public static Task getTaskFromString(String string) {
+		String[] tokens = string.split(",");
+		return new Task(tokens[NAME], 
+				Boolean.parseBoolean(tokens[IS_COMPLETED]),
+    			Integer.parseInt(tokens[PRIORITY]));
+	}
+	
+	/*
+	 * Class fields
+	 */
+	
+	private String name;
+	private boolean is_completed;
+	private int priority;
+	
+	/*
+	 * Constructors 
+	 */ 
 	
 	public Task() {
-		name = "Untitled task";
-		priority = TaskPriority.NORMAL;
-		is_completed = false;
+		this("Untitled task", false, TaskPriority.NORMAL);
 	}
 
 	public Task(String task_name) {
-		this.name = task_name;
-		priority = TaskPriority.NORMAL;
-		is_completed = false;
+		this(task_name, false, TaskPriority.NORMAL);
 	}
+	
+	public Task(String task_name, boolean is_completed, int priority) {
+		this.name = task_name;
+		this.is_completed = is_completed;
+		this.priority = priority;
+	}
+	
+	public Task(Task task) {
+		this(task.getName(), task.getIsCompleted(), task.getPriority());
+	}
+	
+	/*
+	 * Class methods 
+	 */ 	
 
 	@Override
 	public boolean equals(Object o) {
@@ -55,9 +86,15 @@ public class Task implements Parcelable {
 			return this.name.equals(t.name);
 		}
 	}
+	
+	@Override
+	public String toString() {
+		return new String(name + ',' + Boolean.toString(is_completed) + ',' + 
+				Integer.toString(priority) + ',');
+	}
 
 	/*
-	 * Parcelable Methods
+	 * Parcelable methods
 	 */
 	
 	public int describeContents() {
@@ -66,7 +103,7 @@ public class Task implements Parcelable {
 	}
 	
 	public void writeToParcel(Parcel out, int flags) {
-		out.writeString(name);		
+		out.writeString(toString());
 	}
 	
 	public static final Parcelable.Creator<Task> CREATOR = new Parcelable.Creator<Task>() {
@@ -80,11 +117,11 @@ public class Task implements Parcelable {
 	};
 	
 	private Task(Parcel in) {
-		name = in.readString();
+		this(getTaskFromString(in.readString()));
 	}
 	
 	/*
-	 * Getters and Setters
+	 * Getters and setters
 	 */
 	
 	public String getName() {

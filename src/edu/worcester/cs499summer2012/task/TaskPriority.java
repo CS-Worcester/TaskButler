@@ -27,6 +27,8 @@ public class TaskPriority implements Comparator<Task> {
 	public static final int NORMAL = 1;
 	public static final int URGENT = 2;
 	
+	public static final String[] LABELS = {"Trivial", "Normal", "Urgent"};
+	
 	public int compare(Task lhs, Task rhs) {
 		if (lhs.getPriority() == rhs.getPriority())
 			return 0;
