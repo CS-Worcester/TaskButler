@@ -61,10 +61,8 @@ public class MainActivity extends ListActivity {
     @Override
     protected void onListItemClick(ListView list_view, View view, int position, 
     		long id) {
-    	Task task = (Task) getListAdapter().getItem(position);
-    	task.toggleIsCompleted();
-    	tasks.set(position, task);
-    	setListAdapter(adapter);
+    	tasks.get(position).toggleIsCompleted();
+    	adapter.notifyDataSetChanged();
     }
     
     @Override
@@ -73,7 +71,7 @@ public class MainActivity extends ListActivity {
     	if (request_code == ADD_TASK_REQUEST && result_code == RESULT_OK) {
     		Task task = intent.getParcelableExtra(AddTaskActivity.EXTRA_TASK);
     		tasks.add(task);
-    		setListAdapter(adapter);
+    		adapter.notifyDataSetChanged();
     	}
     }
     

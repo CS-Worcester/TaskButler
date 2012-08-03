@@ -64,12 +64,18 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 		Task task = tasks.get(position);
 		holder.name.setText(task.getName());
 		holder.priority.setText(TaskPriority.LABELS[task.getPriority()]);
-		//holder.priority.setText(Integer.toString(task.getPriority()));
 		
-		if (!tasks.get(position).getIsCompleted())
-			holder.name.setTextAppearance(getContext(), R.style.text_task_not_completed);
-		else
-			holder.name.setTextAppearance(getContext(), R.style.text_task_completed);
+		if (!tasks.get(position).getIsCompleted()) {
+			holder.name.setTextAppearance(getContext(), 
+					R.style.text_task_not_completed);
+			holder.priority.setTextAppearance(getContext(), 
+					R.style.text_task_not_completed);
+		} else {
+			holder.name.setTextAppearance(getContext(), 
+					R.style.text_task_completed);
+			holder.priority.setTextAppearance(getContext(), 
+					R.style.text_task_completed);
+		}
 		
 		return row_view;
 	}

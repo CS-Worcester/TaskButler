@@ -8,14 +8,15 @@
     <TextView android:id="@+id/text_row_name"
         android:layout_weight="3"
         android:layout_width="0dp"
-        android:layout_height="80dp"
+        android:layout_height="60dp"
+        android:gravity="left|center_vertical"
         android:textSize="20dp" />
     
     <TextView android:id="@+id/text_row_priority"
         android:layout_weight="1"
         android:layout_width="0dp"
-        android:layout_height="80dp"
-        android:gravity="center"
+        android:layout_height="60dp"
+        android:gravity="left|center_vertical"
         android:textSize="16dp" />
     
 </LinearLayout>
