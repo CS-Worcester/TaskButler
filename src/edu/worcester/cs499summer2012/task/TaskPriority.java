@@ -1,7 +1,12 @@
 /**
+
  * TaskPriority.java
  * 
  * Copyright 2012 Jonathan Hasenzahl
+ * 
+ * @file
+ * Enables the user to set the priority of a task. Currently
+ * the user can select from a list of three different priorities.
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,7 +33,13 @@ public class TaskPriority implements Comparator<Task> {
 	public static final int URGENT = 2;
 	
 	public static final String[] LABELS = {"Trivial", "Normal", "Urgent"};
-	
+	/**
+	 * @return
+	 * the equivalence of the left and right hand side.
+	 * @param lhs the left hand task
+	 * @param rhs the right hand task
+	 * 
+	 */	
 	public int compare(Task lhs, Task rhs) {
 		if (lhs.getPriority() == rhs.getPriority())
 			return 0;

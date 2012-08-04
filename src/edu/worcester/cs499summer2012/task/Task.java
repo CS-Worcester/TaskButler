@@ -1,6 +1,12 @@
 /**
  * Task.java
  * 
+ * @file
+ * The class that actually constructs the task itself.
+ * 
+ * @author Jonathan Hasenzahl
+ * @author James Celona
+ * @param 	
  * Copyright 2012 Jonathan Hasenzahl
  * 
  * This program is free software: you can redistribute it and/or modify
@@ -32,7 +38,7 @@ public class Task implements Parcelable {
 	public static final int IS_COMPLETED = 1;
 	public static final int PRIORITY = 2;
 	private static final String DIV = "%%";
-	
+	//Any reason this variable is named string?
 	public static Task parseTask(String string) {
 		String[] tokens = string.split(DIV);
 		return new Task(tokens[NAME], 
@@ -48,7 +54,7 @@ public class Task implements Parcelable {
 	private boolean is_completed;
 	private int priority;
 	
-	/*
+	/**
 	 * Constructors 
 	 */ 
 	
@@ -125,34 +131,56 @@ public class Task implements Parcelable {
 		priority = in.readInt();
 	}
 	
-	/*
-	 * Getters and setters
-	 */
 	
+	/**
+	 * 
+	 * @return the name of the task.
+	 */
 	public String getName() {
 		return name;
 	}
+	/**
+	 * 
+	 * @param task_name the name of the task.
+	 */
 	
 	public void setName(String task_name) {
 		this.name = task_name;
 	}
 	
+	/**
+	 * @return the priority of the task.
+	 */
 	public int getPriority() {
 		return priority;
 	}
-	
+	/**
+	 * 
+	 * @param priority the priority of the task.
+	 */
 	public void setPriority(int priority) {
 		if (priority >= TaskPriority.TRIVIAL && priority <= TaskPriority.URGENT)
 			this.priority = priority;
 	}
+	/**
+	 * 
+	 * @return weather the task is completed or not
+	 */
 	
 	public boolean getIsCompleted() {
 		return is_completed;
 	}
-	
+	/**
+	 * 
+	 * @param is_completed boolean value representing the completion of a task.
+	 */
 	public void setIsCompleted(boolean is_completed) {
 		this.is_completed = is_completed;
 	}
+	
+	/**
+	 * Toggle the task as completed if not already.
+	 */
 	
 	public void toggleIsCompleted() {
 		is_completed = is_completed ? false : true;

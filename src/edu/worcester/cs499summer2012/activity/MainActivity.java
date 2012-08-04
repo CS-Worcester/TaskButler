@@ -1,6 +1,14 @@
 /**
  * MainActivity.java
  * 
+ * @todo
+ * I'm not 100% sure what this class is doing, next meetin confirm before I document this.
+ * 
+ * 
+ * @author	Jonathan Hasenzahl
+ * @author James Celona
+ * @version 1.0 dev
+ * 
  * Copyright 2012 Jonathan Hasenzahl
  * 
  * This program is free software: you can redistribute it and/or modify
@@ -45,6 +53,7 @@ public class MainActivity extends ListActivity {
     private final String TASK_FILE_NAME = "tasks";
 
     @Override
+    
 	protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -105,6 +114,9 @@ public class MainActivity extends ListActivity {
     	}
     }
     
+    /**
+     * save the task into a file to reference later.
+     */
     private void writeTasksToFile() {
     	String eol = System.getProperty("line.separator");
     	BufferedWriter file = null;

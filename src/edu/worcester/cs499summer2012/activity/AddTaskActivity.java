@@ -1,6 +1,13 @@
 /**
  * NewTaskActivity.java
  * 
+ * @file
+ * This is the class to add tasks to the for the application.
+ * @author James Celona
+ * @author Jonathan Hasenzahl 
+ * @version 1.0 dev
+ * 
+ * 
  * Copyright 2012 Jonathan Hasenzahl
  * 
  * This program is free software: you can redistribute it and/or modify
@@ -15,6 +22,8 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+ * 
  */
 
 package edu.worcester.cs499summer2012.activity;
@@ -52,6 +61,7 @@ public class AddTaskActivity extends Activity {
     				Toast.LENGTH_SHORT).show();
     	}
     }
+    
     
     public void cancel(View view) {
     	setResult(RESULT_CANCELED);

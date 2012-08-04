@@ -1,6 +1,10 @@
 /**
  * TaskList.java
  * 
+ * @TODO
+ * What is this class doing?
+ * 
+ * 
  * Copyright 2012 Jonathan Hasenzahl
  * 
  * This program is free software: you can redistribute it and/or modify
@@ -16,6 +20,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 
 package edu.worcester.cs499summer2012.task;
 
