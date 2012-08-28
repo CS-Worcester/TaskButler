@@ -37,8 +37,9 @@ public class Task implements Parcelable {
 	public static final int NAME = 0;
 	public static final int IS_COMPLETED = 1;
 	public static final int PRIORITY = 2;
-	public static final int NOTES = 0;
+	public static final int NOTES = 3;
 	private static final String DIV = "%%";  //assuming no one ever has %% in their task
+	
 	public static Task parseTask(String string) {
 		String[] tokens = string.split(DIV);
 		return new Task(tokens[NAME], 
@@ -100,7 +101,7 @@ public class Task implements Parcelable {
 	@Override
 	public String toString() {
 		return new String(name + DIV + Boolean.toString(is_completed) + DIV + 
-				Integer.toString(priority)+ notes);
+				Integer.toString(priority) + DIV + notes);
 	}
 
 	/*

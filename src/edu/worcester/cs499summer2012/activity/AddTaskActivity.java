@@ -65,19 +65,6 @@ public class AddTaskActivity extends Activity {
     				Toast.LENGTH_SHORT).show();
     	}
     }
-    /*
-    public void addMessage(View view) {
-    	Intent intent = new Intent(this, MainActivity.class);
-    	EditText edit_text = (EditText) findViewById(R.id.add_task_notes);
-    	Task task = new Task(edit_text.getText().toString());
-    	intent.putExtra(EXTRA_TASK, task);
-    	setResult(RESULT_OK, intent);
-    		
-    	}
-    	
-    */ 
-    
-    
     
     public void cancel(View view) {
     	setResult(RESULT_CANCELED);
