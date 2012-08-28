@@ -46,11 +46,15 @@ public class AddTaskActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_task);
     }
-    
+      
     public void addTask(View view) {
     	Intent intent = new Intent(this, MainActivity.class);
     	EditText edit_text = (EditText) findViewById(R.id.edit_task_name);
-    	Task task = new Task(edit_text.getText().toString());
+    	edit_text=(EditText) findViewById(R.id.edit_task_name);   
+    	EditText edit_text2 = (EditText) findViewById(R.id.add_task_notes);    	
+    	Task task = new Task(edit_text.getText().toString(), false, 0, edit_text2.getText().toString());   	 
+    						
+    	
     	if (!task.getName().equals("")) {
 	    	intent.putExtra(EXTRA_TASK, task);
 	    	setResult(RESULT_OK, intent);
@@ -61,6 +65,18 @@ public class AddTaskActivity extends Activity {
     				Toast.LENGTH_SHORT).show();
     	}
     }
+    /*
+    public void addMessage(View view) {
+    	Intent intent = new Intent(this, MainActivity.class);
+    	EditText edit_text = (EditText) findViewById(R.id.add_task_notes);
+    	Task task = new Task(edit_text.getText().toString());
+    	intent.putExtra(EXTRA_TASK, task);
+    	setResult(RESULT_OK, intent);
+    		
+    	}
+    	
+    */ 
+    
     
     
     public void cancel(View view) {

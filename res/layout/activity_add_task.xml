@@ -4,35 +4,108 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingLeft="16dp"
-    android:paddingRight="16dp">
-    
-    <TextView android:id="@+id/text_task_name"
+    android:paddingRight="16dp" >
+
+    <TextView
+        android:id="@+id/text_task_name"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:text="@string/text_task_name" />
 
-    <EditText android:id="@+id/edit_task_name"
+    <EditText
+        android:id="@+id/edit_task_name"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/text_task_name"
+        android:hint="@string/edit_task_name"
+        android:inputType="textCapSentences" />
+
+    <EditText
+        android:id="@+id/add_task_notes"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="70dp"
+        android:hint="@string/add_task_notes"
         android:inputType="textCapSentences"
-        android:hint="@string/edit_task_name" />
-    
-    <Button android:id="@+id/button_cancel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/edit_task_name"
-        android:layout_alignParentRight="true"
-        android:text="@string/button_cancel"
-        android:onClick="cancel" />
-    
-    <Button android:id="@+id/button_create_task"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/edit_task_name"
-        android:layout_toLeftOf="@id/button_cancel"
-        android:text="@string/button_add_task"
+        android:maxLength="1500"
         android:onClick="addTask" />
 
+    <TextView
+        android:id="@+id/priority_title"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/add_task_notes"
+        android:layout_below="@+id/add_task_notes"
+        android:text="@string/pirority_title" />
+
+    <RadioGroup
+        android:id="@+id/radiogroup"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@id/priority_title"
+        android:layout_below="@+id/priority_title"
+        android:orientation="horizontal" >
+
+        <RadioButton
+            android:id="@+id/radiobutton1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/priority_trivial" />
+
+        <RadioButton
+            android:id="@+id/radiobutton2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/priority_normal" />
+
+        <RadioButton
+            android:id="@+id/radiobutton3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/priority_urgent" />
+    </RadioGroup>
+
+    <DatePicker
+        android:id="@+id/datePickerStart"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/radiogroup" />
+   
+    <Button
+        android:id="@+id/button_create_task"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/datePickerStart"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="70dp"
+        android:onClick="addTask"
+        android:text="@string/button_add_task" />
+
+    <Button
+        android:id="@+id/button_cancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/button_create_task"
+        android:layout_alignBottom="@+id/button_create_task"
+        android:layout_toRightOf="@+id/button_create_task"
+        android:onClick="cancel"
+        android:text="@string/button_cancel" />
+
+    <TimePicker
+        android:id="@+id/timePicker1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/radiogroup"
+        android:layout_alignTop="@+id/datePickerStart" />
+
+    <DatePicker
+        android:id="@+id/datePicker1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/button_create_task"
+        android:layout_below="@+id/timePicker1" />
+
 </RelativeLayout>
+    

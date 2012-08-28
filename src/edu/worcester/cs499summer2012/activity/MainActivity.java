@@ -2,7 +2,6 @@
  * MainActivity.java
  * 
  * @todo
- * I'm not 100% sure what this class is doing, next meetin confirm before I document this.
  * 
  * 
  * @author	Jonathan Hasenzahl
@@ -115,7 +114,8 @@ public class MainActivity extends ListActivity {
     }
     
     /**
-     * save the task into a file to reference later.
+     * @param eol string to represent the end of line character.
+     * @param file bufferwriter to write the contents to a txt file to reference on restart
      */
     private void writeTasksToFile() {
     	String eol = System.getProperty("line.separator");

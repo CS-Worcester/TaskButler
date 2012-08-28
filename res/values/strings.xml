@@ -16,5 +16,12 @@
     <string name="edit_task_name">Enter task name</string>
     <string name="button_create_task">Create New Task</string>
     <string name="button_cancel">Cancel</string>
+    <string name="button_set_priority">Priority</string>
+    <string name="add_task_notes">Task Notes</string>
+    <string name="priority_trivial">Trivial</string>
+    <string name="priority_normal">Normal</string>
+    <string name="priority_urgent">Urgent</string>
+    <string name="pirority_title">Select the priority of the task</string>
+    
     
 </resources>

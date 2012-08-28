@@ -1,5 +1,12 @@
 /**
  * TaskArrayAdapter.java
+ *
+ *@file
+ *Takes each element of the array and converts to xml using the getview() method.
+ *@author Jonathan Hasenzahl
+ *@author James Celona
+ *@version 1.0 dev
+ *
  * 
  * Copyright 2012 Jonathan Hasenzahl
  * 
@@ -47,6 +54,10 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 	}
 	
 	@Override
+	/**
+	 * @return
+	 * the current row being viewed.  
+	 */
 	public View getView(int position, View convert_view, ViewGroup parent) {
 		View row_view = convert_view;
 		if (row_view == null) {

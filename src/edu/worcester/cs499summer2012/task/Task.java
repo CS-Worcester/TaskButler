@@ -2,11 +2,11 @@
  * Task.java
  * 
  * @file
- * The class that actually constructs the task itself.
+ * The class that actually constructs the task itself
  * 
  * @author Jonathan Hasenzahl
  * @author James Celona
- * @param 	
+ * @param  
  * Copyright 2012 Jonathan Hasenzahl
  * 
  * This program is free software: you can redistribute it and/or modify
@@ -37,14 +37,15 @@ public class Task implements Parcelable {
 	public static final int NAME = 0;
 	public static final int IS_COMPLETED = 1;
 	public static final int PRIORITY = 2;
-	private static final String DIV = "%%";
-	//Any reason this variable is named string?
+	public static final int NOTES = 0;
+	private static final String DIV = "%%";  //assuming no one ever has %% in their task
 	public static Task parseTask(String string) {
 		String[] tokens = string.split(DIV);
 		return new Task(tokens[NAME], 
 				Boolean.parseBoolean(tokens[IS_COMPLETED]),
-    			Integer.parseInt(tokens[PRIORITY]));
-	}
+    			Integer.parseInt(tokens[PRIORITY]),
+    			tokens[NOTES]);	
+	}	
 	
 	/*
 	 * Class fields
@@ -53,33 +54,35 @@ public class Task implements Parcelable {
 	private String name;
 	private boolean is_completed;
 	private int priority;
+	private String notes;
 	
 	/**
 	 * Constructors 
 	 */ 
 	
 	public Task() {
-		this("Untitled task", false, TaskPriority.NORMAL);
+		this("Untitled task", false, TaskPriority.NORMAL, "No Description Available");
 	}
 
 	public Task(String task_name) {
-		this(task_name, false, TaskPriority.NORMAL);
+		this(task_name, false, TaskPriority.NORMAL, null);
 	}
 	
-	public Task(String task_name, boolean is_completed, int priority) {
+	public Task(String task_name, boolean is_completed, int priority, String notes) {
 		this.name = task_name;
 		this.is_completed = is_completed;
 		this.priority = priority;
+		this.notes = notes;
 	}
 	
 	public Task(Task task) {
-		this(task.getName(), task.getIsCompleted(), task.getPriority());
+		this(task.getName(), task.getIsCompleted(), task.getPriority(), task.getNotes());
 	}
 	
 	/*
 	 * Class methods 
 	 */ 	
-
+	
 	@Override
 	public boolean equals(Object o) {
 		if (o == this)
@@ -97,7 +100,7 @@ public class Task implements Parcelable {
 	@Override
 	public String toString() {
 		return new String(name + DIV + Boolean.toString(is_completed) + DIV + 
-				Integer.toString(priority));
+				Integer.toString(priority)+ notes);
 	}
 
 	/*
@@ -113,6 +116,7 @@ public class Task implements Parcelable {
 		out.writeString(name);
 		out.writeString(Boolean.toString(is_completed));
 		out.writeInt(priority);
+		out.writeString(notes);
 	}
 	
 	public static final Parcelable.Creator<Task> CREATOR = new Parcelable.Creator<Task>() {
@@ -129,6 +133,7 @@ public class Task implements Parcelable {
 		name = in.readString();
 		is_completed = Boolean.parseBoolean(in.readString());
 		priority = in.readInt();
+		notes = in.readString();
 	}
 	
 	
@@ -185,4 +190,22 @@ public class Task implements Parcelable {
 	public void toggleIsCompleted() {
 		is_completed = is_completed ? false : true;
 	}
+
+	/**
+	 * accessor methods for notes
+	 * @return the notes from the app
+	 */
+	
+	public String getNotes() {
+		return notes;
+	}
+	/**
+	 * setter for notes.
+	 * @param notes a string that describes the task that is going to be attempted.
+	 */
+	public void setNotes(String notes) {
+			this.notes = notes;
+		
+	}
 }
+

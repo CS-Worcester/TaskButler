@@ -2,3 +2,6 @@ CS499Summer2012
 ===============
 
 Android App development project CS 499 Summer 2012
+This app is going to be a minimalist style calendar event system handler, 
+utilizing a .txt file for storage the tasks will contain information such as:
+name, date, priority, notes and others as the app progresses.
