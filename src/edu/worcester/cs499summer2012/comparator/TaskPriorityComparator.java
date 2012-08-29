@@ -1,14 +1,7 @@
 /**
- * TaskCompletionComparator.java
+ * TaskPriorityComparator.java
  * 
- * @file
- * Simple class to confirm completion of a task.
- * @author Jonathan Hasenzahl
- * @author James Celona
- * @verion 1.0 dev
- * 
- * 
- * Copyright 2012 Jonathan Hasenzahl
+ * Copyright 2012 Worcester State University
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,25 +17,32 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package edu.worcester.cs499summer2012.task;
+package edu.worcester.cs499summer2012.comparator;
 
 import java.util.Comparator;
 
+import edu.worcester.cs499summer2012.task.Task;
 
-public class TaskCompletionComparator implements Comparator<Task> {
-
+/**
+ * Comparator for sorting tasks by priority.
+ * @author Jonathan Hasenzahl
+ */
+public class TaskPriorityComparator implements Comparator<Task> {
+	
 	/**
-	 * @param lhs The left hand side boolean value of a task
-	 * @param rhs the left hand side boolean value of a task
-	 * 
-	 */
+	 * Compares two tasks by their priorities. Tasks with a higher priority
+	 * come before tasks with a lower priority.
+	 * @param lhs the first task
+	 * @param rhs the second task
+	 * @return 0 if the tasks have the same priority; -1 if the first task has
+	 *         a higher priority; 1 otherwise
+	 */	
 	public int compare(Task lhs, Task rhs) {
-		if (!lhs.getIsCompleted() && rhs.getIsCompleted())
-			return -1;
-		else if (lhs.getIsCompleted() && !rhs.getIsCompleted())
-			return 1;
-		else
+		if (lhs.getPriority() == rhs.getPriority())
 			return 0;
+		else if (lhs.getPriority() > rhs.getPriority())
+			return -1;
+		else
+			return 1;
 	}
-
 }

@@ -1,13 +1,6 @@
 /**
  * MainActivity.java
  * 
- * @todo
- * 
- * 
- * @author	Jonathan Hasenzahl
- * @author James Celona
- * @version 1.0 dev
- * 
  * Copyright 2012 Jonathan Hasenzahl
  * 
  * This program is free software: you can redistribute it and/or modify
@@ -39,10 +32,16 @@ import android.view.View;
 import android.widget.ListView;
 import edu.worcester.cs499summer2012.R;
 import edu.worcester.cs499summer2012.adapter.TaskListAdapter;
+import edu.worcester.cs499summer2012.comparator.TaskCompletionComparator;
 import edu.worcester.cs499summer2012.task.Task;
-import edu.worcester.cs499summer2012.task.TaskCompletionComparator;
 import edu.worcester.cs499summer2012.task.TaskList;
 
+/**
+ * Main app activity. Displays current task list and allows user to access
+ * task creation, task modification, and task sorting activities.
+ * @author Jonathan Hasenzahl
+ * @author James Celona
+ */
 public class MainActivity extends ListActivity {
 	
 	public static final int ADD_TASK_REQUEST = 0;
@@ -52,7 +51,6 @@ public class MainActivity extends ListActivity {
     private final String TASK_FILE_NAME = "tasks";
 
     @Override
-    
 	protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -86,11 +84,19 @@ public class MainActivity extends ListActivity {
     	}
     }
     
+    /**
+     * This method is called when the user clicks the Add Task button. The
+     * AddTaskActivity is started to get back an intent with the new task.
+     * @param view The view from which the user called this method
+     */
     public void getNewTask(View view) {
     	startActivityForResult(new Intent(this, AddTaskActivity.class), 
     			ADD_TASK_REQUEST);
     }
     
+    /**
+     * Reads tasks from a text file and populates a TaskList.
+     */
     private void readTasksFromFile() {
     	BufferedReader file = null;
     	try {
@@ -114,8 +120,7 @@ public class MainActivity extends ListActivity {
     }
     
     /**
-     * @param eol string to represent the end of line character.
-     * @param file bufferwriter to write the contents to a txt file to reference on restart
+     * Writes the contents of a TaskList to a text file.
      */
     private void writeTasksToFile() {
     	String eol = System.getProperty("line.separator");

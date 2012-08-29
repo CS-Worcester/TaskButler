@@ -1,14 +1,7 @@
 /**
- * TaskArrayAdapter.java
+ * TaskListAdapter.java
  *
- *@file
- *Takes each element of the array and converts to xml using the getview() method.
- *@author Jonathan Hasenzahl
- *@author James Celona
- *@version 1.0 dev
- *
- * 
- * Copyright 2012 Jonathan Hasenzahl
+ * Copyright 2012 Worcester State University
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,8 +28,13 @@ import android.widget.TextView;
 import edu.worcester.cs499summer2012.R;
 import edu.worcester.cs499summer2012.task.Task;
 import edu.worcester.cs499summer2012.task.TaskList;
-import edu.worcester.cs499summer2012.task.TaskPriority;
 
+/**
+ * ListView adapter for the TaskList container. Enables tasks in a TaskList
+ * to be viewed in a ListView. Also allows for list sorting using task 
+ * comparators.
+ * @author Jonathan Hasenzahl
+ */
 public class TaskListAdapter extends ArrayAdapter<Task> {
 
 	private final Activity activity;
@@ -47,6 +45,12 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 		public TextView priority;
 	}
 	
+	/**
+	 * Default constructor. Creates a new TaskListAdapter containing a TaskList
+	 * and assigned to an Activity.
+	 * @param activity the Activity that owns this adapter
+	 * @param tasks the TaskList handled by this adapter
+	 */
 	public TaskListAdapter(Activity activity, TaskList tasks) {
 		super(activity, R.layout.row_layout, tasks);
 		this.activity = activity;
@@ -55,8 +59,13 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 	
 	@Override
 	/**
-	 * @return
-	 * the current row being viewed.  
+	 * This method is called automatically when the user scrolls the ListView.
+	 * Updates the View of a single visible row, reflecting the list being 
+	 * scrolled by the user.
+	 * @param position the index of the TaskList
+	 * @param convert_view the View to be updated
+	 * @param parent the parent ViewGroup of convert_view
+	 * @return the updated View
 	 */
 	public View getView(int position, View convert_view, ViewGroup parent) {
 		View row_view = convert_view;
@@ -74,7 +83,7 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 		ViewHolder holder = (ViewHolder) row_view.getTag();
 		Task task = tasks.get(position);
 		holder.name.setText(task.getName());
-		holder.priority.setText(TaskPriority.LABELS[task.getPriority()]);
+		holder.priority.setText(Task.LABELS[task.getPriority()]);
 		
 		if (!tasks.get(position).getIsCompleted()) {
 			holder.name.setTextAppearance(getContext(), 

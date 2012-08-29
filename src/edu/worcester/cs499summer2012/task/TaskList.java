@@ -1,11 +1,7 @@
 /**
  * TaskList.java
  * 
- * @TODO
- * What is this class doing?
- * 
- * 
- * Copyright 2012 Jonathan Hasenzahl
+ * Copyright 2012 Worcester State University
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,10 +22,28 @@ package edu.worcester.cs499summer2012.task;
 
 import java.util.ArrayList;
 
+/**
+ * Wrapper class for ArrayList&#60;Task&#62;
+ * @author Jonathan Hasenzahl
+ */
 public class TaskList extends ArrayList<Task> {
 
+	/**
+	 * Default constructor. Creates an empty TaskList with 0 elements.
+	 */
 	public TaskList() {
 		super(0);
+	}
+	
+	/**
+	 * Copy constructor.
+	 * @param task_list the TaskList to be copied
+	 */
+	public TaskList(TaskList task_list) {
+		super(0);
+		for (Task task : task_list) {
+			super.add(new Task(task));
+		}
 	}
 
 	/**

@@ -1,14 +1,6 @@
 /**
  * Task.java
  * 
- * @file
- * The class that actually constructs the task itself
- * 
- * @author Jonathan Hasenzahl
- * @author James Celona
- * @param  
- * Copyright 2012 Jonathan Hasenzahl
- * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -28,18 +20,39 @@ package edu.worcester.cs499summer2012.task;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+/**
+ * Represents a single task. A task contains information such as a name,
+ * completion status, and due date. Tasks are parcelable so they can be
+ * bundled with intents and passed between activities.
+ * @author Jonathan Hasenzahl
+ * @author James Celona
+ */
 public class Task implements Parcelable {
 	
 	/*
 	 * Static fields and methods
 	 */
-	
+
+	// Token indexes
 	public static final int NAME = 0;
 	public static final int IS_COMPLETED = 1;
 	public static final int PRIORITY = 2;
 	public static final int NOTES = 3;
+	
+	// Priority labels and indexes
+	public static final String[] LABELS = {"Trivial", "Normal", "Urgent"};
+	public static final int TRIVIAL = 0;
+	public static final int NORMAL = 1;
+	public static final int URGENT = 2;	
+
+	// Token divider for file i/o
 	private static final String DIV = "%DIV%";
 	
+	/**
+	 * Creates a new task from a string. Used for reading tasks from a file.
+	 * @param string the string to be parsed
+	 * @return a new task derived from the parsed string
+	 */
 	public static Task parseTask(String string) {
 		String[] tokens = string.split(DIV);
 		
@@ -66,10 +79,14 @@ public class Task implements Parcelable {
 	private int priority;
 	private String notes;
 	
+
 	/**
-	 * Constructors 
-	 */ 
-	
+	 * Default constructor. Creates a new task based on the supplied arguments.
+	 * @param task_name the name of the task
+	 * @param is_completed whether or not the task is completed
+	 * @param priority the priority of the task
+	 * @param notes task notes
+	 */
 	public Task(String task_name, boolean is_completed, int priority, String notes) {
 		this.name = task_name;
 		this.is_completed = is_completed;
@@ -77,6 +94,10 @@ public class Task implements Parcelable {
 		this.notes = notes;
 	}
 	
+	/**
+	 * Copy constructor.
+	 * @param task the Task to be copied
+	 */
 	public Task(Task task) {
 		this(task.getName(), task.getIsCompleted(), task.getPriority(), task.getNotes());
 	}
@@ -86,6 +107,12 @@ public class Task implements Parcelable {
 	 */ 	
 	
 	@Override
+	/**
+	 * Compares this object to another. To return true, the compared object must
+	 * have the same class and identical private fields.
+	 * @param o the object to be compared with
+	 * @return true if the objects are equal, false otherwise
+	 */
 	public boolean equals(Object o) {
 		if (o == this)
 			return true;
@@ -93,13 +120,25 @@ public class Task implements Parcelable {
 			return false;
 		if (o.getClass() != this.getClass())
 			return false;
-		else {
-			Task t = (Task) o;
-			return this.name.equals(t.name);
-		}
+		
+		Task t = (Task) o;
+		if (!this.name.equals(t.name))
+			return false;
+		if (this.is_completed != t.is_completed)
+			return false;
+		if (this.priority != t.priority)
+			return false;
+		if (!this.notes.equals(t.notes))
+			return false;
+		
+		return true;
 	}
 	
 	@Override
+	/**
+	 * Returns a string representation of the class. Used for writing to file.
+	 * return a string representation of the class
+	 */
 	public String toString() {
 		String to_string = name + DIV + Boolean.toString(is_completed) + DIV + 
 				Integer.toString(priority);
@@ -114,12 +153,22 @@ public class Task implements Parcelable {
 	/*
 	 * Parcelable methods
 	 */
-	
+	/**
+	 * Empty & unused method. Required for implementing Parcelable.
+	 * @return 0
+	 * @see Parcelable
+	 */
 	public int describeContents() {
 		// TODO Auto-generated method stub
 		return 0;
 	}
 	
+	/**
+	 * Converts task to a parcel.
+	 * @param out the parcel the task will be written to
+	 * @param flags unused
+	 * @see Parcelable
+	 */
 	public void writeToParcel(Parcel out, int flags) {
 		out.writeString(name);
 		out.writeString(Boolean.toString(is_completed));
@@ -144,76 +193,45 @@ public class Task implements Parcelable {
 		notes = in.readString();
 	}
 	
-	
-	/**
-	 * 
-	 * @return the name of the task.
+	/*
+	 * Getters and setters
 	 */
+	
 	public String getName() {
 		return name;
 	}
-	/**
-	 * 
-	 * @param task_name the name of the task.
-	 */
 	
 	public void setName(String task_name) {
 		this.name = task_name;
 	}
 	
-	/**
-	 * @return the priority of the task.
-	 */
 	public int getPriority() {
 		return priority;
 	}
-	/**
-	 * 
-	 * @param priority the priority of the task.
-	 */
+
 	public void setPriority(int priority) {
-		if (priority >= TaskPriority.TRIVIAL && priority <= TaskPriority.URGENT)
+		if (priority >= TRIVIAL && priority <= URGENT)
 			this.priority = priority;
 	}
-	/**
-	 * 
-	 * @return weather the task is completed or not
-	 */
 	
 	public boolean getIsCompleted() {
 		return is_completed;
 	}
-	/**
-	 * 
-	 * @param is_completed boolean value representing the completion of a task.
-	 */
+
 	public void setIsCompleted(boolean is_completed) {
 		this.is_completed = is_completed;
 	}
 	
-	/**
-	 * Toggle the task as completed if not already.
-	 */
-	
 	public void toggleIsCompleted() {
 		is_completed = is_completed ? false : true;
 	}
-
-	/**
-	 * accessor methods for notes
-	 * @return the notes from the app
-	 */
 	
 	public String getNotes() {
 		return notes;
 	}
-	/**
-	 * setter for notes.
-	 * @param notes a string that describes the task that is going to be attempted.
-	 */
+
 	public void setNotes(String notes) {
-			this.notes = notes;
-		
+		this.notes = notes;		
 	}
 }
 

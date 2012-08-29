@@ -28,7 +28,6 @@ import android.widget.RadioGroup;
 import android.widget.Toast;
 import edu.worcester.cs499summer2012.R;
 import edu.worcester.cs499summer2012.task.Task;
-import edu.worcester.cs499summer2012.task.TaskPriority;
 
 /**
  * Activity for adding a new task.
@@ -42,12 +41,8 @@ public class AddTaskActivity extends Activity {
 	 */
 	public final static String EXTRA_TASK = "edu.worcester.cs499summer2012.TASK";
 
-	/**
-	 * This method is called automatically when the activity is created. It sets
-	 * the view of the activity.
-	 */
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_task);
     }
@@ -76,14 +71,14 @@ public class AddTaskActivity extends Activity {
     	
     	switch (task_priority.getCheckedRadioButtonId()) {
     	case R.id.radio_urgent:
-    		priority = TaskPriority.URGENT;
+    		priority = Task.URGENT;
     		break;
     	case R.id.radio_trivial:
-    		priority = TaskPriority.TRIVIAL;
+    		priority = Task.TRIVIAL;
     		break;
     	case R.id.radio_normal:
     	default:
-    		priority = TaskPriority.NORMAL;
+    		priority = Task.NORMAL;
     		break;    		
     	}
     	
