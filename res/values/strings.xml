@@ -10,18 +10,18 @@
     <string name="text_empty_list">No tasks found.\nClick the button below to create a task!</string>
     <string name="button_add_task">Create New Task</string>
     
-    <!-- New Task Activity -->
+    <!-- Add Task Activity -->
     <string name="title_activity_add_task">Create New Task</string>
-    <string name="text_task_name">Task name</string>
+    <string name="text_task_name">Task name</string> 
+    <string name="text_task_priority">Task priority</string>
+    <string name="text_task_due">Due date and time</string> 
+    <string name="text_task_notes">Notes</string>   	   
     <string name="edit_task_name">Enter task name</string>
-    <string name="button_create_task">Create New Task</string>
-    <string name="button_cancel">Cancel</string>
-    <string name="button_set_priority">Priority</string>
-    <string name="add_task_notes">Task Notes</string>
-    <string name="priority_trivial">Trivial</string>
-    <string name="priority_normal">Normal</string>
-    <string name="priority_urgent">Urgent</string>
-    <string name="pirority_title">Select the priority of the task</string>
-    
+    <string name="edit_task_notes">You can enter notes here</string>
+    <string name="radio_trivial">Trivial</string>
+    <string name="radio_normal">Normal</string>
+    <string name="radio_urgent">Urgent</string>
+    <string name="button_create_task">Create new task</string>
+    <string name="button_cancel">Cancel</string>    
     
 </resources>

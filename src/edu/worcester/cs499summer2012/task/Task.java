@@ -38,14 +38,23 @@ public class Task implements Parcelable {
 	public static final int IS_COMPLETED = 1;
 	public static final int PRIORITY = 2;
 	public static final int NOTES = 3;
-	private static final String DIV = "%%";  //assuming no one ever has %% in their task
+	private static final String DIV = "%DIV%";
 	
 	public static Task parseTask(String string) {
 		String[] tokens = string.split(DIV);
-		return new Task(tokens[NAME], 
-				Boolean.parseBoolean(tokens[IS_COMPLETED]),
-    			Integer.parseInt(tokens[PRIORITY]),
-    			tokens[NOTES]);	
+		
+		String name = tokens[NAME];
+		boolean is_completed = Boolean.parseBoolean(tokens[IS_COMPLETED]);
+		int priority = Integer.parseInt(tokens[PRIORITY]);
+		String notes;
+		
+		// Notes are optional, so there may not be any notes to parse
+		if (tokens.length < 4)
+			notes = null;
+		else
+			notes = tokens[NOTES];
+		
+		return new Task(name, is_completed, priority, notes);
 	}	
 	
 	/*
@@ -60,14 +69,6 @@ public class Task implements Parcelable {
 	/**
 	 * Constructors 
 	 */ 
-	
-	public Task() {
-		this("Untitled task", false, TaskPriority.NORMAL, "No Description Available");
-	}
-
-	public Task(String task_name) {
-		this(task_name, false, TaskPriority.NORMAL, null);
-	}
 	
 	public Task(String task_name, boolean is_completed, int priority, String notes) {
 		this.name = task_name;
@@ -100,8 +101,14 @@ public class Task implements Parcelable {
 	
 	@Override
 	public String toString() {
-		return new String(name + DIV + Boolean.toString(is_completed) + DIV + 
-				Integer.toString(priority) + DIV + notes);
+		String to_string = name + DIV + Boolean.toString(is_completed) + DIV + 
+				Integer.toString(priority);
+		
+		// Notes are optional, so only write to file if they exist
+		if (notes != null)
+			to_string += DIV + notes;
+		
+		return to_string;
 	}
 
 	/*

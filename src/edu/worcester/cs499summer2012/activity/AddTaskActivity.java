@@ -1,14 +1,7 @@
 /**
- * NewTaskActivity.java
+ * AddTaskActivity.java
  * 
- * @file
- * This is the class to add tasks to the for the application.
- * @author James Celona
- * @author Jonathan Hasenzahl 
- * @version 1.0 dev
- * 
- * 
- * Copyright 2012 Jonathan Hasenzahl
+ * Copyright 2012 Worcester State University
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,50 +15,102 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
- * 
  */
 
 package edu.worcester.cs499summer2012.activity;
 
-import edu.worcester.cs499summer2012.R;
-import edu.worcester.cs499summer2012.task.Task;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.RadioGroup;
 import android.widget.Toast;
+import edu.worcester.cs499summer2012.R;
+import edu.worcester.cs499summer2012.task.Task;
+import edu.worcester.cs499summer2012.task.TaskPriority;
 
+/**
+ * Activity for adding a new task.
+ * @author Jonathan Hasenzahl
+ * @author James Celona
+ */
 public class AddTaskActivity extends Activity {
 	
+	/**
+	 * Label for the extra task parcel which will be added to the returned intent
+	 */
 	public final static String EXTRA_TASK = "edu.worcester.cs499summer2012.TASK";
 
+	/**
+	 * This method is called automatically when the activity is created. It sets
+	 * the view of the activity.
+	 */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_task);
     }
-      
+    
+    /**
+     * This method is called when the user clicks the OK button. A new task is
+     * created based on user input. The task is added as an extra parcel to a 
+     * return intent, and the activity finishes.
+     * @param view The view from which the user called this method
+     */
     public void addTask(View view) {
-    	Intent intent = new Intent(this, MainActivity.class);
-    	EditText edit_text = (EditText) findViewById(R.id.edit_task_name);
-    	edit_text=(EditText) findViewById(R.id.edit_task_name);   
-    	EditText edit_text2 = (EditText) findViewById(R.id.add_task_notes);    	
-    	Task task = new Task(edit_text.getText().toString(), false, 0, edit_text2.getText().toString());   	 
-    						
+    	// Get task name
+    	EditText task_name = (EditText) findViewById(R.id.edit_task_name);
+    	String name = task_name.getText().toString();
     	
-    	if (!task.getName().equals("")) {
-	    	intent.putExtra(EXTRA_TASK, task);
-	    	setResult(RESULT_OK, intent);
-	    	finish();
+    	// If there is no task name, don't create the task
+    	if (name.equals(""))
+    	{
+    		Toast.makeText(this, "Task needs a name!", Toast.LENGTH_SHORT).show();
+    		return;
     	}
-    	else {
-    		Toast.makeText(this, "Task needs a name!", 
-    				Toast.LENGTH_SHORT).show();
+    	
+    	// Get task priority
+    	RadioGroup task_priority = (RadioGroup) findViewById(R.id.radiogroup_task_priority);
+    	int priority;
+    	
+    	switch (task_priority.getCheckedRadioButtonId()) {
+    	case R.id.radio_urgent:
+    		priority = TaskPriority.URGENT;
+    		break;
+    	case R.id.radio_trivial:
+    		priority = TaskPriority.TRIVIAL;
+    		break;
+    	case R.id.radio_normal:
+    	default:
+    		priority = TaskPriority.NORMAL;
+    		break;    		
     	}
+    	
+    	// Get task notes
+    	EditText task_notes = (EditText) findViewById(R.id.edit_task_notes);
+    	String notes = task_notes.getText().toString();
+    	if (notes.equals(""))
+    		notes = null;
+    	
+    	
+    	// Create the task
+    	Task task = new Task(name, false, priority, notes);
+    	
+    	// Create the return intent and add the task
+    	Intent intent = new Intent(this, MainActivity.class);    	
+    	intent.putExtra(EXTRA_TASK, task);
+	    
+    	// Set the return result to OK and finish the activity
+    	setResult(RESULT_OK, intent);
+	    finish();
     }
     
+    /**
+     * This method is called when the user clicks the cancel button. The 
+     * activity finishes without adding a new task.
+     * @param view The view from which the user called this method
+     */
     public void cancel(View view) {
     	setResult(RESULT_CANCELED);
     	finish();
