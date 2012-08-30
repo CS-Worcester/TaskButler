@@ -25,11 +25,19 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 
+import android.app.AlertDialog;
 import android.app.ListActivity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ListView;
+import android.widget.Toast;
 import edu.worcester.cs499summer2012.R;
 import edu.worcester.cs499summer2012.adapter.TaskListAdapter;
 import edu.worcester.cs499summer2012.comparator.TaskCompletionComparator;
@@ -53,11 +61,21 @@ public class MainActivity extends ListActivity {
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        
+        // Assign the layout to this activity
         setContentView(R.layout.activity_main);
-    	tasks = new TaskList();
+    	
+        // Create a task list and read contents from file
+        tasks = new TaskList();
     	readTasksFromFile();
+    	
+    	// Create an adapter for the task list
 		adapter = new TaskListAdapter(this, tasks);
     	setListAdapter(adapter);
+    	
+    	// Enable long-pressing the list view to pop up a context menu
+    	ListView list = getListView();
+    	registerForContextMenu(list);
     }
     
     @Override
@@ -72,6 +90,50 @@ public class MainActivity extends ListActivity {
     	tasks.get(position).toggleIsCompleted();
     	adapter.sort(new TaskCompletionComparator());
     	adapter.notifyDataSetChanged();
+    }
+    
+    @Override
+	public void onCreateContextMenu(ContextMenu menu, View view, 
+			ContextMenuInfo info) {
+    	super.onCreateContextMenu(menu, view, info);
+    	MenuInflater inflater = getMenuInflater();
+    	inflater.inflate(R.menu.context_edit_delete_task, menu);
+    	
+    }
+    
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+    	AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
+    	final int position = info.position;
+    	
+    	switch (item.getItemId()) {
+    	case R.id.context_edit_task:
+    		toast("Coming soon!");
+    		return true;
+    	
+    	case R.id.context_delete_task:
+    		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+    		builder.setMessage("Are you sure you want to delete?")
+    		       .setCancelable(false)
+    		       .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+    		    	   public void onClick(DialogInterface dialog, int id) {
+    		    		   tasks.remove(position);
+    		    		   adapter.notifyDataSetChanged();
+    		    		   toast("Task deleted");
+    		    	   }
+    		       })
+    		       .setNegativeButton("No", new DialogInterface.OnClickListener() {
+    		    	   public void onClick(DialogInterface dialog, int id) {
+    		    		   dialog.cancel();
+    		    	   }
+    		       });
+			AlertDialog alert = builder.create();
+			alert.show();
+    		return true;
+    	
+    	default:
+    		return super.onContextItemSelected(item);	
+    	}
     }
     
     @Override
@@ -147,4 +209,14 @@ public class MainActivity extends ListActivity {
     	}
     }
     
+    /**
+     * This is a convenience method which displays a message in a Toast
+     * notification for a short duration.
+     * @param message the message to be displayed
+     */
+    private void toast(String message)
+    {
+    	Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    }
+
 }

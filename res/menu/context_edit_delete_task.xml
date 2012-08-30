@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item android:id="@+id/context_edit_task"
+		android:title="@string/context_edit_task"
+		android:showAsAction="always" />
+		    
+    <item android:id="@+id/context_delete_task"
+		android:title="@string/context_delete_task"
+	    android:showAsAction="always" />    
+    
+</menu>
