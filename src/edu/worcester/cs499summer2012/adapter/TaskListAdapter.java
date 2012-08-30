@@ -43,6 +43,8 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 	static class ViewHolder {
 		public TextView name;
 		public TextView priority;
+		public TextView date_due;
+		public TextView is_completed;
 	}
 	
 	/**
@@ -52,7 +54,7 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 	 * @param tasks the TaskList handled by this adapter
 	 */
 	public TaskListAdapter(Activity activity, TaskList tasks) {
-		super(activity, R.layout.row_layout, tasks);
+		super(activity, R.layout.row_task, tasks);
 		this.activity = activity;
 		this.tasks = tasks;
 	}
@@ -71,12 +73,16 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 		View row_view = convert_view;
 		if (row_view == null) {
 			LayoutInflater inflater = activity.getLayoutInflater();
-			row_view = inflater.inflate(R.layout.row_layout, null);
+			row_view = inflater.inflate(R.layout.row_task, null);
 			ViewHolder view_holder = new ViewHolder();
 			view_holder.name = (TextView) 
 					row_view.findViewById(R.id.text_row_name);
 			view_holder.priority = (TextView)
 					row_view.findViewById(R.id.text_row_priority);
+			view_holder.date_due = (TextView)
+					row_view.findViewById(R.id.text_row_date_due);
+			view_holder.is_completed = (TextView)
+					row_view.findViewById(R.id.text_row_is_completed);
 			row_view.setTag(view_holder);
 		}
 
@@ -84,6 +90,13 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 		Task task = tasks.get(position);
 		holder.name.setText(task.getName());
 		holder.priority.setText(Task.LABELS[task.getPriority()]);
+		
+		if (task.getDateDue() != null)
+			holder.date_due.setText(task.getDateDue().getTime().toString());
+		else
+			holder.date_due.setText("No due date");
+		
+		holder.is_completed.setText(task.getIsCompleted() ? "Done" : "Not done");
 		
 		if (!tasks.get(position).getIsCompleted()) {
 			holder.name.setTextAppearance(getContext(), 

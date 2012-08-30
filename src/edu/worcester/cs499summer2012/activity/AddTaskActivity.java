@@ -26,8 +26,10 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.RadioGroup;
+import android.widget.TimePicker;
 import android.widget.Toast;
 import edu.worcester.cs499summer2012.R;
 import edu.worcester.cs499summer2012.task.Task;
@@ -86,9 +88,13 @@ public class AddTaskActivity extends Activity {
     	}
     	
     	// Get task creation date & task due date
-    	// TODO: Implement due dates
+    	DatePicker task_date = (DatePicker) findViewById(R.id.date_task_due);
+    	TimePicker task_time = (TimePicker) findViewById(R.id.time_task_due);
     	Calendar date_created = new GregorianCalendar();
-    	Calendar date_due = null;
+    	Calendar date_due = new GregorianCalendar();
+    	date_due.set(task_date.getYear(), task_date.getMonth(), 
+    			task_date.getDayOfMonth(), task_time.getCurrentHour(), 
+    			task_time.getCurrentMinute());
     	
     	// Get task notes
     	EditText task_notes = (EditText) findViewById(R.id.edit_task_notes);
