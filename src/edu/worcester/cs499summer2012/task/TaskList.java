@@ -21,6 +21,10 @@
 package edu.worcester.cs499summer2012.task;
 
 import java.util.ArrayList;
+import java.util.Comparator;
+
+import edu.worcester.cs499summer2012.comparator.TaskCompletionComparator;
+import edu.worcester.cs499summer2012.comparator.TaskPriorityComparator;
 
 /**
  * Wrapper class for ArrayList&#60;Task&#62;
@@ -28,11 +32,16 @@ import java.util.ArrayList;
  */
 public class TaskList extends ArrayList<Task> {
 
+	private Comparator<Task> completion_comparator;
+	private Comparator<Task> priority_comparator;
+	
 	/**
 	 * Default constructor. Creates an empty TaskList with 0 elements.
 	 */
 	public TaskList() {
 		super(0);
+		completion_comparator = new TaskCompletionComparator();
+		priority_comparator = new TaskPriorityComparator();
 	}
 	
 	/**
@@ -40,10 +49,19 @@ public class TaskList extends ArrayList<Task> {
 	 * @param task_list the TaskList to be copied
 	 */
 	public TaskList(TaskList task_list) {
-		super(0);
+		this();
 		for (Task task : task_list) {
 			super.add(new Task(task));
 		}
+		
+	}
+	
+	public Comparator<Task> completionComparator() {
+		return completion_comparator;
+	}
+	
+	public Comparator<Task> priorityComparator() {
+		return priority_comparator;
 	}
 
 	/**

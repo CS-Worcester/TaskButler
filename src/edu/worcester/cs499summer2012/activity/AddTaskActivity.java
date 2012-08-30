@@ -19,6 +19,9 @@
 
 package edu.worcester.cs499summer2012.activity;
 
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -82,15 +85,22 @@ public class AddTaskActivity extends Activity {
     		break;    		
     	}
     	
+    	// Get task creation date & task due date
+    	// TODO: Implement due dates
+    	Calendar date_created = new GregorianCalendar();
+    	Calendar date_due = null;
+    	
     	// Get task notes
     	EditText task_notes = (EditText) findViewById(R.id.edit_task_notes);
     	String notes = task_notes.getText().toString();
     	if (notes.equals(""))
     		notes = null;
-    	
-    	
+    	    	
     	// Create the task
-    	Task task = new Task(name, false, priority, notes);
+    	Task task = new Task();
+    	task.setName(name).setIsCompleted(false).setPriority(priority)
+    	    .setCreationDate(date_created).setDueDate(date_due)
+    	    .setNotes(notes);
     	
     	// Create the return intent and add the task
     	Intent intent = new Intent(this, MainActivity.class);    	
