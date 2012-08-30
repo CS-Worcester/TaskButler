@@ -2,11 +2,11 @@
 <resources>
     
     <!-- App -->
-    <string name="app_name">Unnamed Tasks App</string>
+    <string name="app_name">Task Butler</string>
     <string name="menu_settings">Settings</string>
     
     <!-- Main Activity -->
-    <string name="title_activity_main">CS499Summer2012 Task Manager</string>
+    <string name="title_activity_main">Task Butler</string>
     <string name="text_empty_list">No tasks found.\nClick the button below to create a task!</string>
     <string name="button_add_task">Create New Task</string>
     

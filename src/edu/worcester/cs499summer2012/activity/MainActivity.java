@@ -1,7 +1,7 @@
-/**
+/*
  * MainActivity.java
  * 
- * Copyright 2012 Jonathan Hasenzahl
+ * Copyright 2012 Jonathan Hasenzahl, James Celona
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
