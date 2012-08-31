@@ -1,7 +1,50 @@
-CS499Summer2012
-===============
+*******************************************************************************
+* TASK BUTLER 0.1 - A task organization app                                   *
+*******************************************************************************
 
-Android App development project CS 499 Summer 2012
-This app is going to be a minimalist style calendar event system handler, 
-utilizing a .txt file for storage the tasks will contain information such as:
-name, date, priority, notes and others as the app progresses.
+**********
+* Notice *
+**********
+
+This app is in its very early stages of development. Much of its functionality
+has yet to be implemented and there are bound to be bugs. If you would like to 
+try our app, we recommend that you run it in an AVD (Android virtual device).
+
+***************
+* Description *
+***************
+
+Task Butler is a task organization app for Android 2.2+. Using Task Butler, you
+can create tasks for your everyday life such as paying bills or picking up the
+dry-cleaning. Tasks can be customized by importance, due date, category, and
+more. Task Butler will notify you when a task is due, and will automatically
+repeat tasks that are recurring (such as bills payments). Keep your life
+organized and never miss an obligation or deadline again with Task Butler!
+
+Task Butler is being developed as part of CS 499 Summer 2012 at Worcester State
+University.
+
+*********************************************
+* Building from source - required libraries *
+*********************************************
+
+ActionBarSherlock - http://actionbarsherlock.com/
+
+***********
+* License *
+***********
+
+Copyright 2012 Jonathan Hasenzahl, James Celona
+ 
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
