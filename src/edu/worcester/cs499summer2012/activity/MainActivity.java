@@ -26,7 +26,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 
 import android.app.AlertDialog;
-import android.app.ListActivity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -38,6 +37,9 @@ import android.view.View;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ListView;
 import android.widget.Toast;
+
+import com.actionbarsherlock.app.SherlockListActivity;
+
 import edu.worcester.cs499summer2012.R;
 import edu.worcester.cs499summer2012.adapter.TaskListAdapter;
 import edu.worcester.cs499summer2012.task.Task;
@@ -49,7 +51,7 @@ import edu.worcester.cs499summer2012.task.TaskList;
  * @author Jonathan Hasenzahl
  * @author James Celona
  */
-public class MainActivity extends ListActivity {
+public class MainActivity extends SherlockListActivity {
 	
 	public static final int ADD_TASK_REQUEST = 0;
 	

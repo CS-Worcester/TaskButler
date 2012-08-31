@@ -22,7 +22,6 @@ package edu.worcester.cs499summer2012.activity;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -31,6 +30,9 @@ import android.widget.EditText;
 import android.widget.RadioGroup;
 import android.widget.TimePicker;
 import android.widget.Toast;
+
+import com.actionbarsherlock.app.SherlockActivity;
+
 import edu.worcester.cs499summer2012.R;
 import edu.worcester.cs499summer2012.task.Task;
 
@@ -39,7 +41,7 @@ import edu.worcester.cs499summer2012.task.Task;
  * @author Jonathan Hasenzahl
  * @author James Celona
  */
-public class AddTaskActivity extends Activity {
+public class AddTaskActivity extends SherlockActivity {
 	
 	/**
 	 * Label for the extra task parcel which will be added to the returned intent
