@@ -96,23 +96,6 @@
 	        android:hint="@string/edit_task_notes"
 	        android:inputType="textCapSentences"
 	        android:maxLength="1500" />
-	   
-	    <Button
-	        android:id="@+id/button_create_task"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:layout_below="@id/edit_task_notes"
-	        android:onClick="addTask"
-	        android:text="@string/button_add_task" />
-	
-	    <Button
-	        android:id="@+id/button_cancel"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:layout_below="@id/edit_task_notes"
-	        android:layout_toRightOf="@id/button_create_task"
-	        android:onClick="cancel"
-	        android:text="@string/button_cancel" />
 	
 	</RelativeLayout>
 

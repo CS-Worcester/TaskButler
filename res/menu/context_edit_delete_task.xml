@@ -2,11 +2,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <item android:id="@+id/context_edit_task"
-		android:title="@string/context_edit_task"
+		android:icon="@drawable/ic_action_edit"
 		android:showAsAction="always" />
 		    
     <item android:id="@+id/context_delete_task"
-		android:title="@string/context_delete_task"
+	    android:icon="@drawable/ic_action_delete"
 	    android:showAsAction="always" />    
     
 </menu>

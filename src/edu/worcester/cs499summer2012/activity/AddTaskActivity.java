@@ -24,7 +24,6 @@ import java.util.GregorianCalendar;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.RadioGroup;
@@ -32,6 +31,9 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
 
 import edu.worcester.cs499summer2012.R;
 import edu.worcester.cs499summer2012.task.Task;
@@ -59,6 +61,12 @@ public class AddTaskActivity extends SherlockActivity {
     }
     
     /**************************************************************************
+     * Private fields                                                         *
+     **************************************************************************/
+    
+    private Intent intent;
+    
+    /**************************************************************************
 	 * Class methods                                                          *
 	 **************************************************************************/
     
@@ -68,7 +76,7 @@ public class AddTaskActivity extends SherlockActivity {
      * return intent, and the activity finishes.
      * @param view The view from which the user called this method
      */
-    public void addTask(View view) {
+    public boolean addTask() {
     	// Get task name
     	EditText task_name = (EditText) findViewById(R.id.edit_task_name);
     	String name = task_name.getText().toString();
@@ -77,7 +85,7 @@ public class AddTaskActivity extends SherlockActivity {
     	if (name.equals(""))
     	{
     		Toast.makeText(this, "Task needs a name!", Toast.LENGTH_SHORT).show();
-    		return;
+    		return false;
     	}
     	
     	// Get task priority
@@ -119,21 +127,43 @@ public class AddTaskActivity extends SherlockActivity {
     	    .setNotes(notes);
     	
     	// Create the return intent and add the task
-    	Intent intent = new Intent(this, MainActivity.class);    	
+    	intent = new Intent(this, MainActivity.class);    	
     	intent.putExtra(EXTRA_TASK, task);
-	    
-    	// Set the return result to OK and finish the activity
-    	setResult(RESULT_OK, intent);
-	    finish();
+    	
+    	return true;
     }
     
-    /**
-     * This method is called when the user clicks the cancel button. The 
-     * activity finishes without adding a new task.
-     * @param view The view from which the user called this method
-     */
-    public void cancel(View view) {
-    	setResult(RESULT_CANCELED);
-    	finish();
+	/**************************************************************************
+	 * Overridden parent methods                                              *
+	 **************************************************************************/
+    
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+    	MenuInflater inflater = getSupportMenuInflater();
+    	inflater.inflate(R.menu.activity_add_task, menu);
+    	return true;
+    }
+    
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+    	switch (item.getItemId()) {
+    	case R.id.menu_confirm:
+    		if (addTask())
+    		{
+    	    	// Set the return result to OK and finish the activity
+    	    	setResult(RESULT_OK, intent);
+    		    finish();
+    		}
+    		return true;
+    		
+    	case R.id.menu_cancel:
+    	case R.id.homeAsUp:
+    		setResult(RESULT_CANCELED);
+    		finish();
+    		return true;
+    		
+    	default:
+    		return false;
+    	}
     }
 }

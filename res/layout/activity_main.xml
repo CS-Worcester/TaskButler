@@ -7,22 +7,13 @@
     <ListView android:id="@android:id/list"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_above="@+id/button_add_task" />
+        android:layout_alignParentTop="true" />
     
     <TextView android:id="@android:id/empty"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:layout_above="@id/button_add_task"
         android:gravity="center"
-        android:text="@string/text_empty_list" />
-    
-    <Button android:id="@id/button_add_task"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:text="@string/button_add_task"
-        android:onClick="getNewTask" />    
+        android:text="@string/text_empty_list" />  
 
 </RelativeLayout>

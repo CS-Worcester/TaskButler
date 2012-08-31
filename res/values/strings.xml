@@ -3,14 +3,10 @@
     
     <!-- App -->
     <string name="app_name">Task Butler</string>
-    <string name="menu_settings">Settings</string>
     
     <!-- Main Activity -->
     <string name="title_activity_main">Task Butler</string>
-    <string name="text_empty_list">No tasks found.\nClick the button below to create a task!</string>
-    <string name="button_add_task">Create New Task</string>
-    <string name="context_edit_task">Edit</string>
-    <string name="context_delete_task">Delete</string>
+    <string name="text_empty_list">No tasks found.\nClick the button above to create a task!</string>
     
     <!-- Add Task Activity -->
     <string name="title_activity_add_task">Create New Task</string>
@@ -23,7 +19,5 @@
     <string name="radio_trivial">Trivial</string>
     <string name="radio_normal">Normal</string>
     <string name="radio_urgent">Urgent</string>
-    <string name="button_create_task">Create new task</string>
-    <string name="button_cancel">Cancel</string>    
     
 </resources>

@@ -75,16 +75,6 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
 	 **************************************************************************/
     
     /**
-     * This method is called when the user clicks the Add Task button. The
-     * AddTaskActivity is started to get back an intent with the new task.
-     * @param view The view from which the user called this method
-     */
-    public void getNewTask(View view) {
-    	startActivityForResult(new Intent(this, AddTaskActivity.class), 
-    			ADD_TASK_REQUEST);
-    }
-    
-    /**
      * Reads tasks from a text file and populates a TaskList.
      */
     private void readTasksFromFile() {
@@ -172,6 +162,30 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
 	public void onStop() {
     	writeTasksToFile();
     	super.onStop();
+    }
+    
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+    	MenuInflater inflater = getSupportMenuInflater();
+    	inflater.inflate(R.menu.activity_main, menu);
+    	return true;
+    }
+    
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+    	switch (item.getItemId()) {
+    	case R.id.menu_add_task:
+    		startActivityForResult(new Intent(this, AddTaskActivity.class), 
+        			ADD_TASK_REQUEST);
+    		return true;
+    		
+    	case R.id.menu_settings:
+    		toast("Settings coming soon!");
+    		return true;
+    		
+    	default:
+    		return false;
+    	}
     }
     
     @Override
