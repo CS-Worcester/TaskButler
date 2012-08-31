@@ -24,6 +24,9 @@ import java.util.ArrayList;
 import java.util.Comparator;
 
 import edu.worcester.cs499summer2012.comparator.TaskCompletionComparator;
+import edu.worcester.cs499summer2012.comparator.TaskDateCreatedComparator;
+import edu.worcester.cs499summer2012.comparator.TaskDateDueComparator;
+import edu.worcester.cs499summer2012.comparator.TaskNameComparator;
 import edu.worcester.cs499summer2012.comparator.TaskPriorityComparator;
 
 /**
@@ -32,16 +35,17 @@ import edu.worcester.cs499summer2012.comparator.TaskPriorityComparator;
  */
 public class TaskList extends ArrayList<Task> {
 
-	private Comparator<Task> completion_comparator;
-	private Comparator<Task> priority_comparator;
+	private final Comparator<Task> name_comparator = new TaskNameComparator();
+	private final Comparator<Task> completion_comparator = new TaskCompletionComparator();
+	private final Comparator<Task> priority_comparator = new TaskPriorityComparator();
+	private final Comparator<Task> date_created_comparator = new TaskDateCreatedComparator();
+	private final Comparator<Task> date_due_comparator = new TaskDateDueComparator();
 	
 	/**
 	 * Default constructor. Creates an empty TaskList with 0 elements.
 	 */
 	public TaskList() {
 		super(0);
-		completion_comparator = new TaskCompletionComparator();
-		priority_comparator = new TaskPriorityComparator();
 	}
 	
 	/**
@@ -56,12 +60,24 @@ public class TaskList extends ArrayList<Task> {
 		
 	}
 	
+	public Comparator<Task> nameComparator() {
+		return name_comparator;
+	}
+	
 	public Comparator<Task> completionComparator() {
 		return completion_comparator;
 	}
 	
 	public Comparator<Task> priorityComparator() {
 		return priority_comparator;
+	}
+	
+	public Comparator<Task> dateCreatedComparator() {
+		return date_created_comparator;
+	}
+	
+	public Comparator<Task> dateDueComparator() {
+		return date_due_comparator;
 	}
 
 	/**
