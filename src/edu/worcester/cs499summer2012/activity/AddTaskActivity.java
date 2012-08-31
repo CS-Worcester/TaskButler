@@ -42,6 +42,10 @@ import edu.worcester.cs499summer2012.task.Task;
  * @author James Celona
  */
 public class AddTaskActivity extends SherlockActivity {
+
+	/**************************************************************************
+	 * Static fields and methods                                              *
+	 **************************************************************************/
 	
 	/**
 	 * Label for the extra task parcel which will be added to the returned intent
@@ -53,6 +57,10 @@ public class AddTaskActivity extends SherlockActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_task);
     }
+    
+    /**************************************************************************
+	 * Class methods                                                          *
+	 **************************************************************************/
     
     /**
      * This method is called when the user clicks the OK button. A new task is

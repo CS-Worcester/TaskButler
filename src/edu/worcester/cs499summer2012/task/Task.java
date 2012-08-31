@@ -34,9 +34,9 @@ import android.os.Parcelable;
  */
 public class Task implements Parcelable {
 	
-	/*
-	 * Static fields and methods
-	 */
+	/**************************************************************************
+	 * Static fields and methods                                              *
+	 **************************************************************************/
 	
 	// Priority labels and indexes
 	public static final String[] LABELS = {"Trivial", "Normal", "Urgent"};
@@ -129,9 +129,9 @@ public class Task implements Parcelable {
 			return string;
 	}
 	
-	/*
-	 * Private class fields
-	 */
+	/**************************************************************************
+	 * Private fields                                                         *
+	 **************************************************************************/
 	
 	private String name;
 	private boolean is_completed;
@@ -140,9 +140,9 @@ public class Task implements Parcelable {
 	private Calendar date_due;
 	private String notes;
 	
-	/*
-	 * Constructors
-	 */
+	/**************************************************************************
+	 * Constructors                                                           *
+	 **************************************************************************/
 
 	/**
 	 * Default constructor. Creates an empty task.
@@ -162,9 +162,9 @@ public class Task implements Parcelable {
 		notes = task.notes;
 	}
 	
-	/*
-	 * Class methods 
-	 */ 	
+	/**************************************************************************
+	 * Overridden parent methods                                              *
+	 **************************************************************************/ 	
 	
 	/**
 	 * Compares this object to another. To return true, the compared object must
@@ -198,7 +198,6 @@ public class Task implements Parcelable {
 		return true;
 	}
 	
-	@Override
 	/**
 	 * Returns a string representation of the class. Used for writing to file.
 	 * The order of the fields in the string is:
@@ -210,6 +209,7 @@ public class Task implements Parcelable {
 	 *     Notes
 	 * @return a string representation of the class
 	 */
+	@Override
 	public String toString() {
 		return name + DIV + Boolean.toString(is_completed) + DIV + 
 				Integer.toString(priority) + DIV + 
@@ -219,9 +219,10 @@ public class Task implements Parcelable {
 	
 
 
-	/*
-	 * Parcelable methods
-	 */
+	/**************************************************************************
+	 * Methods implementing Parcelable interface                              *
+	 **************************************************************************/
+	
 	/**
 	 * Empty & unused method. Required for implementing Parcelable.
 	 * @return 0
@@ -266,9 +267,9 @@ public class Task implements Parcelable {
 		notes = notesFromString(in.readString());
 	}
 	
-	/*
-	 * Getters and setters
-	 */
+	/**************************************************************************
+	 * Getters and setters                                                    *
+	 **************************************************************************/
 	
 	public String getName() {
 		return name;

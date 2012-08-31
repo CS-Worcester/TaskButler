@@ -37,15 +37,27 @@ import edu.worcester.cs499summer2012.task.TaskList;
  */
 public class TaskListAdapter extends ArrayAdapter<Task> {
 
-	private final Activity activity;
-	private final TaskList tasks;
-	
+	/**************************************************************************
+	 * Static fields and methods                                              *
+	 **************************************************************************/
+
 	static class ViewHolder {
 		public TextView name;
 		public TextView priority;
 		public TextView date_due;
 		public TextView is_completed;
 	}
+	
+	/**************************************************************************
+	 * Private fields                                                         *
+	 **************************************************************************/
+	
+	private final Activity activity;
+	private final TaskList tasks;
+	
+	/**************************************************************************
+	 * Constructors                                                           *
+	 **************************************************************************/
 	
 	/**
 	 * Default constructor. Creates a new TaskListAdapter containing a TaskList
@@ -59,7 +71,10 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 		this.tasks = tasks;
 	}
 	
-	@Override
+	/**************************************************************************
+	 * Overridden parent methods                                              *
+	 **************************************************************************/
+	
 	/**
 	 * This method is called automatically when the user scrolls the ListView.
 	 * Updates the View of a single visible row, reflecting the list being 
@@ -69,6 +84,7 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 	 * @param parent the parent ViewGroup of convert_view
 	 * @return the updated View
 	 */
+	@Override
 	public View getView(int position, View convert_view, ViewGroup parent) {
 		View row_view = convert_view;
 		if (row_view == null) {
