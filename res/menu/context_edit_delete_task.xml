@@ -2,11 +2,15 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <item android:id="@+id/context_edit_task"
-		android:icon="@drawable/ic_action_edit"
-		android:showAsAction="always" />
+        android:title="@string/context_edit_task"
+		android:icon="@drawable/ic_edit"
+		android:showAsAction="ifRoom|withText" 
+		android:orderInCategory="1"/>
 		    
     <item android:id="@+id/context_delete_task"
-	    android:icon="@drawable/ic_action_delete"
-	    android:showAsAction="always" />    
+        android:title="@string/context_delete_task"
+	    android:icon="@drawable/ic_delete"
+	    android:showAsAction="ifRoom|withText" 
+	    android:orderInCategory="2"/>    
     
 </menu>

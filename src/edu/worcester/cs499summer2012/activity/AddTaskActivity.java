@@ -58,6 +58,9 @@ public class AddTaskActivity extends SherlockActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_task);
+        
+        // Allow Action bar icon to act as a button
+        getSupportActionBar().setHomeButtonEnabled(true);
     }
     
     /**************************************************************************
@@ -147,6 +150,12 @@ public class AddTaskActivity extends SherlockActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
     	switch (item.getItemId()) {
+    	case android.R.id.home:
+    	case R.id.menu_cancel:
+    		setResult(RESULT_CANCELED);
+    		finish();
+    		return true;
+    	
     	case R.id.menu_confirm:
     		if (addTask())
     		{
@@ -156,14 +165,8 @@ public class AddTaskActivity extends SherlockActivity {
     		}
     		return true;
     		
-    	case R.id.menu_cancel:
-    	case R.id.homeAsUp:
-    		setResult(RESULT_CANCELED);
-    		finish();
-    		return true;
-    		
     	default:
-    		return false;
+    		return super.onOptionsItemSelected(item);
     	}
     }
 }

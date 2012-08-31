@@ -1,13 +1,17 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     
     <item 
-        android:id="@+id/menu_cancel"
-        android:showAsAction="always"
-        android:icon="@drawable/ic_action_cancel" />
+        android:id="@+id/menu_confirm"
+        android:title="@string/menu_confirm"
+        android:icon="@drawable/ic_done"
+        android:showAsAction="ifRoom|withText" 
+        android:orderInCategory="1"/>    
     
     <item 
-        android:id="@+id/menu_confirm"
-        android:showAsAction="always"
-        android:icon="@drawable/ic_action_done" />
+        android:id="@+id/menu_cancel"
+        android:title="@string/menu_cancel"
+        android:icon="@drawable/ic_cancel"
+        android:showAsAction="ifRoom|withText" 
+        android:orderInCategory="2"/>
     
 </menu>

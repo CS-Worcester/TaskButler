@@ -179,12 +179,16 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
         			ADD_TASK_REQUEST);
     		return true;
     		
+    	case R.id.menu_sort:
+    		toast("Sort coming soon!");
+    		return true;
+    		
     	case R.id.menu_settings:
     		toast("Settings coming soon!");
     		return true;
     		
     	default:
-    		return false;
+    		return super.onOptionsItemSelected(item);
     	}
     }
     
