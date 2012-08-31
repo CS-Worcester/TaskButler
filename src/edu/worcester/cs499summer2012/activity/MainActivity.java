@@ -25,17 +25,20 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.view.View.OnLongClickListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockListActivity;
 import com.actionbarsherlock.view.ActionMode;
-import com.actionbarsherlock.view.ActionMode.Callback;
 import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 
 import edu.worcester.cs499summer2012.R;
@@ -49,7 +52,7 @@ import edu.worcester.cs499summer2012.task.TaskList;
  * @author Jonathan Hasenzahl
  * @author James Celona
  */
-public class MainActivity extends SherlockListActivity implements OnLongClickListener, Callback {
+public class MainActivity extends SherlockListActivity implements OnItemLongClickListener, ActionMode.Callback {
 
 	/**************************************************************************
 	 * Static fields and methods                                              *
@@ -64,7 +67,8 @@ public class MainActivity extends SherlockListActivity implements OnLongClickLis
     private final String TASK_FILE_NAME = "tasks";	
     private TaskList tasks;
     private TaskListAdapter adapter;
-    private Object action_mode;    
+    private Object action_mode;
+    private int selected_task;
 
 	/**************************************************************************
 	 * Class methods                                                          *
@@ -160,9 +164,8 @@ public class MainActivity extends SherlockListActivity implements OnLongClickLis
 		adapter = new TaskListAdapter(this, tasks);
     	setListAdapter(adapter);
     	
-    	// Enable long-pressing the list view to pop up a context menu
-    	ListView list = getListView();
-    	registerForContextMenu(list);
+    	// Set up a long item click listener
+    	getListView().setOnItemLongClickListener(this);
     }
     
     @Override
@@ -179,50 +182,6 @@ public class MainActivity extends SherlockListActivity implements OnLongClickLis
     	adapter.notifyDataSetChanged();
     }
     
-    /*@Override
-	public void onCreateContextMenu(ContextMenu menu, View view, 
-			ContextMenuInfo info) {
-    	super.onCreateContextMenu(menu, view, info);
-    	MenuInflater inflater = getMenuInflater();
-    	inflater.inflate(R.menu.context_edit_delete_task, menu);
-    	
-    }
-    
-    @Override
-    public boolean onContextItemSelected(MenuItem item) {
-    	AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
-    	final int position = info.position;
-    	
-    	switch (item.getItemId()) {
-    	case R.id.context_edit_task:
-    		toast("Coming soon!");
-    		return true;
-    	
-    	case R.id.context_delete_task:
-    		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-    		builder.setMessage("Are you sure you want to delete?")
-    		       .setCancelable(false)
-    		       .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-    		    	   public void onClick(DialogInterface dialog, int id) {
-    		    		   tasks.remove(position);
-    		    		   adapter.notifyDataSetChanged();
-    		    		   toast("Task deleted");
-    		    	   }
-    		       })
-    		       .setNegativeButton("No", new DialogInterface.OnClickListener() {
-    		    	   public void onClick(DialogInterface dialog, int id) {
-    		    		   dialog.cancel();
-    		    	   }
-    		       });
-			AlertDialog alert = builder.create();
-			alert.show();
-    		return true;
-    	
-    	default:
-    		return super.onContextItemSelected(item);	
-    	}
-    }*/
-    
     @Override
 	public void onActivityResult(int request_code, int result_code, 
     		Intent intent) {
@@ -234,23 +193,30 @@ public class MainActivity extends SherlockListActivity implements OnLongClickLis
     }
     
 	/**************************************************************************
-	 * Methods implementing OnLongClickListener interface                     *
+	 * Methods implementing OnItemLongClickListener interface                 *
 	 **************************************************************************/ 
-	
+
 	@Override
-	public boolean onLongClick(View v) {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean onItemLongClick(AdapterView<?> parent, View view, 
+			int position, long id) {
+		if (action_mode != null)
+			return false;
+		
+		selected_task = position;
+		action_mode = startActionMode(this);
+		view.setSelected(true);
+		return true;
 	}
     
 	/**************************************************************************
-	 * Methods implementing Callback interface                                *
+	 * Methods implementing ActionMode.Callback interface                     *
 	 **************************************************************************/    
 
 	@Override
 	public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-		// TODO Auto-generated method stub
-		return false;
+		MenuInflater inflater = mode.getMenuInflater();
+		inflater.inflate(R.menu.context_edit_delete_task, menu);
+		return true;
 	}
 
 	/** 
@@ -265,16 +231,42 @@ public class MainActivity extends SherlockListActivity implements OnLongClickLis
 	}
 
 	@Override
-	public boolean onActionItemClicked(ActionMode mode,
-			MenuItem item) {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+		switch (item.getItemId()) {
+		case R.id.context_edit_task:
+			toast("Coming soon!");
+			mode.finish();
+			return true;
+		
+		case R.id.context_delete_task:
+    		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+    		builder.setMessage("Are you sure you want to delete?")
+    		       .setCancelable(false)
+    		       .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+    		    	   public void onClick(DialogInterface dialog, int id) {
+    		    		   tasks.remove(selected_task);
+    		    		   adapter.notifyDataSetChanged();
+    		    		   toast("Task deleted");
+    		    	   }
+    		       })
+    		       .setNegativeButton("No", new DialogInterface.OnClickListener() {
+    		    	   public void onClick(DialogInterface dialog, int id) {
+    		    		   dialog.cancel();
+    		    	   }
+    		       });
+			AlertDialog alert = builder.create();
+			alert.show();
+			mode.finish();
+			return true;
+			
+		default:
+			return false;
+		}
 	}
 
 	@Override
 	public void onDestroyActionMode(ActionMode mode) {
-		// TODO Auto-generated method stub
-		
+		action_mode = null;			
 	}
 
 }

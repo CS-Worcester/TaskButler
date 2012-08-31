@@ -9,8 +9,8 @@
     <string name="title_activity_main">Task Butler</string>
     <string name="text_empty_list">No tasks found.\nClick the button below to create a task!</string>
     <string name="button_add_task">Create New Task</string>
-    <string name="context_edit_task">Edit Task</string>
-    <string name="context_delete_task">Delete Task</string>
+    <string name="context_edit_task">Edit</string>
+    <string name="context_delete_task">Delete</string>
     
     <!-- Add Task Activity -->
     <string name="title_activity_add_task">Create New Task</string>
