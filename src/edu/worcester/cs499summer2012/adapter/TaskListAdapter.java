@@ -92,13 +92,13 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 			row_view = inflater.inflate(R.layout.row_task, null);
 			ViewHolder view_holder = new ViewHolder();
 			view_holder.name = (TextView) 
-					row_view.findViewById(R.id.text_row_name);
+					row_view.findViewById(R.id.text_main_row_name);
 			view_holder.priority = (TextView)
-					row_view.findViewById(R.id.text_row_priority);
+					row_view.findViewById(R.id.text_main_row_priority);
 			view_holder.date_due = (TextView)
-					row_view.findViewById(R.id.text_row_date_due);
+					row_view.findViewById(R.id.text_main_row_date_due);
 			view_holder.is_completed = (TextView)
-					row_view.findViewById(R.id.text_row_is_completed);
+					row_view.findViewById(R.id.text_main_row_is_completed);
 			row_view.setTag(view_holder);
 		}
 

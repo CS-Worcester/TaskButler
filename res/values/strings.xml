@@ -4,25 +4,33 @@
     <!-- App -->
     <string name="app_name">Task Butler</string>
     
-    <!-- Main Activity -->
+    <!-- Activity titles -->
     <string name="title_activity_main">Task Butler</string>
-    <string name="menu_add_task">New</string>
-    <string name="menu_sort">Sort</string>
-    <string name="menu_settings">Settings</string>
-    <string name="context_edit_task">Edit</string>
-    <string name="context_delete_task">Delete</string>
-    <string name="text_empty_list">No tasks found.\nClick the button above to create a task!</string>
-    
-    <!-- Add Task Activity -->
     <string name="title_activity_add_task">Create New Task</string>
+    
+    <!-- Menu items -->
     <string name="menu_confirm">Add</string>
     <string name="menu_cancel">Cancel</string>
+    <string name="menu_add_task">New</string>
+    <string name="menu_edit_task">Edit</string>
+    <string name="menu_delete_task">Delete</string>
+    <string name="menu_sort">Sort</string>
+    <string name="menu_auto_sort">Auto sort</string>
+    <string name="menu_custom_sort">Custom sort&#8230;</string>
+    <string name="menu_settings">Settings</string>
+    
+    <!-- TextView items -->
+    <string name="text_empty_list">No tasks found.\nClick the button above to create a task!</string>
     <string name="text_task_name">Task name</string> 
     <string name="text_task_priority">Task priority</string>
     <string name="text_task_due">Due date and time</string> 
-    <string name="text_task_notes">Notes</string>   	   
+    <string name="text_task_notes">Notes</string>  
+    
+    <!-- EditText items -->
     <string name="edit_task_name">Enter task name</string>
     <string name="edit_task_notes">You can enter notes here</string>
+    
+    <!-- Radiobutton items -->
     <string name="radio_trivial">Trivial</string>
     <string name="radio_normal">Normal</string>
     <string name="radio_urgent">Urgent</string>

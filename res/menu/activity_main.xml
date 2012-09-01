@@ -2,24 +2,39 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     
     <item
-        android:id="@+id/menu_add_task"
+        android:id="@+id/menu_main_add_task"
         android:title="@string/menu_add_task"
         android:icon="@drawable/ic_new"
         android:showAsAction="ifRoom|withText" 
-        android:orderInCategory="1"/>
+        android:orderInCategory="0"/>
     
     <item
-        android:id="@+id/menu_sort"
+        android:id="@+id/menu_main_sort"
         android:title="@string/menu_sort"
         android:icon="@drawable/ic_sort"
-        android:showAsAction="ifRoom|withText" 
-        android:orderInCategory="2"/>
+        android:showAsAction="ifRoom|withText"
+        android:orderInCategory="1">
+        
+        <menu>
+            <group android:checkableBehavior="single">
+                <item 
+                    android:id="@+id/menu_main_auto_sort"
+                    android:title="@string/menu_auto_sort"
+                    android:orderInCategory="0"/>
+                <item 
+                    android:id="@+id/menu_main_custom_sort"
+                    android:title="@string/menu_custom_sort"
+                    android:orderInCategory="1"/>
+            </group>
+        </menu>
+        
+    </item>
     
     <item
-        android:id="@+id/menu_settings"
+        android:id="@+id/menu_main_settings"
         android:title="@string/menu_settings"
         android:icon="@drawable/ic_settings"
         android:showAsAction="ifRoom|withText" 
-        android:orderInCategory="3"/>    
+        android:orderInCategory="2"/>    
     
 </menu>

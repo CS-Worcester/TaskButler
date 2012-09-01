@@ -35,11 +35,13 @@ import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockListActivity;
 import com.actionbarsherlock.view.ActionMode;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
+import com.actionbarsherlock.view.SubMenu;
 
 import edu.worcester.cs499summer2012.R;
 import edu.worcester.cs499summer2012.adapter.TaskListAdapter;
@@ -52,13 +54,16 @@ import edu.worcester.cs499summer2012.task.TaskList;
  * @author Jonathan Hasenzahl
  * @author James Celona
  */
-public class MainActivity extends SherlockListActivity implements OnItemLongClickListener, ActionMode.Callback {
+public class MainActivity extends SherlockListActivity implements OnItemLongClickListener, 
+		ActionMode.Callback {
 
 	/**************************************************************************
 	 * Static fields and methods                                              *
 	 **************************************************************************/
 	
 	public static final int ADD_TASK_REQUEST = 0;
+	public static final int AUTO_SORT = 0;
+	public static final int CUSTOM_SORT = 1;
 
 	/**************************************************************************
 	 * Private fields                                                         *
@@ -67,8 +72,10 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
     private final String TASK_FILE_NAME = "tasks";	
     private TaskList tasks;
     private TaskListAdapter adapter;
+    private ActionBar action_bar;
     private Object action_mode;
     private int selected_task;
+    private int sort_type = AUTO_SORT;
 
 	/**************************************************************************
 	 * Class methods                                                          *
@@ -174,16 +181,25 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
     	switch (item.getItemId()) {
-    	case R.id.menu_add_task:
+    	case R.id.menu_main_add_task:
     		startActivityForResult(new Intent(this, AddTaskActivity.class), 
         			ADD_TASK_REQUEST);
     		return true;
     		
-    	case R.id.menu_sort:
-    		toast("Sort coming soon!");
+    	case R.id.menu_main_sort:
+    		SubMenu sort_menu = item.getSubMenu();
+    		sort_menu.getItem(sort_type).setChecked(true);
     		return true;
     		
-    	case R.id.menu_settings:
+    	case R.id.menu_main_auto_sort:
+    		sort_type = AUTO_SORT;
+    		return true;
+    		
+    	case R.id.menu_main_custom_sort:
+    		sort_type = CUSTOM_SORT;
+    		return true;
+    		
+    	case R.id.menu_main_settings:
     		toast("Settings coming soon!");
     		return true;
     		
@@ -233,15 +249,10 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
 	@Override
 	public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 		MenuInflater inflater = mode.getMenuInflater();
-		inflater.inflate(R.menu.context_edit_delete_task, menu);
+		inflater.inflate(R.menu.context_modify_task, menu);
 		return true;
 	}
 
-	/** 
-	 * Called each time the action mode is shown. Always called after
-	 * onCreateActionMode, but may be called multiple times if the mode is
-	 * invaldated.
-	 */
 	@Override
 	public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
 		// Return false if nothing is done
@@ -251,12 +262,12 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
 	@Override
 	public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 		switch (item.getItemId()) {
-		case R.id.context_edit_task:
+		case R.id.menu_main_edit_task:
 			toast("Coming soon!");
 			mode.finish();
 			return true;
 		
-		case R.id.context_delete_task:
+		case R.id.menu_main_delete_task:
     		AlertDialog.Builder builder = new AlertDialog.Builder(this);
     		builder.setMessage("Are you sure you want to delete?")
     		       .setCancelable(false)
@@ -286,5 +297,5 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
 	public void onDestroyActionMode(ActionMode mode) {
 		action_mode = null;			
 	}
-
+	
 }

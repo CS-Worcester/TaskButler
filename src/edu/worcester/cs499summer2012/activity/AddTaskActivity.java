@@ -81,7 +81,7 @@ public class AddTaskActivity extends SherlockActivity {
      */
     public boolean addTask() {
     	// Get task name
-    	EditText task_name = (EditText) findViewById(R.id.edit_task_name);
+    	EditText task_name = (EditText) findViewById(R.id.edit_add_task_name);
     	String name = task_name.getText().toString();
     	
     	// If there is no task name, don't create the task
@@ -92,25 +92,25 @@ public class AddTaskActivity extends SherlockActivity {
     	}
     	
     	// Get task priority
-    	RadioGroup task_priority = (RadioGroup) findViewById(R.id.radiogroup_task_priority);
+    	RadioGroup task_priority = (RadioGroup) findViewById(R.id.radiogroup_add_task_priority);
     	int priority;
     	
     	switch (task_priority.getCheckedRadioButtonId()) {
-    	case R.id.radio_urgent:
+    	case R.id.radio_add_task_urgent:
     		priority = Task.URGENT;
     		break;
-    	case R.id.radio_trivial:
+    	case R.id.radio_add_task_trivial:
     		priority = Task.TRIVIAL;
     		break;
-    	case R.id.radio_normal:
+    	case R.id.radio_add_task_normal:
     	default:
     		priority = Task.NORMAL;
     		break;    		
     	}
     	
     	// Get task creation date & task due date
-    	DatePicker task_date = (DatePicker) findViewById(R.id.date_task_due);
-    	TimePicker task_time = (TimePicker) findViewById(R.id.time_task_due);
+    	DatePicker task_date = (DatePicker) findViewById(R.id.date_add_task_due);
+    	TimePicker task_time = (TimePicker) findViewById(R.id.time_add_task_due);
     	Calendar date_created = new GregorianCalendar();
     	Calendar date_due = new GregorianCalendar();
     	date_due.set(task_date.getYear(), task_date.getMonth(), 
@@ -118,7 +118,7 @@ public class AddTaskActivity extends SherlockActivity {
     			task_time.getCurrentMinute());
     	
     	// Get task notes
-    	EditText task_notes = (EditText) findViewById(R.id.edit_task_notes);
+    	EditText task_notes = (EditText) findViewById(R.id.edit_add_task_notes);
     	String notes = task_notes.getText().toString();
     	if (notes.equals(""))
     		notes = null;
@@ -151,12 +151,12 @@ public class AddTaskActivity extends SherlockActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
     	switch (item.getItemId()) {
     	case android.R.id.home:
-    	case R.id.menu_cancel:
+    	case R.id.menu_add_task_cancel:
     		setResult(RESULT_CANCELED);
     		finish();
     		return true;
     	
-    	case R.id.menu_confirm:
+    	case R.id.menu_add_task_confirm:
     		if (addTask())
     		{
     	    	// Set the return result to OK and finish the activity

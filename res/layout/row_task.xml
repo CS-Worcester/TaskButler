@@ -5,30 +5,30 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal">
     
-    <TextView android:id="@+id/text_row_name"
+    <TextView android:id="@+id/text_main_row_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:textSize="20dp" />
     
-    <TextView android:id="@+id/text_row_date_due"
+    <TextView android:id="@+id/text_main_row_date_due"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_below="@id/text_row_name"
+        android:layout_below="@id/text_main_row_name"
         android:textSize="16dp" />
     
-    <TextView android:id="@+id/text_row_priority"
+    <TextView android:id="@+id/text_main_row_priority"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:textSize="16dp" />
     
-    <TextView android:id="@+id/text_row_is_completed"
+    <TextView android:id="@+id/text_main_row_is_completed"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:layout_below="@id/text_row_priority"
+        android:layout_below="@id/text_main_row_priority"
         android:textSize="16dp" />
     
 </RelativeLayout>

@@ -1,17 +1,17 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     
     <item 
-        android:id="@+id/menu_confirm"
+        android:id="@+id/menu_add_task_confirm"
         android:title="@string/menu_confirm"
         android:icon="@drawable/ic_done"
         android:showAsAction="ifRoom|withText" 
-        android:orderInCategory="1"/>    
+        android:orderInCategory="0"/>    
     
     <item 
-        android:id="@+id/menu_cancel"
+        android:id="@+id/menu_add_task_cancel"
         android:title="@string/menu_cancel"
         android:icon="@drawable/ic_cancel"
         android:showAsAction="ifRoom|withText" 
-        android:orderInCategory="2"/>
+        android:orderInCategory="1"/>
     
 </menu>

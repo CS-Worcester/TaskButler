@@ -13,49 +13,49 @@
 	    android:paddingRight="16dp" >
 	
 	    <TextView
-	        android:id="@+id/text_task_name"
+	        android:id="@+id/text_add_task_name"
 	        android:layout_width="fill_parent"
 	        android:layout_height="wrap_content"
 	        android:layout_alignParentTop="true"
 	        android:text="@string/text_task_name" />
 	
 	    <EditText
-	        android:id="@+id/edit_task_name"
+	        android:id="@+id/edit_add_task_name"
 	        android:layout_width="fill_parent"
 	        android:layout_height="wrap_content"
-	        android:layout_below="@id/text_task_name"
+	        android:layout_below="@id/text_add_task_name"
 	        android:hint="@string/edit_task_name"
 	        android:inputType="textCapSentences" />
 	    
 	    <TextView
-	        android:id="@+id/text_task_priority"
+	        android:id="@+id/text_add_task_priority"
 	        android:layout_width="fill_parent"
 	        android:layout_height="wrap_content"
-	        android:layout_below="@id/edit_task_name"
+	        android:layout_below="@id/edit_add_task_name"
 	        android:text="@string/text_task_priority" />
 	
 	    <RadioGroup
-	        android:id="@+id/radiogroup_task_priority"
+	        android:id="@+id/radiogroup_add_task_priority"
 	        android:layout_width="fill_parent"
 	        android:layout_height="wrap_content"
-	        android:layout_below="@id/text_task_priority"
+	        android:layout_below="@id/text_add_task_priority"
 	        android:orientation="horizontal">
 	        
 	        <RadioButton
-	            android:id="@+id/radio_urgent"
+	            android:id="@+id/radio_add_task_urgent"
 	            android:layout_width="wrap_content"
 	            android:layout_height="wrap_content"
 	            android:text="@string/radio_urgent" />        
 	
 	        <RadioButton
-	            android:id="@+id/radio_normal"
+	            android:id="@+id/radio_add_task_normal"
 	            android:layout_width="wrap_content"
 	            android:layout_height="wrap_content"
 	            android:checked="true"
 	            android:text="@string/radio_normal" />
 	        
 	        <RadioButton
-	            android:id="@+id/radio_trivial"
+	            android:id="@+id/radio_add_task_trivial"
 	            android:layout_width="wrap_content"
 	            android:layout_height="wrap_content"
 	            android:text="@string/radio_trivial" />        
@@ -63,36 +63,36 @@
 	    </RadioGroup>
 	
 	    <TextView
-	        android:id="@+id/text_task_due"
+	        android:id="@+id/text_add_task_due"
 	        android:layout_width="fill_parent"
 	        android:layout_height="wrap_content"
-	        android:layout_below="@id/radiogroup_task_priority"
+	        android:layout_below="@id/radiogroup_add_task_priority"
 	        android:text="@string/text_task_due" />    
 	    
 	    <DatePicker
-	        android:id="@+id/date_task_due"
+	        android:id="@+id/date_add_task_due"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
-	        android:layout_below="@id/text_task_due" />
+	        android:layout_below="@id/text_add_task_due" />
 	    
 	    <TimePicker
-	        android:id="@+id/time_task_due"
+	        android:id="@+id/time_add_task_due"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
-	        android:layout_below="@id/date_task_due" />    
+	        android:layout_below="@id/date_add_task_due" />    
 	    
 	    <TextView 
-	        android:id="@+id/text_task_notes"
+	        android:id="@+id/text_add_task_notes"
 	        android:layout_width="fill_parent"
 	        android:layout_height="wrap_content"
-	        android:layout_below="@id/time_task_due"
+	        android:layout_below="@id/time_add_task_due"
 	        android:text="@string/text_task_notes" />
 	    
 	    <EditText
-	        android:id="@+id/edit_task_notes"
+	        android:id="@+id/edit_add_task_notes"
 	        android:layout_width="fill_parent"
 	        android:layout_height="wrap_content"
-	        android:layout_below="@id/text_task_notes"
+	        android:layout_below="@id/text_add_task_notes"
 	        android:hint="@string/edit_task_notes"
 	        android:inputType="textCapSentences"
 	        android:maxLength="1500" />
