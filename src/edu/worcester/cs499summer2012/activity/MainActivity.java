@@ -26,8 +26,10 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -61,6 +63,8 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
 	 * Static fields and methods                                              *
 	 **************************************************************************/
 	
+	public static final String TASK_FILE_NAME = "tasks";
+	public static final String PREF_SORT_TYPE = "sort_type";
 	public static final int ADD_TASK_REQUEST = 0;
 	public static final int AUTO_SORT = 0;
 	public static final int CUSTOM_SORT = 1;
@@ -68,18 +72,29 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
 	/**************************************************************************
 	 * Private fields                                                         *
 	 **************************************************************************/
-	
-    private final String TASK_FILE_NAME = "tasks";	
+		
+	private SharedPreferences settings;
+	private SharedPreferences.Editor settings_editor;
     private TaskList tasks;
     private TaskListAdapter adapter;
     private ActionBar action_bar;
     private Object action_mode;
     private int selected_task;
-    private int sort_type = AUTO_SORT;
+    private int sort_type;
 
 	/**************************************************************************
 	 * Class methods                                                          *
 	 **************************************************************************/
+    
+    /**
+     * Reads settings from a SharedPreferences file.
+     */
+    private void readSettingsFromFile() {
+    	settings = getPreferences(Context.MODE_PRIVATE);
+    	settings_editor = settings.edit();
+    	
+    	sort_type = settings.getInt(PREF_SORT_TYPE, AUTO_SORT);
+    }
     
     /**
      * Reads tasks from a text file and populates a TaskList.
@@ -104,6 +119,13 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
     			}
     		}
     	}
+    }
+    
+    /**
+     * Writes settings to a SharedPreferences file.
+     */
+    private void writeSettingsToFile() {
+    	settings_editor.commit();
     }
     
     /**
@@ -152,7 +174,10 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
         
         // Assign the layout to this activity
         setContentView(R.layout.activity_main);
-    	
+        
+        // Read settings from file
+    	readSettingsFromFile();
+        
         // Create a task list and read contents from file
         tasks = new TaskList();
     	readTasksFromFile();
@@ -168,6 +193,7 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
     @Override
 	public void onStop() {
     	writeTasksToFile();
+    	writeSettingsToFile();
     	super.onStop();
     }
     
@@ -193,14 +219,20 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
     		
     	case R.id.menu_main_auto_sort:
     		sort_type = AUTO_SORT;
+    		settings_editor.putInt(PREF_SORT_TYPE, sort_type);
     		return true;
     		
     	case R.id.menu_main_custom_sort:
     		sort_type = CUSTOM_SORT;
+    		settings_editor.putInt(PREF_SORT_TYPE, sort_type);
     		return true;
     		
     	case R.id.menu_main_settings:
-    		toast("Settings coming soon!");
+    		startActivity(new Intent(this, SettingsActivity.class));
+    		return true;
+    		
+    	case R.id.menu_main_help:
+    		toast("Help coming soon!");
     		return true;
     		
     	default:

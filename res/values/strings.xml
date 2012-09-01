@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    
+
     <!-- App -->
     <string name="app_name">Task Butler</string>
-    
+
     <!-- Activity titles -->
     <string name="title_activity_main">Task Butler</string>
     <string name="title_activity_add_task">Create New Task</string>
+    <string name="title_activity_settings">Settings</string>
     
     <!-- Menu items -->
     <string name="menu_confirm">Add</string>
@@ -18,21 +19,28 @@
     <string name="menu_auto_sort">Auto sort</string>
     <string name="menu_custom_sort">Custom sort&#8230;</string>
     <string name="menu_settings">Settings</string>
-    
+    <string name="menu_help">Help</string>
+
     <!-- TextView items -->
     <string name="text_empty_list">No tasks found.\nClick the button above to create a task!</string>
-    <string name="text_task_name">Task name</string> 
+    <string name="text_task_name">Task name</string>
     <string name="text_task_priority">Task priority</string>
-    <string name="text_task_due">Due date and time</string> 
-    <string name="text_task_notes">Notes</string>  
-    
+    <string name="text_task_due">Due date and time</string>
+    <string name="text_task_notes">Notes</string>
+    <string name="text_delete_finished">Delete all completed tasks</string>
+    <string name="text_delete_all">Delete all tasks</string>
+
     <!-- EditText items -->
     <string name="edit_task_name">Enter task name</string>
     <string name="edit_task_notes">You can enter notes here</string>
-    
-    <!-- Radiobutton items -->
+
+    <!-- RadioButton items -->
     <string name="radio_trivial">Trivial</string>
     <string name="radio_normal">Normal</string>
     <string name="radio_urgent">Urgent</string>
     
+    <!-- CheckBox items -->
+    <string name="checkbox_hide_completed">Hide completed tasks</string>
+    <string name="checkbox_auto_delete">Delete completed tasks automatically</string>
+
 </resources>
