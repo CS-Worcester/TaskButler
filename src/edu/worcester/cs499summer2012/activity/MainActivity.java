@@ -68,6 +68,9 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
 	public static final int ADD_TASK_REQUEST = 0;
 	public static final int AUTO_SORT = 0;
 	public static final int CUSTOM_SORT = 1;
+	public static final int DELETE_MODE_SINGLE = 0;
+	public static final int DELETE_MODE_FINISHED = 1;
+	public static final int DELETE_MODE_ALL = 2;
 
 	/**************************************************************************
 	 * Private fields                                                         *
@@ -164,6 +167,45 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
     	Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
     
+    private void deleteAlert(String question, final int mode, 
+    		final String confirmation)
+    {
+    	AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setMessage(question)
+		       .setCancelable(false)
+		       .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+		    	   public void onClick(DialogInterface dialog, int id) {
+		    		   switch (mode) {
+		    		   case DELETE_MODE_SINGLE:
+		    			   tasks.remove(selected_task);
+		    			   break;
+		    		   case DELETE_MODE_FINISHED:
+		    			   for (int i = 0; i < tasks.size(); i++)
+		    			   {
+		    				   if (tasks.get(i).getIsCompleted())
+		    				   {
+		    					   tasks.remove(i);
+		    					   i--;
+		    				   }
+		    			   }
+		    			   break;
+		    		   case DELETE_MODE_ALL:
+		    			   tasks.clear();
+		    			   break;
+		    		   }
+		    		   adapter.notifyDataSetChanged();
+		    		   toast(confirmation);
+		    	   }
+		       })
+		       .setNegativeButton("No", new DialogInterface.OnClickListener() {
+		    	   public void onClick(DialogInterface dialog, int id) {
+		    		   dialog.cancel();
+		    	   }
+		       });
+		AlertDialog alert = builder.create();
+		alert.show();
+    }
+    
 	/**************************************************************************
 	 * Overridden parent methods                                              *
 	 **************************************************************************/
@@ -225,6 +267,16 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
     	case R.id.menu_main_custom_sort:
     		sort_type = CUSTOM_SORT;
     		settings_editor.putInt(PREF_SORT_TYPE, sort_type);
+    		return true;
+    		
+    	case R.id.menu_delete_finished:
+    		deleteAlert("Are you sure you want to delete all completed tasks? This cannot be undone.",
+    				DELETE_MODE_FINISHED, "Tasks deleted");
+    		return true;
+    		
+    	case R.id.menu_delete_all:
+    		deleteAlert("Are you sure you want to delete all tasks? This cannot be undone.",
+    				DELETE_MODE_ALL, "All tasks deleted");
     		return true;
     		
     	case R.id.menu_main_settings:
@@ -300,23 +352,8 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
 			return true;
 		
 		case R.id.menu_main_delete_task:
-    		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-    		builder.setMessage("Are you sure you want to delete?")
-    		       .setCancelable(false)
-    		       .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-    		    	   public void onClick(DialogInterface dialog, int id) {
-    		    		   tasks.remove(selected_task);
-    		    		   adapter.notifyDataSetChanged();
-    		    		   toast("Task deleted");
-    		    	   }
-    		       })
-    		       .setNegativeButton("No", new DialogInterface.OnClickListener() {
-    		    	   public void onClick(DialogInterface dialog, int id) {
-    		    		   dialog.cancel();
-    		    	   }
-    		       });
-			AlertDialog alert = builder.create();
-			alert.show();
+			deleteAlert("Are you sure you want to delete this task?",
+					DELETE_MODE_SINGLE, "Task deleted");
 			mode.finish();
 			return true;
 			
