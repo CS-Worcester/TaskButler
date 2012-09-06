@@ -41,6 +41,9 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 	 * Static fields and methods                                              *
 	 **************************************************************************/
 
+	public static final int AUTO_SORT = 0;
+	public static final int CUSTOM_SORT = 1;
+	
 	static class ViewHolder {
 		public TextView name;
 		public TextView priority;
@@ -54,6 +57,7 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 	
 	private final Activity activity;
 	private final TaskList tasks;
+	private int sort_type;
 	
 	/**************************************************************************
 	 * Constructors                                                           *
@@ -69,6 +73,7 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 		super(activity, R.layout.row_task, tasks);
 		this.activity = activity;
 		this.tasks = tasks;
+		this.setNotifyOnChange(true);
 	}
 	
 	/**************************************************************************
@@ -128,4 +133,26 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 		
 		return row_view;
 	}
+	
+	public void sort() {
+		if (sort_type == AUTO_SORT)
+		{
+			this.sort(tasks.autoComparator());
+		}
+		this.notifyDataSetChanged();
+	}
+	
+	/**************************************************************************
+	 * Getters and setters                                                    *
+	 **************************************************************************/
+	
+	public int getSortType() {
+		return sort_type;
+	}
+	
+	public void setSortType(int sort_type) {
+		if (sort_type == AUTO_SORT || sort_type == CUSTOM_SORT)
+			this.sort_type = sort_type;
+	}
+	
 }

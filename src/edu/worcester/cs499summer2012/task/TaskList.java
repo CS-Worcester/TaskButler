@@ -23,6 +23,7 @@ package edu.worcester.cs499summer2012.task;
 import java.util.ArrayList;
 import java.util.Comparator;
 
+import edu.worcester.cs499summer2012.comparator.TaskAutoComparator;
 import edu.worcester.cs499summer2012.comparator.TaskCompletionComparator;
 import edu.worcester.cs499summer2012.comparator.TaskDateCreatedComparator;
 import edu.worcester.cs499summer2012.comparator.TaskDateDueComparator;
@@ -39,6 +40,7 @@ public class TaskList extends ArrayList<Task> {
 	 * Static fields and methods                                              *
 	 **************************************************************************/
 	
+	private final Comparator<Task> auto_comparator = new TaskAutoComparator();
 	private final Comparator<Task> name_comparator = new TaskNameComparator();
 	private final Comparator<Task> completion_comparator = new TaskCompletionComparator();
 	private final Comparator<Task> priority_comparator = new TaskPriorityComparator();
@@ -72,6 +74,10 @@ public class TaskList extends ArrayList<Task> {
 	/**************************************************************************
 	 * Class methods                                                          *
 	 **************************************************************************/
+	
+	public Comparator<Task> autoComparator() {
+		return auto_comparator;
+	}
 	
 	public Comparator<Task> nameComparator() {
 		return name_comparator;

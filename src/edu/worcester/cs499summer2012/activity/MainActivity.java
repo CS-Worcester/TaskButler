@@ -37,7 +37,6 @@ import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockListActivity;
 import com.actionbarsherlock.view.ActionMode;
 import com.actionbarsherlock.view.Menu;
@@ -66,8 +65,6 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
 	public static final String TASK_FILE_NAME = "tasks";
 	public static final String PREF_SORT_TYPE = "sort_type";
 	public static final int ADD_TASK_REQUEST = 0;
-	public static final int AUTO_SORT = 0;
-	public static final int CUSTOM_SORT = 1;
 	public static final int DELETE_MODE_SINGLE = 0;
 	public static final int DELETE_MODE_FINISHED = 1;
 	public static final int DELETE_MODE_ALL = 2;
@@ -80,10 +77,8 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
 	private SharedPreferences.Editor settings_editor;
     private TaskList tasks;
     private TaskListAdapter adapter;
-    private ActionBar action_bar;
     private Object action_mode;
     private int selected_task;
-    private int sort_type;
 
 	/**************************************************************************
 	 * Class methods                                                          *
@@ -96,7 +91,8 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
     	settings = getPreferences(Context.MODE_PRIVATE);
     	settings_editor = settings.edit();
     	
-    	sort_type = settings.getInt(PREF_SORT_TYPE, AUTO_SORT);
+    	adapter.setSortType(settings.getInt(PREF_SORT_TYPE, 
+    			TaskListAdapter.AUTO_SORT));
     }
     
     /**
@@ -217,9 +213,6 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
         // Assign the layout to this activity
         setContentView(R.layout.activity_main);
         
-        // Read settings from file
-    	readSettingsFromFile();
-        
         // Create a task list and read contents from file
         tasks = new TaskList();
     	readTasksFromFile();
@@ -227,6 +220,9 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
     	// Create an adapter for the task list
 		adapter = new TaskListAdapter(this, tasks);
     	setListAdapter(adapter);
+    	
+        // Read settings from file
+    	readSettingsFromFile();
     	
     	// Set up a long item click listener
     	getListView().setOnItemLongClickListener(this);
@@ -256,17 +252,18 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
     		
     	case R.id.menu_main_sort:
     		SubMenu sort_menu = item.getSubMenu();
-    		sort_menu.getItem(sort_type).setChecked(true);
+    		sort_menu.getItem(adapter.getSortType()).setChecked(true);
     		return true;
     		
     	case R.id.menu_main_auto_sort:
-    		sort_type = AUTO_SORT;
-    		settings_editor.putInt(PREF_SORT_TYPE, sort_type);
+    		adapter.setSortType(TaskListAdapter.AUTO_SORT);
+    		settings_editor.putInt(PREF_SORT_TYPE, TaskListAdapter.AUTO_SORT);
+    		adapter.sort();
     		return true;
     		
     	case R.id.menu_main_custom_sort:
-    		sort_type = CUSTOM_SORT;
-    		settings_editor.putInt(PREF_SORT_TYPE, sort_type);
+    		adapter.setSortType(TaskListAdapter.CUSTOM_SORT);
+    		settings_editor.putInt(PREF_SORT_TYPE, TaskListAdapter.CUSTOM_SORT);
     		return true;
     		
     	case R.id.menu_delete_finished:
@@ -296,8 +293,7 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
     public void onListItemClick(ListView list_view, View view, int position, 
     		long id) {
     	tasks.get(position).toggleIsCompleted();
-    	adapter.sort(tasks.completionComparator());
-    	adapter.notifyDataSetChanged();
+    	adapter.sort();
     }
     
     @Override
@@ -306,7 +302,7 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
     	if (request_code == ADD_TASK_REQUEST && result_code == RESULT_OK) {
     		Task task = intent.getParcelableExtra(AddTaskActivity.EXTRA_TASK);
     		tasks.add(0, task);
-    		adapter.notifyDataSetChanged();
+    		adapter.sort();
     	}
     }
     
