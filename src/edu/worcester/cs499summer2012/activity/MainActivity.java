@@ -75,7 +75,6 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
 		
 	private SharedPreferences settings;
 	private SharedPreferences.Editor settings_editor;
-    private ArrayList<Task> tasks;
     private TaskListAdapter adapter;
     private Object action_mode;
     private int selected_task;
@@ -105,7 +104,7 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
     				InputStreamReader(openFileInput(TASK_FILE_NAME)));
     		String line;
     		while ((line = file.readLine()) != null) {
-    			tasks.add(Task.taskFromString(line));
+    			adapter.add(Task.taskFromString(line));
     		}
     	} catch (Exception e) {
     		e.printStackTrace();
@@ -137,11 +136,9 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
     		file = new BufferedWriter(new 
     				OutputStreamWriter(openFileOutput(TASK_FILE_NAME, 
     						MODE_PRIVATE)));
-    		if (tasks.size() > 0) {
-    			for (Task task : tasks) {
-    				file.write(task + eol);
-    			}
-    		}
+			for (int i = 0; i < adapter.getCount(); i++) {
+				file.write(adapter.getItem(i) + eol);
+			}
     	} catch (Exception e) {
     		e.printStackTrace();
     	} finally {
@@ -173,23 +170,22 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
 		    	   public void onClick(DialogInterface dialog, int id) {
 		    		   switch (mode) {
 		    		   case DELETE_MODE_SINGLE:
-		    			   tasks.remove(selected_task);
+		    			   adapter.remove(adapter.getItem(selected_task));
 		    			   break;
 		    		   case DELETE_MODE_FINISHED:
-		    			   for (int i = 0; i < tasks.size(); i++)
+		    			   for (int i = 0; i < adapter.getCount(); i++)
 		    			   {
-		    				   if (tasks.get(i).getIsCompleted())
+		    				   if (adapter.getItem(i).getIsCompleted())
 		    				   {
-		    					   tasks.remove(i);
+		    					   adapter.remove(adapter.getItem(i));
 		    					   i--;
 		    				   }
 		    			   }
 		    			   break;
 		    		   case DELETE_MODE_ALL:
-		    			   tasks.clear();
+		    			   adapter.clear();
 		    			   break;
 		    		   }
-		    		   adapter.notifyDataSetChanged();
 		    		   toast(confirmation);
 		    	   }
 		       })
@@ -212,14 +208,13 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
         
         // Assign the layout to this activity
         setContentView(R.layout.activity_main);
-        
-        // Create a task list and read contents from file
-        tasks = new ArrayList<Task>(0);
-    	readTasksFromFile();
     	
     	// Create an adapter for the task list
-		adapter = new TaskListAdapter(this, tasks);
+		adapter = new TaskListAdapter(this, new ArrayList<Task>(0));
     	setListAdapter(adapter);
+    	
+        // Read tasks from file
+    	readTasksFromFile();
     	
         // Read settings from file
     	readSettingsFromFile();
@@ -292,7 +287,7 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
     @Override
     public void onListItemClick(ListView list_view, View view, int position, 
     		long id) {
-    	tasks.get(position).toggleIsCompleted();
+    	adapter.getItem(position).toggleIsCompleted();
     	adapter.sort();
     }
     
@@ -301,7 +296,7 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
     		Intent intent) {
     	if (request_code == ADD_TASK_REQUEST && result_code == RESULT_OK) {
     		Task task = intent.getParcelableExtra(AddTaskActivity.EXTRA_TASK);
-    		tasks.add(0, task);
+    		adapter.add(task);
     		adapter.sort();
     	}
     }
