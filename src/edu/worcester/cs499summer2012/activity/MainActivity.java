@@ -24,6 +24,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -47,7 +48,6 @@ import com.actionbarsherlock.view.SubMenu;
 import edu.worcester.cs499summer2012.R;
 import edu.worcester.cs499summer2012.adapter.TaskListAdapter;
 import edu.worcester.cs499summer2012.task.Task;
-import edu.worcester.cs499summer2012.task.TaskList;
 
 /**
  * Main app activity. Displays current task list and allows user to access
@@ -75,7 +75,7 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
 		
 	private SharedPreferences settings;
 	private SharedPreferences.Editor settings_editor;
-    private TaskList tasks;
+    private ArrayList<Task> tasks;
     private TaskListAdapter adapter;
     private Object action_mode;
     private int selected_task;
@@ -214,7 +214,7 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
         setContentView(R.layout.activity_main);
         
         // Create a task list and read contents from file
-        tasks = new TaskList();
+        tasks = new ArrayList<Task>(0);
     	readTasksFromFile();
     	
     	// Create an adapter for the task list

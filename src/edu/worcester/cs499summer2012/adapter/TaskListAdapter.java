@@ -19,6 +19,9 @@
 
 package edu.worcester.cs499summer2012.adapter;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+
 import android.app.Activity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,8 +29,8 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import edu.worcester.cs499summer2012.R;
+import edu.worcester.cs499summer2012.comparator.TaskAutoComparator;
 import edu.worcester.cs499summer2012.task.Task;
-import edu.worcester.cs499summer2012.task.TaskList;
 
 /**
  * ListView adapter for the TaskList container. Enables tasks in a TaskList
@@ -56,8 +59,14 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 	 **************************************************************************/
 	
 	private final Activity activity;
-	private final TaskList tasks;
+	private final ArrayList<Task> tasks;
 	private int sort_type;
+	private final Comparator<Task> auto_comparator = new TaskAutoComparator();
+	//private final Comparator<Task> name_comparator = new TaskNameComparator();
+	//private final Comparator<Task> completion_comparator = new TaskCompletionComparator();
+	//private final Comparator<Task> priority_comparator = new TaskPriorityComparator();
+	//private final Comparator<Task> date_created_comparator = new TaskDateCreatedComparator();
+	//private final Comparator<Task> date_due_comparator = new TaskDateDueComparator();
 	
 	/**************************************************************************
 	 * Constructors                                                           *
@@ -69,7 +78,7 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 	 * @param activity the Activity that owns this adapter
 	 * @param tasks the TaskList handled by this adapter
 	 */
-	public TaskListAdapter(Activity activity, TaskList tasks) {
+	public TaskListAdapter(Activity activity, ArrayList<Task> tasks) {
 		super(activity, R.layout.row_task, tasks);
 		this.activity = activity;
 		this.tasks = tasks;
@@ -137,7 +146,7 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 	public void sort() {
 		if (sort_type == AUTO_SORT)
 		{
-			this.sort(tasks.autoComparator());
+			this.sort(auto_comparator);
 		}
 		this.notifyDataSetChanged();
 	}
