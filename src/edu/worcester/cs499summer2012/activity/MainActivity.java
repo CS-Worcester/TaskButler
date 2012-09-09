@@ -27,11 +27,11 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemLongClickListener;
@@ -73,8 +73,8 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
 	 * Private fields                                                         *
 	 **************************************************************************/
 		
-	private SharedPreferences settings;
-	private SharedPreferences.Editor settings_editor;
+	private SharedPreferences prefs;
+	private SharedPreferences.Editor prefs_editor;
     private TaskListAdapter adapter;
     private Object action_mode;
     private int selected_task;
@@ -87,10 +87,10 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
      * Reads settings from a SharedPreferences file.
      */
     private void readSettingsFromFile() {
-    	settings = getPreferences(Context.MODE_PRIVATE);
-    	settings_editor = settings.edit();
+    	prefs = PreferenceManager.getDefaultSharedPreferences(this);
+    	prefs_editor = prefs.edit();
     	
-    	adapter.setSortType(settings.getInt(PREF_SORT_TYPE, 
+    	adapter.setSortType(prefs.getInt(PREF_SORT_TYPE, 
     			TaskListAdapter.AUTO_SORT));
     }
     
@@ -123,7 +123,7 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
      * Writes settings to a SharedPreferences file.
      */
     private void writeSettingsToFile() {
-    	settings_editor.commit();
+    	prefs_editor.commit();
     }
     
     /**
@@ -252,13 +252,13 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
     		
     	case R.id.menu_main_auto_sort:
     		adapter.setSortType(TaskListAdapter.AUTO_SORT);
-    		settings_editor.putInt(PREF_SORT_TYPE, TaskListAdapter.AUTO_SORT);
+    		prefs_editor.putInt(PREF_SORT_TYPE, TaskListAdapter.AUTO_SORT);
     		adapter.sort();
     		return true;
     		
     	case R.id.menu_main_custom_sort:
     		adapter.setSortType(TaskListAdapter.CUSTOM_SORT);
-    		settings_editor.putInt(PREF_SORT_TYPE, TaskListAdapter.CUSTOM_SORT);
+    		prefs_editor.putInt(PREF_SORT_TYPE, TaskListAdapter.CUSTOM_SORT);
     		return true;
     		
     	case R.id.menu_delete_finished:

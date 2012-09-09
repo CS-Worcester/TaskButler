@@ -30,8 +30,6 @@
     <string name="text_task_priority">Task priority</string>
     <string name="text_task_due">Due date and time</string>
     <string name="text_task_notes">Notes</string>
-    <string name="text_delete_finished">Delete all completed tasks</string>
-    <string name="text_delete_all">Delete all tasks</string>
 
     <!-- EditText items -->
     <string name="edit_task_name">Enter task name</string>

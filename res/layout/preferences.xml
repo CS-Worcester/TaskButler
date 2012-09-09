@@ -11,13 +11,5 @@
     	    android:key="auto_delete"
     	    android:title="@string/checkbox_auto_delete"
     	    android:defaultValue="false" />
-    	
-    	<Preference 
-    	    android:key="delete_finished"
-    	    android:title="@string/text_delete_finished" />
-    
-    	<Preference 
-    	    android:key="delete_all"
-    	    android:title="@string/text_delete_all" />    	
 
 </PreferenceScreen>
