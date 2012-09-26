@@ -21,13 +21,13 @@ package edu.worcester.cs499summer2012.comparator;
 
 import java.util.Comparator;
 
-import edu.worcester.cs499summer2012.task.Task;
+import edu.worcester.cs499summer2012.task.DeprecatedTask;
 
 /**
  * Comparator for sorting tasks by name.
  * @author Jonathan Hasenzahl
  */
-public class TaskNameComparator implements Comparator<Task> {
+public class TaskNameComparator implements Comparator<DeprecatedTask> {
 	
 	/**
 	 * Compares two tasks by the lexographical order of their names. Case is
@@ -37,7 +37,7 @@ public class TaskNameComparator implements Comparator<Task> {
 	 * @return 0 if the names are the same, -1 if the first task is ordered
 	 *         first, or 1 if the second task is ordered first
 	 */	
-	public int compare(Task lhs, Task rhs) {
+	public int compare(DeprecatedTask lhs, DeprecatedTask rhs) {
 		return lhs.getName().compareToIgnoreCase(rhs.getName());
 	}
 }

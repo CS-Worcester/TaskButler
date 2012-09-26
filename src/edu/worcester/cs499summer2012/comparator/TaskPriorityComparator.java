@@ -21,13 +21,13 @@ package edu.worcester.cs499summer2012.comparator;
 
 import java.util.Comparator;
 
-import edu.worcester.cs499summer2012.task.Task;
+import edu.worcester.cs499summer2012.task.DeprecatedTask;
 
 /**
  * Comparator for sorting tasks by priority.
  * @author Jonathan Hasenzahl
  */
-public class TaskPriorityComparator implements Comparator<Task> {
+public class TaskPriorityComparator implements Comparator<DeprecatedTask> {
 	
 	/**
 	 * Compares two tasks by their priorities. Tasks with a higher priority
@@ -37,7 +37,7 @@ public class TaskPriorityComparator implements Comparator<Task> {
 	 * @return 0 if the tasks have the same priority; -1 if the first task has
 	 *         a higher priority; 1 otherwise
 	 */	
-	public int compare(Task lhs, Task rhs) {
+	public int compare(DeprecatedTask lhs, DeprecatedTask rhs) {
 		if (lhs.getPriority() == rhs.getPriority())
 			return 0;
 		else if (lhs.getPriority() > rhs.getPriority())

@@ -47,7 +47,7 @@ import com.actionbarsherlock.view.SubMenu;
 
 import edu.worcester.cs499summer2012.R;
 import edu.worcester.cs499summer2012.adapter.TaskListAdapter;
-import edu.worcester.cs499summer2012.task.Task;
+import edu.worcester.cs499summer2012.task.DeprecatedTask;
 
 /**
  * Main app activity. Displays current task list and allows user to access
@@ -104,7 +104,7 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
     				InputStreamReader(openFileInput(TASK_FILE_NAME)));
     		String line;
     		while ((line = file.readLine()) != null) {
-    			adapter.add(Task.taskFromString(line));
+    			adapter.add(DeprecatedTask.taskFromString(line));
     		}
     	} catch (Exception e) {
     		e.printStackTrace();
@@ -210,7 +210,7 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
         setContentView(R.layout.activity_main);
     	
     	// Create an adapter for the task list
-		adapter = new TaskListAdapter(this, new ArrayList<Task>(0));
+		adapter = new TaskListAdapter(this, new ArrayList<DeprecatedTask>(0));
     	setListAdapter(adapter);
     	
         // Read tasks from file
@@ -295,8 +295,8 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
 	public void onActivityResult(int request_code, int result_code, 
     		Intent intent) {
     	if (request_code == ADD_TASK_REQUEST && result_code == RESULT_OK) {
-    		Task task = intent.getParcelableExtra(AddTaskActivity.EXTRA_TASK);
-    		adapter.add(task);
+    		DeprecatedTask deprecatedTask = intent.getParcelableExtra(AddTaskActivity.EXTRA_TASK);
+    		adapter.add(deprecatedTask);
     		adapter.sort();
     	}
     }

@@ -36,7 +36,7 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 
 import edu.worcester.cs499summer2012.R;
-import edu.worcester.cs499summer2012.task.Task;
+import edu.worcester.cs499summer2012.task.DeprecatedTask;
 
 /**
  * Activity for adding a new task.
@@ -97,14 +97,14 @@ public class AddTaskActivity extends SherlockActivity {
     	
     	switch (task_priority.getCheckedRadioButtonId()) {
     	case R.id.radio_add_task_urgent:
-    		priority = Task.URGENT;
+    		priority = DeprecatedTask.URGENT;
     		break;
     	case R.id.radio_add_task_trivial:
-    		priority = Task.TRIVIAL;
+    		priority = DeprecatedTask.TRIVIAL;
     		break;
     	case R.id.radio_add_task_normal:
     	default:
-    		priority = Task.NORMAL;
+    		priority = DeprecatedTask.NORMAL;
     		break;    		
     	}
     	
@@ -124,14 +124,14 @@ public class AddTaskActivity extends SherlockActivity {
     		notes = null;
     	    	
     	// Create the task
-    	Task task = new Task();
-    	task.setName(name).setIsCompleted(false).setPriority(priority)
+    	DeprecatedTask deprecatedTask = new DeprecatedTask();
+    	deprecatedTask.setName(name).setIsCompleted(false).setPriority(priority)
     	    .setCreationDate(date_created).setDueDate(date_due)
     	    .setNotes(notes);
     	
     	// Create the return intent and add the task
     	intent = new Intent(this, MainActivity.class);    	
-    	intent.putExtra(EXTRA_TASK, task);
+    	intent.putExtra(EXTRA_TASK, deprecatedTask);
     	
     	return true;
     }

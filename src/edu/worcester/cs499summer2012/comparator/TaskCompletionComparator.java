@@ -21,13 +21,13 @@ package edu.worcester.cs499summer2012.comparator;
 
 import java.util.Comparator;
 
-import edu.worcester.cs499summer2012.task.Task;
+import edu.worcester.cs499summer2012.task.DeprecatedTask;
 
 /**
  * Comparator for sorting tasks by completion status.
  * @author Jonathan Hasenzahl
  */
-public class TaskCompletionComparator implements Comparator<Task> {
+public class TaskCompletionComparator implements Comparator<DeprecatedTask> {
 
 	/**
 	 * Compares two tasks by their completion status. Tasks that are
@@ -38,7 +38,7 @@ public class TaskCompletionComparator implements Comparator<Task> {
 	 *         finished; 1 if the first task is finished and the second task is
 	 *         unfinished; 0 otherwise 
 	 */
-	public int compare(Task lhs, Task rhs) {
+	public int compare(DeprecatedTask lhs, DeprecatedTask rhs) {
 		if (!lhs.getIsCompleted() && rhs.getIsCompleted())
 			return -1;
 		else if (lhs.getIsCompleted() && !rhs.getIsCompleted())

@@ -21,13 +21,13 @@ package edu.worcester.cs499summer2012.comparator;
 
 import java.util.Comparator;
 
-import edu.worcester.cs499summer2012.task.Task;
+import edu.worcester.cs499summer2012.task.DeprecatedTask;
 
 /**
  * Comparator for sorting tasks by due date.
  * @author Jonathan Hasenzahl
  */
-public class TaskDateDueComparator implements Comparator<Task> {
+public class TaskDateDueComparator implements Comparator<DeprecatedTask> {
 	
 	/**
 	 * Compares two tasks by their due dates. Tasks with no due date are ordered
@@ -37,7 +37,7 @@ public class TaskDateDueComparator implements Comparator<Task> {
 	 * @return 0 if the due dates are the same, -1 if the first task is due
 	 *         first, or 1 if the second task is due first
 	 */	
-	public int compare(Task lhs, Task rhs) {
+	public int compare(DeprecatedTask lhs, DeprecatedTask rhs) {
 		// Check for null calendars (no due date)
 		if (lhs.getDateDue() == null && rhs.getDateDue() == null)
 			return 0;
