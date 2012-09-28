@@ -85,7 +85,7 @@ public class Task implements Parcelable {
 	}
 
 	/**
-	 * Designated constructor, without ID.
+	 * Constructor, without ID and without modification date.
 	 * @param name
 	 * @param isCompleted
 	 * @param priority
@@ -102,14 +102,14 @@ public class Task implements Parcelable {
 		this.priority = priority;
 		this.category = category;
 		this.dateCreated = date_created;
-		this.dateModified = date_created;
+		this.dateModified = date_created; // New task has not been modified yet
 		this.dateDue = date_due;
 		this.finalDateDue = final_date_due;
 		this.notes = notes;
 	}
 
 	/**
-	 * Designated constructor, with id
+	 * Constructor, with ID and without modification date.
 	 * @param id
 	 * @param name
 	 * @param isCompleted
@@ -126,6 +126,27 @@ public class Task implements Parcelable {
 		this(name, isCompleted, priority, category, date_created, date_due, 
 				final_date_due, notes);
 		this.id = id;
+	}
+	
+	/**
+	 * Constructor, with ID and with modification date.
+	 * @param id
+	 * @param name
+	 * @param isCompleted
+	 * @param priority
+	 * @param category
+	 * @param date_created
+	 * @param date_modified
+	 * @param date_due
+	 * @param final_date_due
+	 * @param notes
+	 */
+	public Task(int id, String name, boolean isCompleted, int priority, 
+			int category, int date_created, int date_modified, int date_due, 
+			int final_date_due, String notes) {
+		this(id, name, isCompleted, priority, category, date_created, date_due, 
+				final_date_due, notes);
+		this.dateModified = date_modified;
 	}
 
 
