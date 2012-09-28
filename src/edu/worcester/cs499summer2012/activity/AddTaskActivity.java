@@ -36,7 +36,7 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 
 import edu.worcester.cs499summer2012.R;
-import edu.worcester.cs499summer2012.task.DeprecatedTask;
+import edu.worcester.cs499summer2012.task.Task;
 
 /**
  * Activity for adding a new task.
@@ -97,17 +97,18 @@ public class AddTaskActivity extends SherlockActivity {
     	
     	switch (task_priority.getCheckedRadioButtonId()) {
     	case R.id.radio_add_task_urgent:
-    		priority = DeprecatedTask.URGENT;
+    		priority = Task.URGENT;
     		break;
     	case R.id.radio_add_task_trivial:
-    		priority = DeprecatedTask.TRIVIAL;
+    		priority = Task.TRIVIAL;
     		break;
     	case R.id.radio_add_task_normal:
     	default:
-    		priority = DeprecatedTask.NORMAL;
+    		priority = Task.NORMAL;
     		break;    		
     	}
     	
+    	// TODO: (Jon) Needs to be updated to conform with storing dates as ints
     	// Get task creation date & task due date
     	DatePicker task_date = (DatePicker) findViewById(R.id.date_add_task_due);
     	TimePicker task_time = (TimePicker) findViewById(R.id.time_add_task_due);
@@ -120,18 +121,23 @@ public class AddTaskActivity extends SherlockActivity {
     	// Get task notes
     	EditText task_notes = (EditText) findViewById(R.id.edit_add_task_notes);
     	String notes = task_notes.getText().toString();
-    	if (notes.equals(""))
-    		notes = null;
     	    	
     	// Create the task
-    	DeprecatedTask deprecatedTask = new DeprecatedTask();
-    	deprecatedTask.setName(name).setIsCompleted(false).setPriority(priority)
-    	    .setCreationDate(date_created).setDueDate(date_due)
-    	    .setNotes(notes);
+    	// TODO: Implement task category (currently defaults to 0)
+    	// TODO: Implement final date due (current defaults to date due)
+    	Task task = new Task();
+    	task.setName(name);
+    	task.setIsCompleted(false);
+    	task.setPriority(priority);
+    	task.setDateCreated((int) date_created.getTimeInMillis());
+    	task.setDateModified(task.getDateCreated());
+    	task.setDateDue((int) date_due.getTimeInMillis());
+    	task.setFinalDateDue(task.getDateDue());
+    	task.setNotes(notes);
     	
     	// Create the return intent and add the task
     	intent = new Intent(this, MainActivity.class);    	
-    	intent.putExtra(EXTRA_TASK, deprecatedTask);
+    	intent.putExtra(EXTRA_TASK, task);
     	
     	return true;
     }

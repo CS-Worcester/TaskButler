@@ -30,7 +30,7 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import edu.worcester.cs499summer2012.R;
 import edu.worcester.cs499summer2012.comparator.TaskAutoComparator;
-import edu.worcester.cs499summer2012.task.DeprecatedTask;
+import edu.worcester.cs499summer2012.task.Task;
 
 /**
  * ListView adapter for the TaskList container. Enables tasks in a TaskList
@@ -38,7 +38,7 @@ import edu.worcester.cs499summer2012.task.DeprecatedTask;
  * comparators.
  * @author Jonathan Hasenzahl
  */
-public class TaskListAdapter extends ArrayAdapter<DeprecatedTask> {
+public class TaskListAdapter extends ArrayAdapter<Task> {
 
 	/**************************************************************************
 	 * Static fields and methods                                              *
@@ -59,9 +59,9 @@ public class TaskListAdapter extends ArrayAdapter<DeprecatedTask> {
 	 **************************************************************************/
 	
 	private final Activity activity;
-	private final ArrayList<DeprecatedTask> deprecatedTasks;
+	private final ArrayList<Task> tasks;
 	private int sort_type;
-	private final Comparator<DeprecatedTask> auto_comparator = new TaskAutoComparator();
+	//private final Comparator<Task> auto_comparator = new TaskAutoComparator();
 	//private final Comparator<Task> name_comparator = new TaskNameComparator();
 	//private final Comparator<Task> completion_comparator = new TaskCompletionComparator();
 	//private final Comparator<Task> priority_comparator = new TaskPriorityComparator();
@@ -76,12 +76,12 @@ public class TaskListAdapter extends ArrayAdapter<DeprecatedTask> {
 	 * Default constructor. Creates a new TaskListAdapter containing a TaskList
 	 * and assigned to an Activity.
 	 * @param activity the Activity that owns this adapter
-	 * @param deprecatedTasks the TaskList handled by this adapter
+	 * @param tasks the TaskList handled by this adapter
 	 */
-	public TaskListAdapter(Activity activity, ArrayList<DeprecatedTask> deprecatedTasks) {
-		super(activity, R.layout.row_task, deprecatedTasks);
+	public TaskListAdapter(Activity activity, ArrayList<Task> tasks) {
+		super(activity, R.layout.row_task, tasks);
 		this.activity = activity;
-		this.deprecatedTasks = deprecatedTasks;
+		this.tasks = tasks;
 		this.setNotifyOnChange(true);
 	}
 	
@@ -117,18 +117,15 @@ public class TaskListAdapter extends ArrayAdapter<DeprecatedTask> {
 		}
 
 		ViewHolder holder = (ViewHolder) row_view.getTag();
-		DeprecatedTask deprecatedTask = deprecatedTasks.get(position);
-		holder.name.setText(deprecatedTask.getName());
-		holder.priority.setText(DeprecatedTask.LABELS[deprecatedTask.getPriority()]);
+		Task task = tasks.get(position);
+		holder.name.setText(task.getName());
+		holder.priority.setText(Task.LABELS[task.getPriority()]);
 		
-		if (deprecatedTask.getDateDue() != null)
-			holder.date_due.setText(deprecatedTask.getDateDue().getTime().toString());
-		else
-			holder.date_due.setText("No due date");
+		holder.date_due.setText("No due date");
 		
-		holder.is_completed.setText(deprecatedTask.getIsCompleted() ? "Done" : "Not done");
+		holder.is_completed.setText(task.isCompleted() ? "Done" : "Not done");
 		
-		if (!deprecatedTasks.get(position).getIsCompleted()) {
+		if (!tasks.get(position).isCompleted()) {
 			holder.name.setTextAppearance(getContext(), 
 					R.style.text_task_not_completed);
 			holder.priority.setTextAppearance(getContext(), 
@@ -144,10 +141,11 @@ public class TaskListAdapter extends ArrayAdapter<DeprecatedTask> {
 	}
 	
 	public void sort() {
-		if (sort_type == AUTO_SORT)
+		// TODO: Uncomment after comparators are fixed
+		/*if (sort_type == AUTO_SORT)
 		{
 			this.sort(auto_comparator);
-		}
+		}*/
 		this.notifyDataSetChanged();
 	}
 	

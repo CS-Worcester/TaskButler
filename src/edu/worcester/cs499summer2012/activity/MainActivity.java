@@ -19,12 +19,7 @@
 
 package edu.worcester.cs499summer2012.activity;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.util.ArrayList;
+import java.util.GregorianCalendar;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -47,7 +42,8 @@ import com.actionbarsherlock.view.SubMenu;
 
 import edu.worcester.cs499summer2012.R;
 import edu.worcester.cs499summer2012.adapter.TaskListAdapter;
-import edu.worcester.cs499summer2012.task.DeprecatedTask;
+import edu.worcester.cs499summer2012.database.TasksDataSource;
+import edu.worcester.cs499summer2012.task.Task;
 
 /**
  * Main app activity. Displays current task list and allows user to access
@@ -73,6 +69,7 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
 	 * Private fields                                                         *
 	 **************************************************************************/
 		
+	private TasksDataSource data_source;
 	private SharedPreferences prefs;
 	private SharedPreferences.Editor prefs_editor;
     private TaskListAdapter adapter;
@@ -95,64 +92,6 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
     }
     
     /**
-     * Reads tasks from a text file and populates a TaskList.
-     */
-    private void readTasksFromFile() {
-    	BufferedReader file = null;
-    	try {
-    		file = new BufferedReader(new
-    				InputStreamReader(openFileInput(TASK_FILE_NAME)));
-    		String line;
-    		while ((line = file.readLine()) != null) {
-    			adapter.add(DeprecatedTask.taskFromString(line));
-    		}
-    	} catch (Exception e) {
-    		e.printStackTrace();
-    	} finally {
-    		if (file != null) {
-    			try {
-    				file.close();
-    			} catch (IOException e) {
-    				e.printStackTrace();
-    			}
-    		}
-    	}
-    }
-    
-    /**
-     * Writes settings to a SharedPreferences file.
-     */
-    private void writeSettingsToFile() {
-    	prefs_editor.commit();
-    }
-    
-    /**
-     * Writes the contents of a TaskList to a text file.
-     */
-    private void writeTasksToFile() {
-    	String eol = System.getProperty("line.separator");
-    	BufferedWriter file = null;
-    	try {
-    		file = new BufferedWriter(new 
-    				OutputStreamWriter(openFileOutput(TASK_FILE_NAME, 
-    						MODE_PRIVATE)));
-			for (int i = 0; i < adapter.getCount(); i++) {
-				file.write(adapter.getItem(i) + eol);
-			}
-    	} catch (Exception e) {
-    		e.printStackTrace();
-    	} finally {
-    		if (file != null) {
-    			try {
-    				file.close();
-    			} catch (IOException e) {
-    				e.printStackTrace();
-    			}
-    		}
-    	}
-    }
-    
-    /**
      * Displays a message in a Toast notification for a short duration.
      */
     private void toast(String message)
@@ -168,22 +107,30 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
 		       .setCancelable(false)
 		       .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
 		    	   public void onClick(DialogInterface dialog, int id) {
+		    		   int deleted_tasks;
 		    		   switch (mode) {
 		    		   case DELETE_MODE_SINGLE:
+		    			   data_source.deleteTask(adapter.getItem(selected_task));
 		    			   adapter.remove(adapter.getItem(selected_task));
 		    			   break;
+		    			   
 		    		   case DELETE_MODE_FINISHED:
+		    			   deleted_tasks = data_source.deleteFinishedTasks();
 		    			   for (int i = 0; i < adapter.getCount(); i++)
 		    			   {
-		    				   if (adapter.getItem(i).getIsCompleted())
+		    				   if (adapter.getItem(i).isCompleted())
 		    				   {
 		    					   adapter.remove(adapter.getItem(i));
 		    					   i--;
 		    				   }
 		    			   }
+		    			   toast(deleted_tasks + " tasks deleted");
 		    			   break;
+		    			   
 		    		   case DELETE_MODE_ALL:
+		    			   deleted_tasks = data_source.deleteAllTasks();
 		    			   adapter.clear();
+		    			   toast(deleted_tasks + " tasks deleted");
 		    			   break;
 		    		   }
 		    		   toast(confirmation);
@@ -209,12 +156,13 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
         // Assign the layout to this activity
         setContentView(R.layout.activity_main);
     	
-    	// Create an adapter for the task list
-		adapter = new TaskListAdapter(this, new ArrayList<DeprecatedTask>(0));
+    	// Open the database
+        data_source = new TasksDataSource(this);
+        data_source.open();
+        
+        // Create an adapter for the task list
+		adapter = new TaskListAdapter(this, data_source.getAllTasks());
     	setListAdapter(adapter);
-    	
-        // Read tasks from file
-    	readTasksFromFile();
     	
         // Read settings from file
     	readSettingsFromFile();
@@ -224,9 +172,22 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
     }
     
     @Override
+    protected void onResume() {
+    	data_source.open();
+    	super.onResume();
+    }
+    
+    @Override
+    protected void onPause() {
+    	data_source.close();
+    	super.onPause();
+    }
+    
+    @Override
 	public void onStop() {
-    	writeTasksToFile();
-    	writeSettingsToFile();
+    	// Save preferences to file
+    	prefs_editor.commit();
+    	
     	super.onStop();
     }
     
@@ -288,6 +249,12 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
     public void onListItemClick(ListView list_view, View view, int position, 
     		long id) {
     	adapter.getItem(position).toggleIsCompleted();
+    	adapter.getItem(position).setDateModified((int) GregorianCalendar.getInstance().getTimeInMillis());
+    	
+    	// Update database
+    	data_source.updateTask(adapter.getItem(position));
+    	
+    	// Sort the list
     	adapter.sort();
     }
     
@@ -295,9 +262,13 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
 	public void onActivityResult(int request_code, int result_code, 
     		Intent intent) {
     	if (request_code == ADD_TASK_REQUEST && result_code == RESULT_OK) {
-    		DeprecatedTask deprecatedTask = intent.getParcelableExtra(AddTaskActivity.EXTRA_TASK);
-    		adapter.add(deprecatedTask);
+    		Task task = intent.getParcelableExtra(AddTaskActivity.EXTRA_TASK);
+    		adapter.add(task);
     		adapter.sort();
+    		
+    		// Update database
+    		data_source.open();
+    		data_source.addTask(task);
     	}
     }
     
