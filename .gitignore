@@ -19,3 +19,7 @@ local.properties
 .classpath
 .project
 .settings
+
+# Generated project files
+project.properties
+proguard-project.txt
