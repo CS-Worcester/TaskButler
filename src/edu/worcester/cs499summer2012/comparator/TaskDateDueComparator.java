@@ -21,32 +21,47 @@ package edu.worcester.cs499summer2012.comparator;
 
 import java.util.Comparator;
 
-import edu.worcester.cs499summer2012.task.DeprecatedTask;
+import edu.worcester.cs499summer2012.task.Task;
 
 /**
  * Comparator for sorting tasks by due date.
  * @author Jonathan Hasenzahl
  */
-public class TaskDateDueComparator implements Comparator<DeprecatedTask> {
+public class TaskDateDueComparator implements Comparator<Task> {
 	
 	/**
 	 * Compares two tasks by their due dates. Tasks with no due date are ordered
 	 * after those with a due date.
 	 * @param lhs the first task
 	 * @param rhs the second task
-	 * @return 0 if the due dates are the same, -1 if the first task is due
-	 *         first, or 1 if the second task is due first
+	 * @return A negative value if the first task is due first, a positive
+	 *         value if the second task is due first, or 0 if they are due at
+	 *         the same time
 	 */	
-	public int compare(DeprecatedTask lhs, DeprecatedTask rhs) {
-		// Check for null calendars (no due date)
-		if (lhs.getDateDue() == null && rhs.getDateDue() == null)
-			return 0;
-		if (lhs.getDateDue() == null && rhs.getDateDue() != null)
-			return 1;
-		if (lhs.getDateDue() != null && rhs.getDateDue() == null)
-			return -1;
-		
-		// Both calendars are not null
-		return lhs.getDateDue().compareTo(rhs.getDateDue());
+	public int compare(Task lhs, Task rhs) {
+		if (lhs.getDateDue() == 0) {
+			// Case 1: lhs has no due date
+			if (rhs.getDateDue() > 0) {
+				// Case 1a: rhs has a due date and is ordered first
+				return 1;
+			} else {
+				// Case 2a: rhs has no due date and they are equal
+				return 0;
+			}
+		}
+		else {
+			// Case 2: lhs has a due date
+			if (rhs.getDateDue() == 0) {
+				// Case 2a: rhs has no due date and is ordered second
+				return -1;
+			}
+			else {
+				// Case 2b: rhs has a due date
+				// Ex. LHS -> date 5000ms (earlier)
+				//     RHS -> date 6000ms (later)
+				//     LHS - RHS = 5000 - 6000 = -1000 = LHS ordered first
+				return (int) (lhs.getDateDue() - rhs.getDateDue());
+			}
+		}
 	}
 }

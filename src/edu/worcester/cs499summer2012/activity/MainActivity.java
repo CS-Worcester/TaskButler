@@ -81,17 +81,6 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
 	 **************************************************************************/
     
     /**
-     * Reads settings from a SharedPreferences file.
-     */
-    private void readSettingsFromFile() {
-    	prefs = PreferenceManager.getDefaultSharedPreferences(this);
-    	prefs_editor = prefs.edit();
-    	
-    	adapter.setSortType(prefs.getInt(PREF_SORT_TYPE, 
-    			TaskListAdapter.AUTO_SORT));
-    }
-    
-    /**
      * Displays a message in a Toast notification for a short duration.
      */
     private void toast(String message)
@@ -99,8 +88,7 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
     	Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
     
-    private void deleteAlert(String question, final int mode, 
-    		final String confirmation)
+    private void deleteAlert(String question, final int mode)
     {
     	AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setMessage(question)
@@ -110,8 +98,10 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
 		    		   int deleted_tasks;
 		    		   switch (mode) {
 		    		   case DELETE_MODE_SINGLE:
+		    			   toast("Task id: " + adapter.getItem(selected_task).getID());
 		    			   data_source.deleteTask(adapter.getItem(selected_task));
 		    			   adapter.remove(adapter.getItem(selected_task));
+		    			   toast("Task deleted");
 		    			   break;
 		    			   
 		    		   case DELETE_MODE_FINISHED:
@@ -133,7 +123,6 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
 		    			   toast(deleted_tasks + " tasks deleted");
 		    			   break;
 		    		   }
-		    		   toast(confirmation);
 		    	   }
 		       })
 		       .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -164,8 +153,14 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
 		adapter = new TaskListAdapter(this, data_source.getAllTasks());
     	setListAdapter(adapter);
     	
-        // Read settings from file
-    	readSettingsFromFile();
+        // Read preferences from file
+    	prefs = PreferenceManager.getDefaultSharedPreferences(this);
+    	prefs_editor = prefs.edit();
+    	
+    	// Set sort type and sort the list
+    	adapter.setSortType(prefs.getInt(PREF_SORT_TYPE, 
+    			TaskListAdapter.AUTO_SORT));
+    	adapter.sort();
     	
     	// Set up a long item click listener
     	getListView().setOnItemLongClickListener(this);
@@ -224,12 +219,12 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
     		
     	case R.id.menu_delete_finished:
     		deleteAlert("Are you sure you want to delete all completed tasks? This cannot be undone.",
-    				DELETE_MODE_FINISHED, "Tasks deleted");
+    				DELETE_MODE_FINISHED);
     		return true;
     		
     	case R.id.menu_delete_all:
     		deleteAlert("Are you sure you want to delete all tasks? This cannot be undone.",
-    				DELETE_MODE_ALL, "All tasks deleted");
+    				DELETE_MODE_ALL);
     		return true;
     		
     	case R.id.menu_main_settings:
@@ -263,12 +258,15 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
     		Intent intent) {
     	if (request_code == ADD_TASK_REQUEST && result_code == RESULT_OK) {
     		Task task = intent.getParcelableExtra(AddTaskActivity.EXTRA_TASK);
+    		
+    		// Set the ID for the new task and update database
+    		data_source.open();
+    		task.setID(data_source.getNextID());
+    		data_source.addTask(task);
+    		
+    		// Update the adapter
     		adapter.add(task);
     		adapter.sort();
-    		
-    		// Update database
-    		data_source.open();
-    		data_source.addTask(task);
     	}
     }
     
@@ -315,7 +313,7 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
 		
 		case R.id.menu_main_delete_task:
 			deleteAlert("Are you sure you want to delete this task?",
-					DELETE_MODE_SINGLE, "Task deleted");
+					DELETE_MODE_SINGLE);
 			mode.finish();
 			return true;
 			

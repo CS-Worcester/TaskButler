@@ -21,23 +21,24 @@ package edu.worcester.cs499summer2012.comparator;
 
 import java.util.Comparator;
 
-import edu.worcester.cs499summer2012.task.DeprecatedTask;
+import edu.worcester.cs499summer2012.task.Task;
 
 /**
  * Comparator for sorting tasks by name.
  * @author Jonathan Hasenzahl
  */
-public class TaskNameComparator implements Comparator<DeprecatedTask> {
+public class TaskNameComparator implements Comparator<Task> {
 	
 	/**
 	 * Compares two tasks by the lexographical order of their names. Case is
 	 * ignored in this comparison.
 	 * @param lhs the first task
 	 * @param rhs the second task
-	 * @return 0 if the names are the same, -1 if the first task is ordered
-	 *         first, or 1 if the second task is ordered first
+	 * @return A negative value if the first task is ordered first, a positive
+	 *         value if the second task is ordered first, or 0 if they have the
+	 *         same name.
 	 */	
-	public int compare(DeprecatedTask lhs, DeprecatedTask rhs) {
+	public int compare(Task lhs, Task rhs) {
 		return lhs.getName().compareToIgnoreCase(rhs.getName());
 	}
 }
