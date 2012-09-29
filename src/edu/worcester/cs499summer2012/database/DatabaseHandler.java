@@ -46,10 +46,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	public static final String KEY_COMPLETION = "completion"; //data type: INTEGER, indirectly DATETIME as Unix Time
 	public static final String KEY_PRIORITY = "priority"; //data type: INTEGER, 2=URGENT, 1=REGULAR,0=TRIVIAL 
 	public static final String KEY_CATEGORY = "category"; //data type: INTEGER
-	public static final String KEY_CREATION_DATE = "creationDate"; //data type: INTEGER, indirectly DATETIME as Unix Time
-	public static final String KEY_MODIFICATION_DATE = "modificationDate"; //data type: INTEGER, indirectly DATETIME as Unix Time
-	public static final String KEY_DUE_DATE = "dueDate"; //data type: INTEGER, indirectly DATETIME as Unix Time
-	public static final String KEY_FINAL_DUE_DATE = "finalDueDate"; //data type: INTEGER, indirectly DATETIME as Unix Time
+	public static final String KEY_CREATION_DATE = "creationDate"; //data type: DATETIME
+	public static final String KEY_MODIFICATION_DATE = "modificationDate"; //data type: DATETIME
+	public static final String KEY_DUE_DATE = "dueDate"; //data type: DATETIME
+	public static final String KEY_FINAL_DUE_DATE = "finalDueDate"; //data type: DATETIME
 	public static final String KEY_NOTES = "notes"; //data type: TEXT can be null
 	public static final String KEY_COLOR = "color"; //data type: INTEGER, used in category table
 
@@ -67,10 +67,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				+ KEY_COMPLETION + " INTEGER,"
 				+ KEY_PRIORITY + " INTEGER,"
 				+ KEY_CATEGORY + " INTEGER,"
-				+ KEY_CREATION_DATE + " INTEGER,"
-				+ KEY_MODIFICATION_DATE + " INTEGER,"
-				+ KEY_DUE_DATE + " INTEGER,"
-				+ KEY_FINAL_DUE_DATE + " INTEGER,"
+				+ KEY_CREATION_DATE + " DATETIME,"
+				+ KEY_MODIFICATION_DATE + " DATETIME,"
+				+ KEY_DUE_DATE + " DATETIME,"
+				+ KEY_FINAL_DUE_DATE + " DATETIME,"
 				+ KEY_NOTES + " TEXT)";
 		
 		String create_categories_table = "CREATE TABLE " + TABLE_CATEGORIES + "(" 

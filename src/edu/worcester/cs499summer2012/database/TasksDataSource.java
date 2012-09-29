@@ -69,8 +69,9 @@ public class TasksDataSource {
 
 		return new Task(cursor.getInt(0), cursor.getString(1), 
 				cursor.getInt(2) > 0, cursor.getInt(3), cursor.getInt(4), 
-				cursor.getInt(5), cursor.getInt(6), cursor.getInt(7),
-				cursor.getInt(8), cursor.getString(9));
+				cursor.getLong(5), cursor.getLong(6), 
+				cursor.getLong(7), cursor.getLong(8), 
+				cursor.getString(9));
 	}
 	
 	public ArrayList<Task> getAllTasks() {
@@ -89,10 +90,10 @@ public class TasksDataSource {
 				task.setIsCompleted(cursor.getInt(2) > 0); // if value > 0 then isCompleted is set to true
 				task.setPriority(cursor.getInt(3)); // urgent=2 regular=1 trivial=0
 				task.setCategory(cursor.getInt(4));
-				task.setDateCreated(cursor.getInt(5));
-				task.setDateModified(cursor.getInt(6));
-				task.setDateDue(cursor.getInt(7));
-				task.setFinalDateDue(cursor.getInt(8));
+				task.setDateCreated(cursor.getLong(5));
+				task.setDateModified(cursor.getLong(6));
+				task.setDateDue(cursor.getLong(7));
+				task.setFinalDateDue(cursor.getLong(8));
 				task.setNotes(cursor.getString(9));
 
 				// Adding task to list

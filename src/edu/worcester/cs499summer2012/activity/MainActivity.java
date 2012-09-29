@@ -88,8 +88,7 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
     	Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
     
-    private void deleteAlert(String question, final int mode, 
-    		final String confirmation)
+    private void deleteAlert(String question, final int mode)
     {
     	AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setMessage(question)
@@ -102,6 +101,7 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
 		    			   toast("Task id: " + adapter.getItem(selected_task).getID());
 		    			   data_source.deleteTask(adapter.getItem(selected_task));
 		    			   adapter.remove(adapter.getItem(selected_task));
+		    			   toast("Task deleted");
 		    			   break;
 		    			   
 		    		   case DELETE_MODE_FINISHED:
@@ -123,7 +123,6 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
 		    			   toast(deleted_tasks + " tasks deleted");
 		    			   break;
 		    		   }
-		    		   toast(confirmation);
 		    	   }
 		       })
 		       .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -220,12 +219,12 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
     		
     	case R.id.menu_delete_finished:
     		deleteAlert("Are you sure you want to delete all completed tasks? This cannot be undone.",
-    				DELETE_MODE_FINISHED, "Tasks deleted");
+    				DELETE_MODE_FINISHED);
     		return true;
     		
     	case R.id.menu_delete_all:
     		deleteAlert("Are you sure you want to delete all tasks? This cannot be undone.",
-    				DELETE_MODE_ALL, "All tasks deleted");
+    				DELETE_MODE_ALL);
     		return true;
     		
     	case R.id.menu_main_settings:
@@ -314,7 +313,7 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
 		
 		case R.id.menu_main_delete_task:
 			deleteAlert("Are you sure you want to delete this task?",
-					DELETE_MODE_SINGLE, "Task deleted");
+					DELETE_MODE_SINGLE);
 			mode.finish();
 			return true;
 			

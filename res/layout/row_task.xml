@@ -9,26 +9,61 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:textSize="20dp" />
-    
-    <TextView android:id="@+id/text_main_row_date_due"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@id/text_main_row_name"
-        android:textSize="16dp" />
-    
-    <TextView android:id="@+id/text_main_row_priority"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:textSize="16dp" />
+        android:textSize="24dp" />
     
     <TextView android:id="@+id/text_main_row_is_completed"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
+        android:textSize="24dp" />
+    
+    <TextView android:id="@+id/text_main_row_priority"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@id/text_main_row_name"
+        android:textSize="18dp" />
+    
+    <TextView android:id="@+id/text_main_row_category"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/text_main_row_is_completed"
+        android:textSize="18dp" />
+    
+    <TextView android:id="@+id/text_main_row_date_created"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
         android:layout_below="@id/text_main_row_priority"
-        android:textSize="16dp" />
+        android:textSize="10dp" />
+    
+    <TextView android:id="@+id/text_main_row_date_due"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/text_main_row_category"
+        android:textSize="10dp" />
+    
+    <TextView android:id="@+id/text_main_row_date_modified"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@id/text_main_row_date_created"
+        android:textSize="10dp" />
+    
+    <TextView android:id="@+id/text_main_row_final_date_due"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/text_main_row_date_due"
+        android:textSize="10dp" />
+    
+    <TextView android:id="@+id/text_main_row_notes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@id/text_main_row_date_modified"
+        android:textSize="12dp" />
     
 </RelativeLayout>
