@@ -106,8 +106,26 @@ public class TasksDataSource {
 		return taskList;
 	}
 	
+	/**
+	 * Returns the next available ID to be assigned to a new task. This
+	 * number is equal to the highest current ID + 1.
+	 * @return the next available task ID to be assigned to a new task
+	 */
+	public int getNextID() {
+		String selectQuery = "SELECT MAX(" + DatabaseHandler.KEY_ID +
+				") FROM " + DatabaseHandler.TABLE_TASKS;
+		
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		
+		if (cursor.moveToFirst())
+			return cursor.getInt(0) + 1;
+		else
+			return 1;
+	}
+	
 	public void addTask(Task task) {
 		ContentValues values = new ContentValues();
+		values.put(DatabaseHandler.KEY_ID, task.getID());
 		values.put(DatabaseHandler.KEY_NAME, task.getName()); // Task Name
 		values.put(DatabaseHandler.KEY_COMPLETION, task.isCompleted()); // Task completion
 		values.put(DatabaseHandler.KEY_PRIORITY, task.getPriority()); // Task priority

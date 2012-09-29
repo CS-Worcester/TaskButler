@@ -61,7 +61,7 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 	private final Activity activity;
 	private final ArrayList<Task> tasks;
 	private int sort_type;
-	//private final Comparator<Task> auto_comparator = new TaskAutoComparator();
+	private final Comparator<Task> auto_comparator = new TaskAutoComparator();
 	//private final Comparator<Task> name_comparator = new TaskNameComparator();
 	//private final Comparator<Task> completion_comparator = new TaskCompletionComparator();
 	//private final Comparator<Task> priority_comparator = new TaskPriorityComparator();
@@ -141,11 +141,10 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 	}
 	
 	public void sort() {
-		// TODO: Uncomment after comparators are fixed
-		/*if (sort_type == AUTO_SORT)
+		if (sort_type == AUTO_SORT)
 		{
 			this.sort(auto_comparator);
-		}*/
+		}
 		this.notifyDataSetChanged();
 	}
 	

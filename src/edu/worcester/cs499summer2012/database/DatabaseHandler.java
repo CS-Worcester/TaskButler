@@ -36,10 +36,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	// Database Name
 	private static final String DATABASE_NAME = "TaskButler.db";
 
-	// tasks table name
+	// Table names
 	public static final String TABLE_TASKS = "tasks";
+	public static final String TABLE_CATEGORIES = "categories";
 
-	// tasks Table Columns names
+	// Column names
 	public static final String KEY_ID = "id";
 	public static final String KEY_NAME = "name"; //data type: TEXT
 	public static final String KEY_COMPLETION = "completion"; //data type: INTEGER, indirectly DATETIME as Unix Time
@@ -50,6 +51,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	public static final String KEY_DUE_DATE = "dueDate"; //data type: INTEGER, indirectly DATETIME as Unix Time
 	public static final String KEY_FINAL_DUE_DATE = "finalDueDate"; //data type: INTEGER, indirectly DATETIME as Unix Time
 	public static final String KEY_NOTES = "notes"; //data type: TEXT can be null
+	public static final String KEY_COLOR = "color"; //data type: INTEGER, used in category table
 
 
 	public DatabaseHandler(Context context) {
@@ -59,7 +61,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	// Creating Table
 	@Override
 	public void onCreate(SQLiteDatabase db) {
-		String CREATE_TASKS_TABLE = "CREATE TABLE " + TABLE_TASKS + "("
+		String create_tasks_table = "CREATE TABLE " + TABLE_TASKS + "("
 				+ KEY_ID + " INTEGER PRIMARY KEY,"
 				+ KEY_NAME + " TEXT,"
 				+ KEY_COMPLETION + " INTEGER,"
@@ -69,9 +71,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				+ KEY_MODIFICATION_DATE + " INTEGER,"
 				+ KEY_DUE_DATE + " INTEGER,"
 				+ KEY_FINAL_DUE_DATE + " INTEGER,"
-				+ KEY_NOTES + " TEXT" + ")";
+				+ KEY_NOTES + " TEXT)";
+		
+		String create_categories_table = "CREATE TABLE " + TABLE_CATEGORIES + "(" 
+				+ KEY_ID + " INTEGER PRIMARY KEY,"
+				+ KEY_NAME + " TEXT,"
+				+ KEY_COLOR + " INTEGER)";
 
-		db.execSQL(CREATE_TASKS_TABLE);
+		db.execSQL(create_tasks_table);
+		db.execSQL(create_categories_table);
 	}
 
 	// Upgrading database
@@ -79,6 +87,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 		// Drop older table if existed just for testing purposes, will change to copy over old database later on
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_TASKS);
+		db.execSQL("DROP TABLE IF EXISTS " + TABLE_CATEGORIES);
 
 		// Create tables again
 		onCreate(db);

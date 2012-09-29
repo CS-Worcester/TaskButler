@@ -81,17 +81,6 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
 	 **************************************************************************/
     
     /**
-     * Reads settings from a SharedPreferences file.
-     */
-    private void readSettingsFromFile() {
-    	prefs = PreferenceManager.getDefaultSharedPreferences(this);
-    	prefs_editor = prefs.edit();
-    	
-    	adapter.setSortType(prefs.getInt(PREF_SORT_TYPE, 
-    			TaskListAdapter.AUTO_SORT));
-    }
-    
-    /**
      * Displays a message in a Toast notification for a short duration.
      */
     private void toast(String message)
@@ -110,6 +99,7 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
 		    		   int deleted_tasks;
 		    		   switch (mode) {
 		    		   case DELETE_MODE_SINGLE:
+		    			   toast("Task id: " + adapter.getItem(selected_task).getID());
 		    			   data_source.deleteTask(adapter.getItem(selected_task));
 		    			   adapter.remove(adapter.getItem(selected_task));
 		    			   break;
@@ -164,8 +154,14 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
 		adapter = new TaskListAdapter(this, data_source.getAllTasks());
     	setListAdapter(adapter);
     	
-        // Read settings from file
-    	readSettingsFromFile();
+        // Read preferences from file
+    	prefs = PreferenceManager.getDefaultSharedPreferences(this);
+    	prefs_editor = prefs.edit();
+    	
+    	// Set sort type and sort the list
+    	adapter.setSortType(prefs.getInt(PREF_SORT_TYPE, 
+    			TaskListAdapter.AUTO_SORT));
+    	adapter.sort();
     	
     	// Set up a long item click listener
     	getListView().setOnItemLongClickListener(this);
@@ -263,12 +259,15 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
     		Intent intent) {
     	if (request_code == ADD_TASK_REQUEST && result_code == RESULT_OK) {
     		Task task = intent.getParcelableExtra(AddTaskActivity.EXTRA_TASK);
+    		
+    		// Set the ID for the new task and update database
+    		data_source.open();
+    		task.setID(data_source.getNextID());
+    		data_source.addTask(task);
+    		
+    		// Update the adapter
     		adapter.add(task);
     		adapter.sort();
-    		
-    		// Update database
-    		data_source.open();
-    		data_source.addTask(task);
     	}
     }
     
