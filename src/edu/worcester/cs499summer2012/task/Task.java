@@ -18,6 +18,9 @@
  */
 package edu.worcester.cs499summer2012.task;
 
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -56,6 +59,10 @@ public class Task implements Parcelable {
 	private int dateDue;
 	private int finalDateDue;
 	private String notes;
+	private Calendar dateCreatedCal;
+	private Calendar dateModifiedCal;
+	private Calendar dateDueCal;
+	private Calendar finalDateDueCal;
 
 
 	/**************************************************************************
@@ -72,7 +79,8 @@ public class Task implements Parcelable {
 	 * @param task the Task to be copied
 	 */
 	public Task(Task task) {
-		// TODO: (Jon) @Dhimitri - Should this copy ID also?
+		// ID is not copied and kept unique so the copy will not replace the
+		// original task
 		name = task.name;
 		isCompleted = task.isCompleted;
 		priority = task.priority;
@@ -82,10 +90,15 @@ public class Task implements Parcelable {
 		dateDue = task.dateDue;
 		finalDateDue = task.finalDateDue;
 		notes = task.notes;
+		
+		updateDateCreatedCal();
+		updateDateModifiedCal();
+		updateDateDueCal();
+		updateFinalDateDueCal();
 	}
 
 	/**
-	 * Constructor, without ID and without modification date.
+	 * Constructor, without ID and without modification date (new task)
 	 * @param name
 	 * @param isCompleted
 	 * @param priority
@@ -106,26 +119,11 @@ public class Task implements Parcelable {
 		this.dateDue = date_due;
 		this.finalDateDue = final_date_due;
 		this.notes = notes;
-	}
-
-	/**
-	 * Constructor, with ID and without modification date.
-	 * @param id
-	 * @param name
-	 * @param isCompleted
-	 * @param priority
-	 * @param category
-	 * @param date_created
-	 * @param date_due
-	 * @param final_date_due
-	 * @param notes
-	 */
-	public Task(int id, String name, boolean isCompleted, int priority, 
-			int category, int date_created, int date_due, int final_date_due, 
-			String notes) {
-		this(name, isCompleted, priority, category, date_created, date_due, 
-				final_date_due, notes);
-		this.id = id;
+		
+		updateDateCreatedCal();
+		updateDateModifiedCal();
+		updateDateDueCal();
+		updateFinalDateDueCal();
 	}
 	
 	/**
@@ -144,12 +142,55 @@ public class Task implements Parcelable {
 	public Task(int id, String name, boolean isCompleted, int priority, 
 			int category, int date_created, int date_modified, int date_due, 
 			int final_date_due, String notes) {
-		this(id, name, isCompleted, priority, category, date_created, date_due, 
+		this(name, isCompleted, priority, category, date_created, date_due, 
 				final_date_due, notes);
+		this.id = id;
 		this.dateModified = date_modified;
 	}
 
-
+	/**************************************************************************
+	 * Class methods                                                          *
+	 **************************************************************************/ 
+	
+	private void updateDateCreatedCal() {
+		if (dateCreatedCal == null)
+			dateCreatedCal = new GregorianCalendar();
+		
+		dateCreatedCal.setTimeInMillis((long) dateCreated);
+	}
+	
+	private void updateDateModifiedCal() {
+		if (dateModifiedCal == null)
+			dateModifiedCal = new GregorianCalendar();
+		
+		dateModifiedCal.setTimeInMillis((long) dateModified);
+	}
+	
+	private void updateDateDueCal() {
+		if (dateDue == 0)
+		{
+			dateDueCal = null;
+			return;
+		}
+		
+		if (dateDueCal == null)
+			dateDueCal = new GregorianCalendar();
+		
+		dateDueCal.setTimeInMillis((long) dateDue);
+	}
+	
+	private void updateFinalDateDueCal() {
+		if (finalDateDue == 0)
+		{
+			finalDateDueCal = null;
+			return;
+		}
+		
+		if (finalDateDueCal == null)
+			finalDateDueCal = new GregorianCalendar();
+		
+		finalDateDueCal.setTimeInMillis((long) finalDateDue);
+	}
 
 	/**************************************************************************
 	 * Overridden parent methods                                              *
@@ -265,6 +306,11 @@ public class Task implements Parcelable {
 		dateDue = in.readInt();
 		finalDateDue = in.readInt();
 		notes = in.readString();
+		
+		updateDateCreatedCal();
+		updateDateModifiedCal();
+		updateDateDueCal();
+		updateFinalDateDueCal();
 	}
 	
 	/**************************************************************************
@@ -318,33 +364,53 @@ public class Task implements Parcelable {
 	public int getDateCreated() {
 		return dateCreated;
 	}
+	
+	public Calendar getDateCreatedCal() {
+		return dateCreatedCal;
+	}
 
 	public void setDateCreated(int date_created) {
 		this.dateCreated = date_created;
+		updateDateCreatedCal();
 	}
 	
 	public int getDateModified() {
 		return dateModified;
 	}
+	
+	public Calendar getDateModifiedCal() {
+		return dateModifiedCal;
+	}
 
 	public void setDateModified(int date_modified) {
 		this.dateModified = date_modified;
+		updateDateModifiedCal();
 	}
 
 	public int getDateDue() {
 		return dateDue;
 	}
+	
+	public Calendar getDateDueCal() {
+		return dateDueCal;
+	}
 
 	public void setDateDue(int date_due) {
 		this.dateDue = date_due;
+		updateDateDueCal();
 	}
 	
 	public int getFinalDateDue() {
 		return finalDateDue;
 	}
+	
+	public Calendar getFinalDateDueCal() {
+		return finalDateDueCal;
+	}
 
 	public void setFinalDateDue(int final_date_due) {
 		this.finalDateDue = final_date_due;
+		updateFinalDateDueCal();
 	}
 
 	public String getNotes() {
