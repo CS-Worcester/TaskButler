@@ -18,9 +18,12 @@
  */
 package edu.worcester.cs499summer2012.task;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 
 /**
- * Defines a Task object (name, complition, priority, date created, due date, notes), 
+ * Defines a Task object (name, completion, priority, date created, due date, notes), 
  * provides multiple constructors as well as mutators, it has its own defined toString() and equals()
  * @author Dhimitraq Jorgji
  * @author Jonathan Hasenzahl
@@ -28,15 +31,30 @@ package edu.worcester.cs499summer2012.task;
  */
 
 
-public class Task {
+public class Task implements Parcelable {
 
-	//private variables
+	/**************************************************************************
+	 * Static fields and methods                                              *
+	 **************************************************************************/
+	
+	public static final String[] LABELS = {"Trivial", "Normal", "Urgent"};
+	public static final int TRIVIAL = 0;
+	public static final int NORMAL = 1;
+	public static final int URGENT = 2;
+	
+	/**************************************************************************
+	 * Private fields                                                         *
+	 **************************************************************************/
+	
 	private int id;
 	private String name;
 	private boolean isCompleted;
 	private int priority;
+	private int category;
 	private int dateCreated;
-	private int dueDate;
+	private int dateModified;
+	private int dateDue;
+	private int finalDateDue;
 	private String notes;
 
 
@@ -54,52 +72,81 @@ public class Task {
 	 * @param task the Task to be copied
 	 */
 	public Task(Task task) {
+		// TODO: (Jon) @Dhimitri - Should this copy ID also?
 		name = task.name;
 		isCompleted = task.isCompleted;
 		priority = task.priority;
+		category = task.category;
 		dateCreated = task.dateCreated;
-		dueDate = task.dueDate;
+		dateModified = task.dateModified;
+		dateDue = task.dateDue;
+		finalDateDue = task.finalDateDue;
 		notes = task.notes;
 	}
 
 	/**
-	 * Designated constructor
+	 * Constructor, without ID and without modification date.
 	 * @param name
 	 * @param isCompleted
 	 * @param priority
+	 * @param category
 	 * @param date_created
 	 * @param date_due
+	 * @param final_date_due
 	 * @param notes
 	 */
-	public Task(String name, boolean isCompleted, int priority, 
-			int date_created, int date_due, String notes){
+	public Task(String name, boolean isCompleted, int priority, int category,
+			int date_created, int date_due, int final_date_due, String notes) {
 		this.name = name;
 		this.isCompleted = isCompleted;
 		this.priority = priority;
+		this.category = category;
 		this.dateCreated = date_created;
-		this.dueDate = date_due;
+		this.dateModified = date_created; // New task has not been modified yet
+		this.dateDue = date_due;
+		this.finalDateDue = final_date_due;
 		this.notes = notes;
 	}
 
 	/**
-	 * Designated constructor
+	 * Constructor, with ID and without modification date.
 	 * @param id
 	 * @param name
 	 * @param isCompleted
 	 * @param priority
+	 * @param category
 	 * @param date_created
 	 * @param date_due
+	 * @param final_date_due
 	 * @param notes
 	 */
 	public Task(int id, String name, boolean isCompleted, int priority, 
-			int date_created, int date_due, String notes){
+			int category, int date_created, int date_due, int final_date_due, 
+			String notes) {
+		this(name, isCompleted, priority, category, date_created, date_due, 
+				final_date_due, notes);
 		this.id = id;
-		this.name = name;
-		this.isCompleted = isCompleted;
-		this.priority = priority;
-		this.dateCreated = date_created;
-		this.dueDate = date_due;
-		this.notes = notes;
+	}
+	
+	/**
+	 * Constructor, with ID and with modification date.
+	 * @param id
+	 * @param name
+	 * @param isCompleted
+	 * @param priority
+	 * @param category
+	 * @param date_created
+	 * @param date_modified
+	 * @param date_due
+	 * @param final_date_due
+	 * @param notes
+	 */
+	public Task(int id, String name, boolean isCompleted, int priority, 
+			int category, int date_created, int date_modified, int date_due, 
+			int final_date_due, String notes) {
+		this(id, name, isCompleted, priority, category, date_created, date_due, 
+				final_date_due, notes);
+		this.dateModified = date_modified;
 	}
 
 
@@ -129,9 +176,15 @@ public class Task {
 			return false;
 		if (this.priority != t.priority)
 			return false;
+		if (this.category != t.category)
+			return false;
 		if (this.dateCreated != t.dateCreated)
 			return false;
-		if (this.dueDate != t.dueDate)
+		if (this.dateModified != t.dateModified)
+			return false;
+		if (this.dateDue != t.dateDue)
+			return false;
+		if (this.finalDateDue != t.finalDateDue)
 			return false;
 		if (!this.notes.equals(t.notes))
 			return false;
@@ -152,12 +205,68 @@ public class Task {
 	 */
 	@Override
 	public String toString() {
+		// TODO: (Jon) Reimplement this method in a more useful form
 		return name + " " +  Boolean.toString(isCompleted)+ " "
 				+Integer.toString(priority) + " "
-				+ dateCreated + " " + dueDate +  " "
+				+ dateCreated + " " + dateDue +  " "
 				+ notes;
 	}
 
+	/**************************************************************************
+	 * Methods implementing Parcelable interface                              *
+	 **************************************************************************/
+	
+	/**
+	 * Empty & unused method. Required for implementing Parcelable.
+	 * @return 0
+	 * @see Parcelable
+	 */
+	public int describeContents() {
+		return 0;
+	}
+	
+	/**
+	 * Converts task to a parcel.
+	 * @param out the parcel the task will be written to
+	 * @param flags unused
+	 * @see Parcelable
+	 */
+	public void writeToParcel(Parcel out, int flags) {
+		out.writeInt(id);
+		out.writeString(name);
+		out.writeString(Boolean.toString(isCompleted));
+		out.writeInt(priority);
+		out.writeInt(category);
+		out.writeInt(dateCreated);
+		out.writeInt(dateModified);
+		out.writeInt(dateDue);
+		out.writeInt(finalDateDue);
+		out.writeString(notes);
+	}
+	
+	public static final Parcelable.Creator<Task> CREATOR = new Parcelable.Creator<Task>() {
+		public Task createFromParcel(Parcel in) {
+			return new Task(in);
+		}
+		
+		public Task[] newArray(int size) {
+			return new Task[size];
+		}
+	};
+	
+	private Task(Parcel in) {
+		id = in.readInt();
+		name = in.readString();
+		isCompleted = Boolean.parseBoolean(in.readString());
+		priority = in.readInt();
+		category = in.readInt();
+		dateCreated = in.readInt();
+		dateModified = in.readInt();
+		dateDue = in.readInt();
+		finalDateDue = in.readInt();
+		notes = in.readString();
+	}
+	
 	/**************************************************************************
 	 * Getters and setters                                                    *
 	 **************************************************************************/	
@@ -186,6 +295,10 @@ public class Task {
 		this.isCompleted = is_completed;
 	}
 
+	public void toggleIsCompleted() {
+		isCompleted = isCompleted ? false : true;
+	}
+	
 	public int getPriority() {
 		return priority;
 	}
@@ -193,21 +306,45 @@ public class Task {
 	public void setPriority(int priority) {
 		this.priority = priority;
 	}
+	
+	public int getCategory() {
+		return category;
+	}
+	
+	public void setCategory(int category) {
+		this.category = category;
+	}
 
-	public int getDate_created() {
+	public int getDateCreated() {
 		return dateCreated;
 	}
 
-	public void setDate_created(int date_created) {
+	public void setDateCreated(int date_created) {
 		this.dateCreated = date_created;
 	}
-
-	public int getDate_due() {
-		return dueDate;
+	
+	public int getDateModified() {
+		return dateModified;
 	}
 
-	public void setDate_due(int date_due) {
-		this.dueDate = date_due;
+	public void setDateModified(int date_modified) {
+		this.dateModified = date_modified;
+	}
+
+	public int getDateDue() {
+		return dateDue;
+	}
+
+	public void setDateDue(int date_due) {
+		this.dateDue = date_due;
+	}
+	
+	public int getFinalDateDue() {
+		return finalDateDue;
+	}
+
+	public void setFinalDateDue(int final_date_due) {
+		this.finalDateDue = final_date_due;
 	}
 
 	public String getNotes() {
@@ -216,10 +353,5 @@ public class Task {
 
 	public void setNotes(String notes) {
 		this.notes = notes;
-	}
-
-	public Task toggleIsCompleted() {
-		isCompleted = isCompleted ? false : true;
-		return this;
 	}
 }
