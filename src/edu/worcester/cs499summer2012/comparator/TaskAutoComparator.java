@@ -82,7 +82,7 @@ public class TaskAutoComparator implements Comparator<Task> {
 					// Ex. LHS -> date 5000ms (earlier)
 					//     RHS -> date 6000ms (later)
 					//     LHS - RHS = 5000 - 6000 = -1000 = LHS ordered first
-					return lhs.getDateDue() - rhs.getDateDue();
+					return (int) (lhs.getDateDue() - rhs.getDateDue());
 				}
 			}
 		}

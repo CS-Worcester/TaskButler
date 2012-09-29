@@ -54,10 +54,10 @@ public class Task implements Parcelable {
 	private boolean isCompleted;
 	private int priority;
 	private int category;
-	private int dateCreated;
-	private int dateModified;
-	private int dateDue;
-	private int finalDateDue;
+	private long dateCreated;
+	private long dateModified;
+	private long dateDue;
+	private long finalDateDue;
 	private String notes;
 	private Calendar dateCreatedCal;
 	private Calendar dateModifiedCal;
@@ -109,7 +109,7 @@ public class Task implements Parcelable {
 	 * @param notes
 	 */
 	public Task(String name, boolean isCompleted, int priority, int category,
-			int date_created, int date_due, int final_date_due, String notes) {
+			long date_created, long date_due, long final_date_due, String notes) {
 		this.name = name;
 		this.isCompleted = isCompleted;
 		this.priority = priority;
@@ -127,7 +127,7 @@ public class Task implements Parcelable {
 	}
 	
 	/**
-	 * Constructor, with ID and with modification date.
+	 * Constructor, with ID and with modification date (existing task)
 	 * @param id
 	 * @param name
 	 * @param isCompleted
@@ -140,8 +140,8 @@ public class Task implements Parcelable {
 	 * @param notes
 	 */
 	public Task(int id, String name, boolean isCompleted, int priority, 
-			int category, int date_created, int date_modified, int date_due, 
-			int final_date_due, String notes) {
+			int category, long date_created, long date_modified, long date_due, 
+			long final_date_due, String notes) {
 		this(name, isCompleted, priority, category, date_created, date_due, 
 				final_date_due, notes);
 		this.id = id;
@@ -247,10 +247,7 @@ public class Task implements Parcelable {
 	@Override
 	public String toString() {
 		// TODO: (Jon) Reimplement this method in a more useful form
-		return name + " " +  Boolean.toString(isCompleted)+ " "
-				+Integer.toString(priority) + " "
-				+ dateCreated + " " + dateDue +  " "
-				+ notes;
+		return name;
 	}
 
 	/**************************************************************************
@@ -278,10 +275,10 @@ public class Task implements Parcelable {
 		out.writeString(Boolean.toString(isCompleted));
 		out.writeInt(priority);
 		out.writeInt(category);
-		out.writeInt(dateCreated);
-		out.writeInt(dateModified);
-		out.writeInt(dateDue);
-		out.writeInt(finalDateDue);
+		out.writeLong(dateCreated);
+		out.writeLong(dateModified);
+		out.writeLong(dateDue);
+		out.writeLong(finalDateDue);
 		out.writeString(notes);
 	}
 	
@@ -301,10 +298,10 @@ public class Task implements Parcelable {
 		isCompleted = Boolean.parseBoolean(in.readString());
 		priority = in.readInt();
 		category = in.readInt();
-		dateCreated = in.readInt();
-		dateModified = in.readInt();
-		dateDue = in.readInt();
-		finalDateDue = in.readInt();
+		dateCreated = in.readLong();
+		dateModified = in.readLong();
+		dateDue = in.readLong();
+		finalDateDue = in.readLong();
 		notes = in.readString();
 		
 		updateDateCreatedCal();
@@ -361,7 +358,7 @@ public class Task implements Parcelable {
 		this.category = category;
 	}
 
-	public int getDateCreated() {
+	public long getDateCreated() {
 		return dateCreated;
 	}
 	
@@ -369,12 +366,12 @@ public class Task implements Parcelable {
 		return dateCreatedCal;
 	}
 
-	public void setDateCreated(int date_created) {
+	public void setDateCreated(long date_created) {
 		this.dateCreated = date_created;
 		updateDateCreatedCal();
 	}
 	
-	public int getDateModified() {
+	public long getDateModified() {
 		return dateModified;
 	}
 	
@@ -382,12 +379,12 @@ public class Task implements Parcelable {
 		return dateModifiedCal;
 	}
 
-	public void setDateModified(int date_modified) {
+	public void setDateModified(long date_modified) {
 		this.dateModified = date_modified;
 		updateDateModifiedCal();
 	}
 
-	public int getDateDue() {
+	public long getDateDue() {
 		return dateDue;
 	}
 	
@@ -395,12 +392,12 @@ public class Task implements Parcelable {
 		return dateDueCal;
 	}
 
-	public void setDateDue(int date_due) {
+	public void setDateDue(long date_due) {
 		this.dateDue = date_due;
 		updateDateDueCal();
 	}
 	
-	public int getFinalDateDue() {
+	public long getFinalDateDue() {
 		return finalDateDue;
 	}
 	
@@ -408,7 +405,7 @@ public class Task implements Parcelable {
 		return finalDateDueCal;
 	}
 
-	public void setFinalDateDue(int final_date_due) {
+	public void setFinalDateDue(long final_date_due) {
 		this.finalDateDue = final_date_due;
 		updateFinalDateDueCal();
 	}
