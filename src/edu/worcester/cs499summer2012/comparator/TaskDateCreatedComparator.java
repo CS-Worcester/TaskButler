@@ -33,10 +33,15 @@ public class TaskDateCreatedComparator implements Comparator<Task> {
 	 * Compares two tasks by their creation date
 	 * @param lhs the first task
 	 * @param rhs the second task
-	 * @return 0 if the creation dates are the same, -1 if the first task was
-	 *         created first, or 1 if the second task was created first
+	 * @return A negative value if the first task was created first, a positive
+	 *         value if the second task was created first, or 0 if they were 
+	 *         created at the same time
 	 */	
 	public int compare(Task lhs, Task rhs) {
-		return lhs.getDateCreated().compareTo(rhs.getDateCreated());
+		// Compare by date
+		// Ex. LHS -> date 5000ms (earlier)
+		//     RHS -> date 6000ms (later)
+		//     LHS - RHS = 5000 - 6000 = -1000 = LHS ordered first
+		return (int) (lhs.getDateCreated() - rhs.getDateCreated());
 	}
 }

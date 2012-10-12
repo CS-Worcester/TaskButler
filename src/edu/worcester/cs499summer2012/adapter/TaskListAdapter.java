@@ -21,7 +21,6 @@ package edu.worcester.cs499summer2012.adapter;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-
 import android.app.Activity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -49,9 +48,14 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 	
 	static class ViewHolder {
 		public TextView name;
-		public TextView priority;
-		public TextView date_due;
 		public TextView is_completed;
+		public TextView priority;
+		public TextView category;
+		public TextView date_created;
+		public TextView date_modified;
+		public TextView date_due;
+		public TextView final_date_due;
+		public TextView notes;
 	}
 	
 	/**************************************************************************
@@ -107,36 +111,69 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 			ViewHolder view_holder = new ViewHolder();
 			view_holder.name = (TextView) 
 					row_view.findViewById(R.id.text_main_row_name);
-			view_holder.priority = (TextView)
-					row_view.findViewById(R.id.text_main_row_priority);
-			view_holder.date_due = (TextView)
-					row_view.findViewById(R.id.text_main_row_date_due);
 			view_holder.is_completed = (TextView)
 					row_view.findViewById(R.id.text_main_row_is_completed);
+			view_holder.priority = (TextView)
+					row_view.findViewById(R.id.text_main_row_priority);
+			view_holder.category = (TextView)
+					row_view.findViewById(R.id.text_main_row_category);
+			view_holder.date_created = (TextView)
+					row_view.findViewById(R.id.text_main_row_date_created);
+			view_holder.date_modified = (TextView)
+					row_view.findViewById(R.id.text_main_row_date_modified);
+			view_holder.date_due = (TextView)
+					row_view.findViewById(R.id.text_main_row_date_due);
+			view_holder.final_date_due = (TextView)
+					row_view.findViewById(R.id.text_main_row_final_date_due);
+			view_holder.notes = (TextView)
+					row_view.findViewById(R.id.text_main_row_notes);
+			
 			row_view.setTag(view_holder);
 		}
 
 		ViewHolder holder = (ViewHolder) row_view.getTag();
 		Task task = tasks.get(position);
+		
+		// Set name
 		holder.name.setText(task.getName());
+		
+		// Set is completed
+		holder.is_completed.setText(task.isCompleted() ? "Finished" : 
+			"Unfinished");
+		
+		// Set priority
 		holder.priority.setText(Task.LABELS[task.getPriority()]);
 		
-		if (task.getDateDue() != null)
-			holder.date_due.setText(task.getDateDue().getTime().toString());
-		else
-			holder.date_due.setText("No due date");
+		// Set category
+		holder.category.setText("Category: " + task.getCategory());
 		
-		holder.is_completed.setText(task.getIsCompleted() ? "Done" : "Not done");
+		// Set date created
+		holder.date_created.setText("Created: " + task.getDateCreatedCal().getTime().toString());
 		
-		if (!tasks.get(position).getIsCompleted()) {
+		// Set date modified
+		holder.date_modified.setText("Modified: " + task.getDateModifiedCal().getTime().toString());
+		
+		// Set date due
+		holder.date_due.setText("Due: " + (task.getDateDueCal() == null 
+				? "N/A" : task.getDateDueCal().getTime().toString()));
+		
+		// Set final date due
+		holder.final_date_due.setText("Due: " + (task.getFinalDateDueCal() == null 
+				? "N/A" : task.getFinalDateDueCal().getTime().toString()));
+		
+		// Set notes
+		holder.notes.setText("Notes: " + task.getNotes());
+		
+		// Set styles
+		if (!tasks.get(position).isCompleted()) {
 			holder.name.setTextAppearance(getContext(), 
 					R.style.text_task_not_completed);
-			holder.priority.setTextAppearance(getContext(), 
+			holder.is_completed.setTextAppearance(getContext(), 
 					R.style.text_task_not_completed);
 		} else {
 			holder.name.setTextAppearance(getContext(), 
 					R.style.text_task_completed);
-			holder.priority.setTextAppearance(getContext(), 
+			holder.is_completed.setTextAppearance(getContext(), 
 					R.style.text_task_completed);
 		}
 		

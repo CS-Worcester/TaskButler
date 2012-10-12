@@ -39,9 +39,9 @@ public class TaskCompletionComparator implements Comparator<Task> {
 	 *         unfinished; 0 otherwise 
 	 */
 	public int compare(Task lhs, Task rhs) {
-		if (!lhs.getIsCompleted() && rhs.getIsCompleted())
+		if (!lhs.isCompleted() && rhs.isCompleted())
 			return -1;
-		else if (lhs.getIsCompleted() && !rhs.getIsCompleted())
+		else if (lhs.isCompleted() && !rhs.isCompleted())
 			return 1;
 		else
 			return 0;
