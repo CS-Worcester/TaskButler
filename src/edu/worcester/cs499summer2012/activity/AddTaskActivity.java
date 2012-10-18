@@ -108,26 +108,31 @@ public class AddTaskActivity extends SherlockActivity {
     		break;    		
     	}
     	
-    	// Get task creation date & task due date
+    	// Get task creation date
+    	Calendar date_created = GregorianCalendar.getInstance();
+    	date_created.set(GregorianCalendar.SECOND, 0);
+    	date_created.set(GregorianCalendar.MILLISECOND, 0);
+    	
+    	// Get task due date
     	DatePicker task_date = (DatePicker) findViewById(R.id.date_add_task_due);
     	TimePicker task_time = (TimePicker) findViewById(R.id.time_add_task_due);
-    	Calendar date_created = new GregorianCalendar();
     	Calendar date_due = new GregorianCalendar();
     	date_due.set(task_date.getYear(), task_date.getMonth(), 
     			task_date.getDayOfMonth(), task_time.getCurrentHour(), 
     			task_time.getCurrentMinute());
+    	date_due.set(GregorianCalendar.SECOND, 0);
+    	date_due.set(GregorianCalendar.MILLISECOND, 0);
     	
     	// Get task notes
     	EditText task_notes = (EditText) findViewById(R.id.edit_add_task_notes);
     	String notes = task_notes.getText().toString();
-    	if (notes.equals(""))
-    		notes = null;
     	    	
     	// Create the task
-    	Task task = new Task();
-    	task.setName(name).setIsCompleted(false).setPriority(priority)
-    	    .setCreationDate(date_created).setDueDate(date_due)
-    	    .setNotes(notes);
+    	// TODO: Implement task category (currently defaults to 0)
+    	// TODO: Implement final date due (current defaults to date due)
+    	Task task = new Task(name, false, priority, 0,
+    			date_created.getTimeInMillis(), date_due.getTimeInMillis(), 
+    			date_due.getTimeInMillis(), notes);
     	
     	// Create the return intent and add the task
     	intent = new Intent(this, MainActivity.class);    	

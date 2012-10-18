@@ -1,7 +1,7 @@
 /*
  * Task.java
  * 
- * Copyright 2012 Jonathan Hasenzahl, James Celona
+ * Copyright 2012 Jonathan Hasenzahl, James Celona, Dhimitraq Jorgji
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +16,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package edu.worcester.cs499summer2012.task;
 
 import java.util.Calendar;
@@ -25,121 +24,47 @@ import java.util.GregorianCalendar;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+
 /**
- * Represents a single task. A task contains information such as a name,
- * completion status, and due date. Tasks are parcelable so they can be
- * bundled with intents and passed between activities.
+ * Defines a Task object (name, completion, priority, date created, due date, notes), 
+ * provides multiple constructors as well as mutators, it has its own defined toString() and equals()
+ * @author Dhimitraq Jorgji
  * @author Jonathan Hasenzahl
  * @author James Celona
  */
+
+
 public class Task implements Parcelable {
-	
+
 	/**************************************************************************
 	 * Static fields and methods                                              *
 	 **************************************************************************/
 	
-	// Priority labels and indexes
 	public static final String[] LABELS = {"Trivial", "Normal", "Urgent"};
 	public static final int TRIVIAL = 0;
 	public static final int NORMAL = 1;
-	public static final int URGENT = 2;	
-	
-	// Token indexes
-	public static final int NAME = 0;
-	public static final int IS_COMPLETED = 1;
-	public static final int PRIORITY = 2;
-	public static final int DATE_CREATED = 3;
-	public static final int DATE_DUE = 4;
-	public static final int NOTES = 5;
-	public static final int YEAR = 0;
-	public static final int MONTH = 1;
-	public static final int DAY = 2;
-	public static final int HOUR = 3;
-	public static final int MINUTE = 4;
-
-	// Token dividers for file i/o
-	private static final String DIV = "%D%";
-	private static final String DATE_DIV = "%C%";
-	private static final String NO_DATA = "%N%";
-	
-	/**
-	 * Creates a new task from a string. Used for reading tasks from a file.
-	 * @param string the string to be parsed
-	 * @return a new task derived from the parsed string
-	 */
-	public static Task taskFromString(String string) {
-		String[] tokens = string.split(DIV);
-		Task task = new Task();
-		
-		task.name = tokens[NAME];
-		task.is_completed = Boolean.parseBoolean(tokens[IS_COMPLETED]);
-		task.priority = Integer.parseInt(tokens[PRIORITY]);
-		task.date_created = calendarFromString(tokens[DATE_CREATED]);
-		task.date_due = calendarFromString(tokens[DATE_DUE]);
-		task.notes = notesFromString(tokens[NOTES]);
-		
-		return task;
-	}
-	
-	/**
-	 * Creates a new calendar object from a string. Used for reading tasks from
-	 * a file.
-	 * @param string the string to be parsed
-	 * @return a new calendar object derived from the parsed string, or null if
-	 *         there was no data
-	 */
-	private static Calendar calendarFromString(String string)
-	{
-		if (string.equals(NO_DATA))
-			return null;
-		
-		String[] tokens = string.split(DATE_DIV);
-		Calendar calendar = new GregorianCalendar();
-		calendar.set(Integer.parseInt(tokens[YEAR]), 
-				Integer.parseInt(tokens[MONTH]), 
-				Integer.parseInt(tokens[DAY]), 
-				Integer.parseInt(tokens[HOUR]), 
-				Integer.parseInt(tokens[MINUTE]));
-		
-		return calendar;
-	}
-	
-	private static String notesFromString(String string) {
-		if (string.equals(NO_DATA))
-			return null;
-		else
-			return string;
-	}
-	
-	private static String calendarToString(Calendar calendar) {
-		if (calendar == null)
-			return NO_DATA;
-		
-		return calendar.get(Calendar.YEAR) + DATE_DIV + 
-				calendar.get(Calendar.MONTH) + DATE_DIV +
-				calendar.get(Calendar.DAY_OF_MONTH) + DATE_DIV +
-				calendar.get(Calendar.HOUR) + DATE_DIV +
-				calendar.get(Calendar.MINUTE);
-	}
-	
-	private static String notesToString(String string) {
-		if (string == null)
-			return NO_DATA;
-		else
-			return string;
-	}
+	public static final int URGENT = 2;
 	
 	/**************************************************************************
 	 * Private fields                                                         *
 	 **************************************************************************/
 	
+	private int id;
 	private String name;
-	private boolean is_completed;
+	private boolean isCompleted;
 	private int priority;
-	private Calendar date_created;
-	private Calendar date_due;
+	private int category;
+	private long dateCreated;
+	private long dateModified;
+	private long dateDue;
+	private long finalDateDue;
 	private String notes;
-	
+	private Calendar dateCreatedCal;
+	private Calendar dateModifiedCal;
+	private Calendar dateDueCal;
+	private Calendar finalDateDueCal;
+
+
 	/**************************************************************************
 	 * Constructors                                                           *
 	 **************************************************************************/
@@ -148,24 +73,128 @@ public class Task implements Parcelable {
 	 * Default constructor. Creates an empty task.
 	 */
 	public Task() {}
-	
+
 	/**
 	 * Copy constructor.
 	 * @param task the Task to be copied
 	 */
 	public Task(Task task) {
+		// ID is not copied and kept unique so the copy will not replace the
+		// original task
 		name = task.name;
-		is_completed = task.is_completed;
+		isCompleted = task.isCompleted;
 		priority = task.priority;
-		date_created = task.date_created;
-		date_due = task.date_due;
+		category = task.category;
+		dateCreated = task.dateCreated;
+		dateModified = task.dateModified;
+		dateDue = task.dateDue;
+		finalDateDue = task.finalDateDue;
 		notes = task.notes;
+		
+		updateDateCreatedCal();
+		updateDateModifiedCal();
+		updateDateDueCal();
+		updateFinalDateDueCal();
+	}
+
+	/**
+	 * Constructor, without ID and without modification date (new task)
+	 * @param name
+	 * @param isCompleted
+	 * @param priority
+	 * @param category
+	 * @param date_created
+	 * @param date_due
+	 * @param final_date_due
+	 * @param notes
+	 */
+	public Task(String name, boolean isCompleted, int priority, int category,
+			long date_created, long date_due, long final_date_due, String notes) {
+		this.name = name;
+		this.isCompleted = isCompleted;
+		this.priority = priority;
+		this.category = category;
+		this.dateCreated = date_created;
+		this.dateModified = date_created; // New task has not been modified yet
+		this.dateDue = date_due;
+		this.finalDateDue = final_date_due;
+		this.notes = notes;
+		
+		updateDateCreatedCal();
+		updateDateModifiedCal();
+		updateDateDueCal();
+		updateFinalDateDueCal();
 	}
 	
+	/**
+	 * Constructor, with ID and with modification date (existing task)
+	 * @param id
+	 * @param name
+	 * @param isCompleted
+	 * @param priority
+	 * @param category
+	 * @param date_created
+	 * @param date_modified
+	 * @param date_due
+	 * @param final_date_due
+	 * @param notes
+	 */
+	public Task(int id, String name, boolean isCompleted, int priority, 
+			int category, long date_created, long date_modified, long date_due, 
+			long final_date_due, String notes) {
+		this(name, isCompleted, priority, category, date_created, date_due, 
+				final_date_due, notes);
+		this.id = id;
+		this.dateModified = date_modified;
+	}
+
+	/**************************************************************************
+	 * Class methods                                                          *
+	 **************************************************************************/ 
+	
+	private void updateDateCreatedCal() {
+		if (dateCreatedCal == null)
+			dateCreatedCal = new GregorianCalendar();
+		
+		dateCreatedCal.setTimeInMillis((long) dateCreated);
+	}
+	
+	private void updateDateModifiedCal() {
+		if (dateModifiedCal == null)
+			dateModifiedCal = new GregorianCalendar();
+		
+		dateModifiedCal.setTimeInMillis((long) dateModified);
+	}
+	
+	private void updateDateDueCal() {
+		if (dateDue == 0)
+		{
+			dateDueCal = null;
+			return;
+		}
+		
+		if (dateDueCal == null)
+			dateDueCal = new GregorianCalendar();
+		
+		dateDueCal.setTimeInMillis((long) dateDue);
+	}
+	
+	private void updateFinalDateDueCal() {
+		if (finalDateDue == 0)
+		{
+			finalDateDueCal = null;
+			return;
+		}
+		
+		if (finalDateDueCal == null)
+			finalDateDueCal = new GregorianCalendar();
+		
+		finalDateDueCal.setTimeInMillis((long) finalDateDue);
+	}
+
 	/**************************************************************************
 	 * Overridden parent methods                                              *
 	 **************************************************************************/ 	
-	
 	/**
 	 * Compares this object to another. To return true, the compared object must
 	 * have the same class and identical private fields.
@@ -180,24 +209,30 @@ public class Task implements Parcelable {
 			return false;
 		if (o.getClass() != this.getClass())
 			return false;
-		
+
 		Task t = (Task) o;
 		if (!this.name.equals(t.name))
 			return false;
-		if (this.is_completed != t.is_completed)
+		if (this.isCompleted != t.isCompleted)
 			return false;
 		if (this.priority != t.priority)
 			return false;
-		if (this.date_created != t.date_created)
+		if (this.category != t.category)
 			return false;
-		if (this.date_due != t.date_due)
+		if (this.dateCreated != t.dateCreated)
+			return false;
+		if (this.dateModified != t.dateModified)
+			return false;
+		if (this.dateDue != t.dateDue)
+			return false;
+		if (this.finalDateDue != t.finalDateDue)
 			return false;
 		if (!this.notes.equals(t.notes))
 			return false;
-		
+
 		return true;
 	}
-	
+
 	/**
 	 * Returns a string representation of the class. Used for writing to file.
 	 * The order of the fields in the string is:
@@ -211,13 +246,9 @@ public class Task implements Parcelable {
 	 */
 	@Override
 	public String toString() {
-		return name + DIV + Boolean.toString(is_completed) + DIV + 
-				Integer.toString(priority) + DIV + 
-				calendarToString(date_created) + DIV +
-				calendarToString(date_due) + DIV + notesToString(notes);
+		// TODO: (Jon) Reimplement this method in a more useful form
+		return name;
 	}
-	
-
 
 	/**************************************************************************
 	 * Methods implementing Parcelable interface                              *
@@ -229,7 +260,6 @@ public class Task implements Parcelable {
 	 * @see Parcelable
 	 */
 	public int describeContents() {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 	
@@ -240,12 +270,16 @@ public class Task implements Parcelable {
 	 * @see Parcelable
 	 */
 	public void writeToParcel(Parcel out, int flags) {
+		out.writeInt(id);
 		out.writeString(name);
-		out.writeString(Boolean.toString(is_completed));
+		out.writeString(Boolean.toString(isCompleted));
 		out.writeInt(priority);
-		out.writeString(calendarToString(date_created));
-		out.writeString(calendarToString(date_due));
-		out.writeString(notesToString(notes));
+		out.writeInt(category);
+		out.writeLong(dateCreated);
+		out.writeLong(dateModified);
+		out.writeLong(dateDue);
+		out.writeLong(finalDateDue);
+		out.writeString(notes);
 	}
 	
 	public static final Parcelable.Creator<Task> CREATOR = new Parcelable.Creator<Task>() {
@@ -259,78 +293,128 @@ public class Task implements Parcelable {
 	};
 	
 	private Task(Parcel in) {
+		id = in.readInt();
 		name = in.readString();
-		is_completed = Boolean.parseBoolean(in.readString());
+		isCompleted = Boolean.parseBoolean(in.readString());
 		priority = in.readInt();
-		date_created = calendarFromString(in.readString());
-		date_due = calendarFromString(in.readString());
-		notes = notesFromString(in.readString());
+		category = in.readInt();
+		dateCreated = in.readLong();
+		dateModified = in.readLong();
+		dateDue = in.readLong();
+		finalDateDue = in.readLong();
+		notes = in.readString();
+		
+		updateDateCreatedCal();
+		updateDateModifiedCal();
+		updateDateDueCal();
+		updateFinalDateDueCal();
 	}
 	
 	/**************************************************************************
 	 * Getters and setters                                                    *
-	 **************************************************************************/
-	
+	 **************************************************************************/	
+
+	public int getID() {
+		return id;
+	}
+
+	public void setID(int id) {
+		this.id = id;
+	}
+
 	public String getName() {
 		return name;
 	}
-	
-	public boolean getIsCompleted() {
-		return is_completed;
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public boolean isCompleted() {
+		return isCompleted;
+	}
+
+	public void setIsCompleted(boolean is_completed) {
+		this.isCompleted = is_completed;
+	}
+
+	public void toggleIsCompleted() {
+		isCompleted = isCompleted ? false : true;
 	}
 	
 	public int getPriority() {
 		return priority;
 	}
-	
-	public Calendar getDateCreated() {
-		return date_created;
+
+	public void setPriority(int priority) {
+		this.priority = priority;
 	}
 	
-	public Calendar getDateDue() {
-		return date_due;
+	public int getCategory() {
+		return category;
 	}
 	
+	public void setCategory(int category) {
+		this.category = category;
+	}
+
+	public long getDateCreated() {
+		return dateCreated;
+	}
+	
+	public Calendar getDateCreatedCal() {
+		return dateCreatedCal;
+	}
+
+	public void setDateCreated(long date_created) {
+		this.dateCreated = date_created;
+		updateDateCreatedCal();
+	}
+	
+	public long getDateModified() {
+		return dateModified;
+	}
+	
+	public Calendar getDateModifiedCal() {
+		return dateModifiedCal;
+	}
+
+	public void setDateModified(long date_modified) {
+		this.dateModified = date_modified;
+		updateDateModifiedCal();
+	}
+
+	public long getDateDue() {
+		return dateDue;
+	}
+	
+	public Calendar getDateDueCal() {
+		return dateDueCal;
+	}
+
+	public void setDateDue(long date_due) {
+		this.dateDue = date_due;
+		updateDateDueCal();
+	}
+	
+	public long getFinalDateDue() {
+		return finalDateDue;
+	}
+	
+	public Calendar getFinalDateDueCal() {
+		return finalDateDueCal;
+	}
+
+	public void setFinalDateDue(long final_date_due) {
+		this.finalDateDue = final_date_due;
+		updateFinalDateDueCal();
+	}
+
 	public String getNotes() {
 		return notes;
 	}
-	
-	public Task setName(String task_name) {
-		this.name = task_name;
-		return this;
-	}
-	
-	public Task setIsCompleted(boolean is_completed) {
-		this.is_completed = is_completed;
-		return this;
-	}
-	
-	public Task toggleIsCompleted() {
-		is_completed = is_completed ? false : true;
-		return this;
-	}
-	
-	public Task setPriority(int priority) {
-		if (priority >= TRIVIAL && priority <= URGENT)
-			this.priority = priority;
-		return this;
-	}
-	
-	public Task setCreationDate(Calendar date_created)
-	{
-		this.date_created = date_created;
-		return this;
-	}
-	
-	public Task setDueDate(Calendar date_due)
-	{
-		this.date_due = date_due;
-		return this;
-	}
 
-	public Task setNotes(String notes) {
+	public void setNotes(String notes) {
 		this.notes = notes;
-		return this;
 	}
 }
-

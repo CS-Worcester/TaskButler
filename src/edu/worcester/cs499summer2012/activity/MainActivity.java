@@ -19,12 +19,7 @@
 
 package edu.worcester.cs499summer2012.activity;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.util.ArrayList;
+import java.util.GregorianCalendar;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -47,6 +42,8 @@ import com.actionbarsherlock.view.SubMenu;
 
 import edu.worcester.cs499summer2012.R;
 import edu.worcester.cs499summer2012.adapter.TaskListAdapter;
+import edu.worcester.cs499summer2012.database.TasksDataSource;
+import edu.worcester.cs499summer2012.service.TaskAlarm;
 import edu.worcester.cs499summer2012.task.Task;
 
 /**
@@ -73,6 +70,7 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
 	 * Private fields                                                         *
 	 **************************************************************************/
 		
+	private TasksDataSource data_source;
 	private SharedPreferences prefs;
 	private SharedPreferences.Editor prefs_editor;
     private TaskListAdapter adapter;
@@ -84,75 +82,6 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
 	 **************************************************************************/
     
     /**
-     * Reads settings from a SharedPreferences file.
-     */
-    private void readSettingsFromFile() {
-    	prefs = PreferenceManager.getDefaultSharedPreferences(this);
-    	prefs_editor = prefs.edit();
-    	
-    	adapter.setSortType(prefs.getInt(PREF_SORT_TYPE, 
-    			TaskListAdapter.AUTO_SORT));
-    }
-    
-    /**
-     * Reads tasks from a text file and populates a TaskList.
-     */
-    private void readTasksFromFile() {
-    	BufferedReader file = null;
-    	try {
-    		file = new BufferedReader(new
-    				InputStreamReader(openFileInput(TASK_FILE_NAME)));
-    		String line;
-    		while ((line = file.readLine()) != null) {
-    			adapter.add(Task.taskFromString(line));
-    		}
-    	} catch (Exception e) {
-    		e.printStackTrace();
-    	} finally {
-    		if (file != null) {
-    			try {
-    				file.close();
-    			} catch (IOException e) {
-    				e.printStackTrace();
-    			}
-    		}
-    	}
-    }
-    
-    /**
-     * Writes settings to a SharedPreferences file.
-     */
-    private void writeSettingsToFile() {
-    	prefs_editor.commit();
-    }
-    
-    /**
-     * Writes the contents of a TaskList to a text file.
-     */
-    private void writeTasksToFile() {
-    	String eol = System.getProperty("line.separator");
-    	BufferedWriter file = null;
-    	try {
-    		file = new BufferedWriter(new 
-    				OutputStreamWriter(openFileOutput(TASK_FILE_NAME, 
-    						MODE_PRIVATE)));
-			for (int i = 0; i < adapter.getCount(); i++) {
-				file.write(adapter.getItem(i) + eol);
-			}
-    	} catch (Exception e) {
-    		e.printStackTrace();
-    	} finally {
-    		if (file != null) {
-    			try {
-    				file.close();
-    			} catch (IOException e) {
-    				e.printStackTrace();
-    			}
-    		}
-    	}
-    }
-    
-    /**
      * Displays a message in a Toast notification for a short duration.
      */
     private void toast(String message)
@@ -160,33 +89,41 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
     	Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
     
-    private void deleteAlert(String question, final int mode, 
-    		final String confirmation)
+    private void deleteAlert(String question, final int mode)
     {
     	AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setMessage(question)
 		       .setCancelable(false)
 		       .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
 		    	   public void onClick(DialogInterface dialog, int id) {
+		    		   int deleted_tasks;
 		    		   switch (mode) {
 		    		   case DELETE_MODE_SINGLE:
+		    			   toast("Task id: " + adapter.getItem(selected_task).getID());
+		    			   data_source.deleteTask(adapter.getItem(selected_task));
 		    			   adapter.remove(adapter.getItem(selected_task));
+		    			   toast("Task deleted");
 		    			   break;
+		    			   
 		    		   case DELETE_MODE_FINISHED:
+		    			   deleted_tasks = data_source.deleteFinishedTasks();
 		    			   for (int i = 0; i < adapter.getCount(); i++)
 		    			   {
-		    				   if (adapter.getItem(i).getIsCompleted())
+		    				   if (adapter.getItem(i).isCompleted())
 		    				   {
 		    					   adapter.remove(adapter.getItem(i));
 		    					   i--;
 		    				   }
 		    			   }
+		    			   toast(deleted_tasks + " tasks deleted");
 		    			   break;
+		    			   
 		    		   case DELETE_MODE_ALL:
+		    			   deleted_tasks = data_source.deleteAllTasks();
 		    			   adapter.clear();
+		    			   toast(deleted_tasks + " tasks deleted");
 		    			   break;
 		    		   }
-		    		   toast(confirmation);
 		    	   }
 		       })
 		       .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -209,24 +146,44 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
         // Assign the layout to this activity
         setContentView(R.layout.activity_main);
     	
-    	// Create an adapter for the task list
-		adapter = new TaskListAdapter(this, new ArrayList<Task>(0));
+    	// Open the database
+        data_source = TasksDataSource.getInstance(getApplicationContext());
+        //data_source.open();
+        
+        // Create an adapter for the task list
+		adapter = new TaskListAdapter(this, data_source.getAllTasks());
     	setListAdapter(adapter);
     	
-        // Read tasks from file
-    	readTasksFromFile();
+        // Read preferences from file
+    	prefs = PreferenceManager.getDefaultSharedPreferences(this);
+    	prefs_editor = prefs.edit();
     	
-        // Read settings from file
-    	readSettingsFromFile();
+    	// Set sort type and sort the list
+    	adapter.setSortType(prefs.getInt(PREF_SORT_TYPE, 
+    			TaskListAdapter.AUTO_SORT));
+    	adapter.sort();
     	
     	// Set up a long item click listener
     	getListView().setOnItemLongClickListener(this);
     }
     
     @Override
+    protected void onResume() {
+    	//data_source.open();
+    	super.onResume();
+    }
+    
+    @Override
+    protected void onPause() {
+    	//data_source.close();
+    	super.onPause();
+    }
+    
+    @Override
 	public void onStop() {
-    	writeTasksToFile();
-    	writeSettingsToFile();
+    	// Save preferences to file
+    	prefs_editor.commit();
+    	
     	super.onStop();
     }
     
@@ -263,12 +220,12 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
     		
     	case R.id.menu_delete_finished:
     		deleteAlert("Are you sure you want to delete all completed tasks? This cannot be undone.",
-    				DELETE_MODE_FINISHED, "Tasks deleted");
+    				DELETE_MODE_FINISHED);
     		return true;
     		
     	case R.id.menu_delete_all:
     		deleteAlert("Are you sure you want to delete all tasks? This cannot be undone.",
-    				DELETE_MODE_ALL, "All tasks deleted");
+    				DELETE_MODE_ALL);
     		return true;
     		
     	case R.id.menu_main_settings:
@@ -288,6 +245,12 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
     public void onListItemClick(ListView list_view, View view, int position, 
     		long id) {
     	adapter.getItem(position).toggleIsCompleted();
+    	adapter.getItem(position).setDateModified((int) GregorianCalendar.getInstance().getTimeInMillis());
+    	
+    	// Update database
+    	data_source.updateTask(adapter.getItem(position));
+    	
+    	// Sort the list
     	adapter.sort();
     }
     
@@ -296,8 +259,18 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
     		Intent intent) {
     	if (request_code == ADD_TASK_REQUEST && result_code == RESULT_OK) {
     		Task task = intent.getParcelableExtra(AddTaskActivity.EXTRA_TASK);
+    		
+    		// Set the ID for the new task and update database
+    		//data_source.open();
+    		task.setID(data_source.getNextID());
+    		data_source.addTask(task);
+    		
+    		// Update the adapter
     		adapter.add(task);
     		adapter.sort();
+    		
+    		TaskAlarm alarm = new TaskAlarm();
+    		alarm.setOnetimeAlarm(this, task.getID());
     	}
     }
     
@@ -344,7 +317,7 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
 		
 		case R.id.menu_main_delete_task:
 			deleteAlert("Are you sure you want to delete this task?",
-					DELETE_MODE_SINGLE, "Task deleted");
+					DELETE_MODE_SINGLE);
 			mode.finish();
 			return true;
 			

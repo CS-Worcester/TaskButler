@@ -34,8 +34,9 @@ public class TaskNameComparator implements Comparator<Task> {
 	 * ignored in this comparison.
 	 * @param lhs the first task
 	 * @param rhs the second task
-	 * @return 0 if the names are the same, -1 if the first task is ordered
-	 *         first, or 1 if the second task is ordered first
+	 * @return A negative value if the first task is ordered first, a positive
+	 *         value if the second task is ordered first, or 0 if they have the
+	 *         same name.
 	 */	
 	public int compare(Task lhs, Task rhs) {
 		return lhs.getName().compareToIgnoreCase(rhs.getName());

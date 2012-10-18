@@ -34,15 +34,14 @@ public class TaskPriorityComparator implements Comparator<Task> {
 	 * come before tasks with a lower priority.
 	 * @param lhs the first task
 	 * @param rhs the second task
-	 * @return 0 if the tasks have the same priority; -1 if the first task has
-	 *         a higher priority; 1 otherwise
+	 * @return A negative number if the first task has a higher priority, a 
+	 *         positive number if the second task has a higher priority, or 0
+	 *         if they have the same priority
 	 */	
 	public int compare(Task lhs, Task rhs) {
-		if (lhs.getPriority() == rhs.getPriority())
-			return 0;
-		else if (lhs.getPriority() > rhs.getPriority())
-			return -1;
-		else
-			return 1;
+		// Ex: LHS -> priority 2 (urgent)
+		//     RHS -> priority 1 (normal)
+		//     RHS - LHS = 1 - 2 = -1 = LHS ordered first
+		return rhs.getPriority() - lhs.getPriority();
 	}
 }
