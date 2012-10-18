@@ -49,19 +49,21 @@ public class NotificationHelper{
 		Log.d("my notification method","beginning of sendBasicNotification");
 		TasksDataSource db = TasksDataSource.getInstance(context);
 		Task task = db.getTask(id);
+		
 		NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
 			.setContentText(task.getName())
 			.setContentTitle("Task Butler")
 			.setSmallIcon(R.drawable.ic_launcher)
 			.setAutoCancel(true)
 			.setContentIntent(getPendingIntent(context))
-			.setWhen(System.currentTimeMillis());	
+			.setWhen(System.currentTimeMillis())
+			.setDefaults(Notification.DEFAULT_ALL);
 		Notification notification = builder.getNotification();
 
 		NotificationManager notificationManager = getNotificationManager(context);
 		notificationManager.notify(task.getID(), notification);
 
-		Log.d("my notification method","after building notification");
+		Log.d("my notification method","after building notification"+Notification.DEFAULT_ALL);
 	}
 	//reuse this to make pending intents so that they match 100% 
 	PendingIntent getPendingIntent(Context context) {
