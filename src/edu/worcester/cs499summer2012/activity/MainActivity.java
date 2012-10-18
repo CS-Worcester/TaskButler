@@ -43,6 +43,7 @@ import com.actionbarsherlock.view.SubMenu;
 import edu.worcester.cs499summer2012.R;
 import edu.worcester.cs499summer2012.adapter.TaskListAdapter;
 import edu.worcester.cs499summer2012.database.TasksDataSource;
+import edu.worcester.cs499summer2012.service.TaskAlarm;
 import edu.worcester.cs499summer2012.task.Task;
 
 /**
@@ -146,8 +147,8 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
         setContentView(R.layout.activity_main);
     	
     	// Open the database
-        data_source = new TasksDataSource(this);
-        data_source.open();
+        data_source = TasksDataSource.getInstance(getApplicationContext());
+        //data_source.open();
         
         // Create an adapter for the task list
 		adapter = new TaskListAdapter(this, data_source.getAllTasks());
@@ -168,13 +169,13 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
     
     @Override
     protected void onResume() {
-    	data_source.open();
+    	//data_source.open();
     	super.onResume();
     }
     
     @Override
     protected void onPause() {
-    	data_source.close();
+    	//data_source.close();
     	super.onPause();
     }
     
@@ -260,13 +261,16 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
     		Task task = intent.getParcelableExtra(AddTaskActivity.EXTRA_TASK);
     		
     		// Set the ID for the new task and update database
-    		data_source.open();
+    		//data_source.open();
     		task.setID(data_source.getNextID());
     		data_source.addTask(task);
     		
     		// Update the adapter
     		adapter.add(task);
     		adapter.sort();
+    		
+    		TaskAlarm alarm = new TaskAlarm();
+    		alarm.setOnetimeAlarm(this, task.getID());
     	}
     }
     

@@ -43,5 +43,7 @@
     <!-- CheckBox items -->
     <string name="checkbox_hide_completed">Hide completed tasks</string>
     <string name="checkbox_auto_delete">Delete completed tasks automatically</string>
-
+    
+    <!-- Debug Value -->
+	<string name="tvHandleNotification">You can handle notification intent here.</string>
 </resources>

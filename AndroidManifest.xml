@@ -9,6 +9,7 @@
 
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
         android:icon="@drawable/ic_launcher"
@@ -22,7 +23,7 @@
         <receiver android:name=".service.OnAlarmReceiver" >
         </receiver>
 
-        <service android:name=".service.AppService" >
+        <service android:name=".service.TaskButlerService" >
         </service>
 
         <activity
@@ -42,6 +43,13 @@
                 android:value="edu.worcester.cs499summer2012.MainActivity" />
         </activity>
         <activity
+            android:name=".activity.HandleNotificationActivity"
+            android:label="@string/title_activity_main" >
+            <intent-filter>
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
             android:name=".activity.SettingsActivity"
             android:label="@string/title_activity_settings" >
             <intent-filter>
@@ -51,5 +59,4 @@
             </intent-filter>
         </activity>
     </application>
-
-</manifest>
+</manifest>

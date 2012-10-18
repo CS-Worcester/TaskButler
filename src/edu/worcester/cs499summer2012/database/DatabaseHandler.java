@@ -17,17 +17,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * Creates SQLite table for storing tasks to a database.
- * @author Dhimitraq Jorgji, Jonathan Hasenzahl
- */
 
 package edu.worcester.cs499summer2012.database;
 
 import android.content.Context;
+
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+/**
+ * Creates SQLite table for storing tasks to a database. DO NOT call this class directly
+ * get an instance of TasksDataSource instead.
+ * @author Dhimitraq Jorgji, Jonathan Hasenzahl
+ */
 public class DatabaseHandler extends SQLiteOpenHelper {
 
 	// Database Version
@@ -85,7 +87,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	// Upgrading database
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-		// Drop older table if existed just for testing purposes, will change to copy over old database later on
+		// Drop older table if existed just for testing purposes, 
+		//TODO:change to copy over old database 
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_TASKS);
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_CATEGORIES);
 

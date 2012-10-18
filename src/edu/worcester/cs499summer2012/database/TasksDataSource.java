@@ -30,27 +30,45 @@ import edu.worcester.cs499summer2012.task.Task;
 
 /**
  * Wrapper for the database handler. Gives some CRUD (Create, Read, Update and 
- * Delete) functionality to the task database.
+ * Delete) functionality to the task database. Implemented as a Singleton to allow
+ * for thread management, call TasksDataSource.getInstance(Context) to get access
+ * to the instance before using the database. THIS IS NOT A CLONABLE CLASS
  * @author Dhimitraq Jorgji, Jonathan Hasenzahl
  */
 public class TasksDataSource {
 
 	private SQLiteDatabase db;
 	private DatabaseHandler handler;
+	private static TasksDataSource instance;
 	
-	public TasksDataSource(Context context) {
-		handler = new DatabaseHandler(context);
+	private TasksDataSource(){
+		
 	}
 	
-	public void open() throws SQLException {
+	private TasksDataSource(Context context) {
+		handler = new DatabaseHandler(context);
+	}
+	/**
+	 * Call this to get access to the instance of TasksDataSource Singleton
+	 * @param context
+	 * @return instance of TasksDataSource
+	 */
+	public static synchronized TasksDataSource getInstance(Context context) {
+		instance = new TasksDataSource(context);
+		instance.open();
+        return instance;
+    }
+	
+	private void open() throws SQLException {
 		db = handler.getWritableDatabase();
 	}
 	
-	public void close() {
+	private void close() {
 		handler.close();
 	}
 
-	Task getTask(int id) {
+	public Task getTask(int id) {
+		open();
 		Cursor cursor = db.query(DatabaseHandler.TABLE_TASKS, new String[] { 
 				DatabaseHandler.KEY_ID,
 				DatabaseHandler.KEY_NAME, 
@@ -66,19 +84,23 @@ public class TasksDataSource {
 				null, null, null, null, null);
 		if (cursor != null)
 			cursor.moveToFirst();
-
-		return new Task(cursor.getInt(0), cursor.getString(1), 
+		Task task = new Task(cursor.getInt(0), cursor.getString(1), 
 				cursor.getInt(2) > 0, cursor.getInt(3), cursor.getInt(4), 
 				cursor.getLong(5), cursor.getLong(6), 
 				cursor.getLong(7), cursor.getLong(8), 
 				cursor.getString(9));
+		close();
+		cursor.close();
+		return task;
 	}
 	
 	public ArrayList<Task> getAllTasks() {
 		ArrayList<Task> taskList = new ArrayList<Task>();
+		
 		// Select All Query
 		String selectQuery = "SELECT * FROM " + DatabaseHandler.TABLE_TASKS;
 
+		open();
 		Cursor cursor = db.rawQuery(selectQuery, null);
 
 		// looping through all rows and adding to list
@@ -102,7 +124,7 @@ public class TasksDataSource {
 		}
 		
 		cursor.close();
-
+		close();
 		// return task list
 		return taskList;
 	}
@@ -113,18 +135,27 @@ public class TasksDataSource {
 	 * @return the next available task ID to be assigned to a new task
 	 */
 	public int getNextID() {
+		
 		String selectQuery = "SELECT MAX(" + DatabaseHandler.KEY_ID +
 				") FROM " + DatabaseHandler.TABLE_TASKS;
-		
+		open();
 		Cursor cursor = db.rawQuery(selectQuery, null);
 		
-		if (cursor.moveToFirst())
-			return cursor.getInt(0) + 1;
-		else
+		if (cursor.moveToFirst()){
+			int i = cursor.getInt(0) + 1;
+			cursor.close();
+			close();
+			return i;
+		}
+		else{
+			cursor.close();
+			close();
 			return 1;
+		}
 	}
 	
 	public void addTask(Task task) {
+		open();
 		ContentValues values = new ContentValues();
 		values.put(DatabaseHandler.KEY_ID, task.getID());
 		values.put(DatabaseHandler.KEY_NAME, task.getName()); // Task Name
@@ -136,12 +167,18 @@ public class TasksDataSource {
 		values.put(DatabaseHandler.KEY_DUE_DATE, task.getDateDue()); //Task due date
 		values.put(DatabaseHandler.KEY_FINAL_DUE_DATE, task.getFinalDateDue()); // Task final due date
 		values.put(DatabaseHandler.KEY_NOTES, task.getNotes()); //Task notes
-
+		
 		// Inserting Row
 		db.insert(DatabaseHandler.TABLE_TASKS, null, values);
+		close();
 	}
-	
+	/**
+	 * 
+	 * @param task
+	 * @return number of rows affected
+	 */
 	public int updateTask(Task task) {
+		open();
 		ContentValues values = new ContentValues();
 		values.put(DatabaseHandler.KEY_NAME, task.getName()); // Task Name
 		values.put(DatabaseHandler.KEY_COMPLETION, task.isCompleted()); // Task completion
@@ -152,23 +189,38 @@ public class TasksDataSource {
 		values.put(DatabaseHandler.KEY_DUE_DATE, task.getDateDue()); //Task due date
 		values.put(DatabaseHandler.KEY_FINAL_DUE_DATE, task.getFinalDateDue()); // Task final due date
 		values.put(DatabaseHandler.KEY_NOTES, task.getNotes()); //Task notes
-
+		
 		// updating row
-		return db.update(DatabaseHandler.TABLE_TASKS, values, 
-				DatabaseHandler.KEY_ID + " = " + task.getID(), null);		
+		int i = db.update(DatabaseHandler.TABLE_TASKS, values, 
+				DatabaseHandler.KEY_ID + " = " + task.getID(), null);
+		close();
+		return i;		
 	}
 	
 	public void deleteTask(Task task) {
+		open();
 		db.delete(DatabaseHandler.TABLE_TASKS, 
 				DatabaseHandler.KEY_ID + " = " + task.getID(), null);
+		close();
 	}
 	
 	public int deleteFinishedTasks() {
-		return db.delete(DatabaseHandler.TABLE_TASKS,
+		open();
+		int i = db.delete(DatabaseHandler.TABLE_TASKS,
 				DatabaseHandler.KEY_COMPLETION + " = 1", null);
+		close();
+		return i;
 	}
 	
 	public int deleteAllTasks() {
-		return db.delete(DatabaseHandler.TABLE_TASKS, null, null);
+		open();
+		int i = db.delete(DatabaseHandler.TABLE_TASKS, null, null);
+		close();
+		return i;
 	}
+	
+	   @Override
+	    protected Object clone() throws CloneNotSupportedException {
+	        throw new CloneNotSupportedException("Clone is not allowed.");
+	    }
 }
