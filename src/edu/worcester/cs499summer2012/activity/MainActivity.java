@@ -43,6 +43,7 @@ import com.actionbarsherlock.view.SubMenu;
 import edu.worcester.cs499summer2012.R;
 import edu.worcester.cs499summer2012.adapter.TaskListAdapter;
 import edu.worcester.cs499summer2012.database.TasksDataSource;
+import edu.worcester.cs499summer2012.service.TaskAlarm;
 import edu.worcester.cs499summer2012.task.Task;
 
 /**
@@ -267,6 +268,9 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
     		// Update the adapter
     		adapter.add(task);
     		adapter.sort();
+    		
+    		TaskAlarm alarm = new TaskAlarm();
+    		alarm.setOnetimeAlarm(this, task.getID());
     	}
     }
     
