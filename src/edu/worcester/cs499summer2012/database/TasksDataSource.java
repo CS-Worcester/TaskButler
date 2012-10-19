@@ -75,20 +75,40 @@ public class TasksDataSource {
 				DatabaseHandler.KEY_COMPLETION, 
 				DatabaseHandler.KEY_PRIORITY, 
 				DatabaseHandler.KEY_CATEGORY,
+				DatabaseHandler.KEY_HAS_DUE_DATE,
+				DatabaseHandler.KEY_HAS_FINAL_DUE_DATE,
+				DatabaseHandler.KEY_IS_REPEATING,
+				DatabaseHandler.KEY_HAS_STOP_REPEATING_DATE,
+				DatabaseHandler.KEY_REPEAT_TYPE,
+				DatabaseHandler.KEY_REPEAT_INTERVAL,
 				DatabaseHandler.KEY_CREATION_DATE,
 				DatabaseHandler.KEY_MODIFICATION_DATE, 
 				DatabaseHandler.KEY_DUE_DATE,
 				DatabaseHandler.KEY_FINAL_DUE_DATE,
+				DatabaseHandler.KEY_STOP_REPEATING_DATE,
 				DatabaseHandler.KEY_NOTES }, 
 				DatabaseHandler.KEY_ID + " = " + id,
 				null, null, null, null, null);
 		if (cursor != null)
 			cursor.moveToFirst();
-		Task task = new Task(cursor.getInt(0), cursor.getString(1), 
-				cursor.getInt(2) > 0, cursor.getInt(3), cursor.getInt(4), 
-				cursor.getLong(5), cursor.getLong(6), 
-				cursor.getLong(7), cursor.getLong(8), 
-				cursor.getString(9));
+		Task task = new Task(
+				cursor.getInt(0), 
+				cursor.getString(1), 
+				cursor.getInt(2) > 0, 
+				cursor.getInt(3),
+				cursor.getInt(4),
+				cursor.getInt(5) > 0,
+				cursor.getInt(6) > 0,
+				cursor.getInt(7) > 0,
+				cursor.getInt(8) > 0,
+				cursor.getInt(9),
+				cursor.getInt(10), 
+				cursor.getLong(11), 
+				cursor.getLong(12), 
+				cursor.getLong(13), 
+				cursor.getLong(14),
+				cursor.getLong(15),
+				cursor.getString(16));
 		close();
 		cursor.close();
 		return task;
@@ -106,17 +126,24 @@ public class TasksDataSource {
 		// looping through all rows and adding to list
 		if (cursor.moveToFirst()) {
 			do {
-				Task task = new Task();
-				task.setID(cursor.getInt(0));
-				task.setName(cursor.getString(1));
-				task.setIsCompleted(cursor.getInt(2) > 0); // if value > 0 then isCompleted is set to true
-				task.setPriority(cursor.getInt(3)); // urgent=2 regular=1 trivial=0
-				task.setCategory(cursor.getInt(4));
-				task.setDateCreated(cursor.getLong(5));
-				task.setDateModified(cursor.getLong(6));
-				task.setDateDue(cursor.getLong(7));
-				task.setFinalDateDue(cursor.getLong(8));
-				task.setNotes(cursor.getString(9));
+				Task task = new Task(
+						cursor.getInt(0), 
+						cursor.getString(1), 
+						cursor.getInt(2) > 0, 
+						cursor.getInt(3),
+						cursor.getInt(4),
+						cursor.getInt(5) > 0,
+						cursor.getInt(6) > 0,
+						cursor.getInt(7) > 0,
+						cursor.getInt(8) > 0,
+						cursor.getInt(9),
+						cursor.getInt(10), 
+						cursor.getLong(11), 
+						cursor.getLong(12), 
+						cursor.getLong(13), 
+						cursor.getLong(14),
+						cursor.getLong(15),
+						cursor.getString(16));
 
 				// Adding task to list
 				taskList.add(task);
@@ -158,15 +185,22 @@ public class TasksDataSource {
 		open();
 		ContentValues values = new ContentValues();
 		values.put(DatabaseHandler.KEY_ID, task.getID());
-		values.put(DatabaseHandler.KEY_NAME, task.getName()); // Task Name
-		values.put(DatabaseHandler.KEY_COMPLETION, task.isCompleted()); // Task completion
-		values.put(DatabaseHandler.KEY_PRIORITY, task.getPriority()); // Task priority
-		values.put(DatabaseHandler.KEY_CATEGORY, task.getCategory()); // Task category
-		values.put(DatabaseHandler.KEY_CREATION_DATE, task.getDateCreated()); //Task creation date
-		values.put(DatabaseHandler.KEY_MODIFICATION_DATE, task.getDateModified()); // Task modification date
-		values.put(DatabaseHandler.KEY_DUE_DATE, task.getDateDue()); //Task due date
-		values.put(DatabaseHandler.KEY_FINAL_DUE_DATE, task.getFinalDateDue()); // Task final due date
-		values.put(DatabaseHandler.KEY_NOTES, task.getNotes()); //Task notes
+		values.put(DatabaseHandler.KEY_NAME, task.getName());
+		values.put(DatabaseHandler.KEY_COMPLETION, task.isCompleted());
+		values.put(DatabaseHandler.KEY_PRIORITY, task.getPriority());
+		values.put(DatabaseHandler.KEY_CATEGORY, task.getCategory());
+		values.put(DatabaseHandler.KEY_HAS_DUE_DATE, task.getDateDue());
+		values.put(DatabaseHandler.KEY_HAS_FINAL_DUE_DATE, task.getFinalDateDue());
+		values.put(DatabaseHandler.KEY_IS_REPEATING, task.isRepeating());
+		values.put(DatabaseHandler.KEY_HAS_STOP_REPEATING_DATE, task.hasStopRepeatingDate());
+		values.put(DatabaseHandler.KEY_REPEAT_TYPE, task.getRepeatType());
+		values.put(DatabaseHandler.KEY_REPEAT_INTERVAL, task.getRepeatInterval());
+		values.put(DatabaseHandler.KEY_CREATION_DATE, task.getDateCreated());
+		values.put(DatabaseHandler.KEY_MODIFICATION_DATE, task.getDateModified());
+		values.put(DatabaseHandler.KEY_DUE_DATE, task.getDateDue());
+		values.put(DatabaseHandler.KEY_FINAL_DUE_DATE, task.getFinalDateDue());
+		values.put(DatabaseHandler.KEY_STOP_REPEATING_DATE, task.getStopRepeatingDate());
+		values.put(DatabaseHandler.KEY_NOTES, task.getNotes());
 		
 		// Inserting Row
 		db.insert(DatabaseHandler.TABLE_TASKS, null, values);
@@ -180,15 +214,22 @@ public class TasksDataSource {
 	public int updateTask(Task task) {
 		open();
 		ContentValues values = new ContentValues();
-		values.put(DatabaseHandler.KEY_NAME, task.getName()); // Task Name
-		values.put(DatabaseHandler.KEY_COMPLETION, task.isCompleted()); // Task completion
-		values.put(DatabaseHandler.KEY_PRIORITY, task.getPriority()); // Task priority
-		values.put(DatabaseHandler.KEY_CATEGORY, task.getCategory()); // Task category
-		values.put(DatabaseHandler.KEY_CREATION_DATE, task.getDateCreated()); //Task creation date
-		values.put(DatabaseHandler.KEY_MODIFICATION_DATE, task.getDateModified()); // Task modification date
-		values.put(DatabaseHandler.KEY_DUE_DATE, task.getDateDue()); //Task due date
-		values.put(DatabaseHandler.KEY_FINAL_DUE_DATE, task.getFinalDateDue()); // Task final due date
-		values.put(DatabaseHandler.KEY_NOTES, task.getNotes()); //Task notes
+		values.put(DatabaseHandler.KEY_NAME, task.getName());
+		values.put(DatabaseHandler.KEY_COMPLETION, task.isCompleted());
+		values.put(DatabaseHandler.KEY_PRIORITY, task.getPriority());
+		values.put(DatabaseHandler.KEY_CATEGORY, task.getCategory());
+		values.put(DatabaseHandler.KEY_HAS_DUE_DATE, task.getDateDue());
+		values.put(DatabaseHandler.KEY_HAS_FINAL_DUE_DATE, task.getFinalDateDue());
+		values.put(DatabaseHandler.KEY_IS_REPEATING, task.isRepeating());
+		values.put(DatabaseHandler.KEY_HAS_STOP_REPEATING_DATE, task.hasStopRepeatingDate());
+		values.put(DatabaseHandler.KEY_REPEAT_TYPE, task.getRepeatType());
+		values.put(DatabaseHandler.KEY_REPEAT_INTERVAL, task.getRepeatInterval());
+		values.put(DatabaseHandler.KEY_CREATION_DATE, task.getDateCreated());
+		values.put(DatabaseHandler.KEY_MODIFICATION_DATE, task.getDateModified());
+		values.put(DatabaseHandler.KEY_DUE_DATE, task.getDateDue());
+		values.put(DatabaseHandler.KEY_FINAL_DUE_DATE, task.getFinalDateDue());
+		values.put(DatabaseHandler.KEY_STOP_REPEATING_DATE, task.getStopRepeatingDate());
+		values.put(DatabaseHandler.KEY_NOTES, task.getNotes());
 		
 		// updating row
 		int i = db.update(DatabaseHandler.TABLE_TASKS, values, 
@@ -219,8 +260,8 @@ public class TasksDataSource {
 		return i;
 	}
 	
-	   @Override
-	    protected Object clone() throws CloneNotSupportedException {
-	        throw new CloneNotSupportedException("Clone is not allowed.");
-	    }
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        throw new CloneNotSupportedException("Clone is not allowed.");
+    }
 }

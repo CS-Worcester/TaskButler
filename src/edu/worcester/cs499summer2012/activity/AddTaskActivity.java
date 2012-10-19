@@ -130,9 +130,26 @@ public class AddTaskActivity extends SherlockActivity {
     	// Create the task
     	// TODO: Implement task category (currently defaults to 0)
     	// TODO: Implement final date due (current defaults to date due)
-    	Task task = new Task(name, false, priority, 0,
-    			date_created.getTimeInMillis(), date_due.getTimeInMillis(), 
-    			date_due.getTimeInMillis(), notes);
+    	// TODO: Implement has due date/has final due date
+    	// TODO: Implement isRepeating/hasStopRepeatingDate
+    	// TODO: Implement repeat type/repeat interval
+    	// TODO: Implement stop repeating date
+    	Task task = new Task(
+    			name, 
+    			false, 
+    			priority, 
+    			0,
+    			true,
+    			false,
+    			false,
+    			false,
+    			0,
+    			0,
+    			date_created.getTimeInMillis(), 
+    			date_due.getTimeInMillis(), 
+    			0,
+    			0,
+    			notes);
     	
     	// Create the return intent and add the task
     	intent = new Intent(this, MainActivity.class);    	
