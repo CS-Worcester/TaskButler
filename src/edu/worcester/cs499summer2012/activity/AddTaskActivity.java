@@ -24,10 +24,15 @@ import java.util.GregorianCalendar;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.DatePicker;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.RadioGroup;
-import android.widget.TimePicker;
+import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockActivity;
@@ -43,7 +48,7 @@ import edu.worcester.cs499summer2012.task.Task;
  * @author Jonathan Hasenzahl
  * @author James Celona
  */
-public class AddTaskActivity extends SherlockActivity {
+public class AddTaskActivity extends SherlockActivity implements OnCheckedChangeListener {
 
 	/**************************************************************************
 	 * Static fields and methods                                              *
@@ -53,21 +58,22 @@ public class AddTaskActivity extends SherlockActivity {
 	 * Label for the extra task parcel which will be added to the returned intent
 	 */
 	public final static String EXTRA_TASK = "edu.worcester.cs499summer2012.TASK";
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_task);
-        
-        // Allow Action bar icon to act as a button
-        getSupportActionBar().setHomeButtonEnabled(true);
-    }
     
     /**************************************************************************
      * Private fields                                                         *
      **************************************************************************/
     
     private Intent intent;
+    private CheckBox has_due_date;
+    private Button edit_due_date;
+    private TextView due_date;
+    private CheckBox has_final_due_date;
+    private Button edit_final_due_date;
+    private TextView final_due_date;
+    private CheckBox has_repetition;   
+    private TextView repeats;
+    private EditText repeat_interval;
+    private Spinner repeat_type;
     
     /**************************************************************************
 	 * Class methods                                                          *
@@ -91,6 +97,10 @@ public class AddTaskActivity extends SherlockActivity {
     		return false;
     	}
     	
+    	// Get completion status
+    	CheckBox task_completion = (CheckBox) findViewById(R.id.checkbox_already_completed);
+    	boolean is_completed = task_completion.isChecked();
+    	
     	// Get task priority
     	RadioGroup task_priority = (RadioGroup) findViewById(R.id.radiogroup_add_task_priority);
     	int priority;
@@ -108,45 +118,48 @@ public class AddTaskActivity extends SherlockActivity {
     		break;    		
     	}
     	
+    	// Get task category
+    	// TODO: Implement this
+    	
+    	// Get has due date
+    	CheckBox task_has_due_date = (CheckBox) findViewById(R.id.checkbox_has_due_date);
+    	boolean has_due_date = task_has_due_date.isChecked();
+    	
+    	// Get has final due date
+    	CheckBox task_has_final_due_date = (CheckBox) findViewById(R.id.checkbox_has_final_due_date);
+    	boolean has_final_due_date = task_has_final_due_date.isChecked();
+    	
     	// Get task creation date
     	Calendar date_created = GregorianCalendar.getInstance();
-    	date_created.set(GregorianCalendar.SECOND, 0);
-    	date_created.set(GregorianCalendar.MILLISECOND, 0);
     	
     	// Get task due date
-    	DatePicker task_date = (DatePicker) findViewById(R.id.date_add_task_due);
+    	/*DatePicker task_date = (DatePicker) findViewById(R.id.date_add_task_due);
     	TimePicker task_time = (TimePicker) findViewById(R.id.time_add_task_due);
     	Calendar date_due = new GregorianCalendar();
     	date_due.set(task_date.getYear(), task_date.getMonth(), 
     			task_date.getDayOfMonth(), task_time.getCurrentHour(), 
     			task_time.getCurrentMinute());
     	date_due.set(GregorianCalendar.SECOND, 0);
-    	date_due.set(GregorianCalendar.MILLISECOND, 0);
+    	date_due.set(GregorianCalendar.MILLISECOND, 0);*/
     	
     	// Get task notes
     	EditText task_notes = (EditText) findViewById(R.id.edit_add_task_notes);
     	String notes = task_notes.getText().toString();
     	    	
     	// Create the task
-    	// TODO: Implement task category (currently defaults to 0)
-    	// TODO: Implement final date due (current defaults to date due)
-    	// TODO: Implement has due date/has final due date
-    	// TODO: Implement isRepeating/hasStopRepeatingDate
-    	// TODO: Implement repeat type/repeat interval
-    	// TODO: Implement stop repeating date
     	Task task = new Task(
     			name, 
-    			false, 
+    			is_completed, 
     			priority, 
     			0,
-    			true,
-    			false,
+    			has_due_date,
+    			has_final_due_date,
     			false,
     			false,
     			0,
     			0,
     			date_created.getTimeInMillis(), 
-    			date_due.getTimeInMillis(), 
+    			0, 
     			0,
     			0,
     			notes);
@@ -161,6 +174,37 @@ public class AddTaskActivity extends SherlockActivity {
 	/**************************************************************************
 	 * Overridden parent methods                                              *
 	 **************************************************************************/
+    
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_add_task);
+        
+        // Initialize the fields that can be enabled/disabled or listened to
+        has_due_date = (CheckBox) findViewById(R.id.checkbox_has_due_date);
+        edit_due_date = (Button) findViewById(R.id.button_edit_due_date);
+        due_date = (TextView) findViewById(R.id.text_add_task_due_date);
+        has_final_due_date = (CheckBox) findViewById(R.id.checkbox_has_final_due_date);
+        edit_final_due_date = (Button) findViewById(R.id.button_edit_final_due_date);
+        final_due_date = (TextView) findViewById(R.id.text_add_task_final_due_date);
+        has_repetition = (CheckBox) findViewById(R.id.checkbox_has_repetition);   
+        repeats = (TextView) findViewById(R.id.text_add_task_repeats);
+        repeat_interval = (EditText) findViewById(R.id.edit_add_task_repeat_interval);
+        repeat_type = (Spinner) findViewById(R.id.spinner_add_task_repeat_type);
+        has_due_date.setOnCheckedChangeListener(this);
+        
+        // Allow Action bar icon to act as a button
+        getSupportActionBar().setHomeButtonEnabled(true);
+        
+        // Populate the repeat type spinner
+        ArrayAdapter<CharSequence> repeat_type_adapter = 
+        		ArrayAdapter.createFromResource(this, 
+        				R.array.spinner_repeat_types, 
+        				android.R.layout.simple_spinner_item);
+        repeat_type_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        repeat_type.setAdapter(repeat_type_adapter);
+        repeat_type.setEnabled(false);
+    }
     
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -191,4 +235,26 @@ public class AddTaskActivity extends SherlockActivity {
     		return super.onOptionsItemSelected(item);
     	}
     }
+
+	/**************************************************************************
+	 * Methods implementing OnCheckedChangedListener interface                *
+	 **************************************************************************/
+
+	@Override
+	public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+		switch (buttonView.getId()) {
+		case R.id.checkbox_has_due_date:
+			if (isChecked) {
+				edit_due_date.setEnabled(true);
+				due_date.setEnabled(true);
+				has_final_due_date.setEnabled(true);
+				has_repetition.setEnabled(true);
+			} else {
+				edit_due_date.setEnabled(false);
+				due_date.setEnabled(false);
+				has_final_due_date.setEnabled(false);
+				has_repetition.setEnabled(false);
+			}
+		}
+	}
 }
