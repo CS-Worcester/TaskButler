@@ -269,7 +269,7 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
     		adapter.add(task);
     		adapter.sort();
     		
-    		if (task.hasDateDue()) {
+    		if (task.hasDateDue() && !task.isCompleted()) {
     			TaskAlarm alarm = new TaskAlarm();
     			alarm.setOnetimeAlarm(this, task.getID());
     		}

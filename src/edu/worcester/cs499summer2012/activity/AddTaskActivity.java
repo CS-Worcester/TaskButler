@@ -22,17 +22,25 @@ package edu.worcester.cs499summer2012.activity;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.format.DateFormat;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockActivity;
@@ -48,7 +56,8 @@ import edu.worcester.cs499summer2012.task.Task;
  * @author Jonathan Hasenzahl
  * @author James Celona
  */
-public class AddTaskActivity extends SherlockActivity implements OnCheckedChangeListener {
+public class AddTaskActivity extends SherlockActivity implements 
+        OnCheckedChangeListener, OnClickListener, DialogInterface.OnClickListener {
 
 	/**************************************************************************
 	 * Static fields and methods                                              *
@@ -58,12 +67,20 @@ public class AddTaskActivity extends SherlockActivity implements OnCheckedChange
 	 * Label for the extra task parcel which will be added to the returned intent
 	 */
 	public final static String EXTRA_TASK = "edu.worcester.cs499summer2012.TASK";
+	public final static int DEFAULT_HOUR = 12;
+	public final static int DEFAULT_MINUTE = 0;
+	public final static int DEFAULT_SECOND = 0;
+	public final static int DEFAULT_MILLISECOND = 0;
+	public final static String DEFAULT_INTERVAL = "1";
     
     /**************************************************************************
      * Private fields                                                         *
      **************************************************************************/
-    
+	
+	// Intent to be returned
     private Intent intent;
+    
+    // UI elements
     private CheckBox has_due_date;
     private Button edit_due_date;
     private TextView due_date;
@@ -74,6 +91,17 @@ public class AddTaskActivity extends SherlockActivity implements OnCheckedChange
     private TextView repeats;
     private EditText repeat_interval;
     private Spinner repeat_type;
+    private CheckBox stop_repeating;
+    private Button edit_stop_repeating_date;
+    private TextView stop_repeating_date;
+    private DatePicker date_picker;
+    private TimePicker time_picker;
+    
+    // Task properties that are modified by UI elements
+    private Calendar due_date_cal;
+    private Calendar final_due_date_cal;
+    private Calendar stop_repeating_date_cal;
+    private int selected_calendar;
     
     /**************************************************************************
 	 * Class methods                                                          *
@@ -87,8 +115,7 @@ public class AddTaskActivity extends SherlockActivity implements OnCheckedChange
      */
     public boolean addTask() {
     	// Get task name
-    	EditText task_name = (EditText) findViewById(R.id.edit_add_task_name);
-    	String name = task_name.getText().toString();
+    	EditText name = (EditText) findViewById(R.id.edit_add_task_name);
     	
     	// If there is no task name, don't create the task
     	if (name.equals(""))
@@ -98,8 +125,7 @@ public class AddTaskActivity extends SherlockActivity implements OnCheckedChange
     	}
     	
     	// Get completion status
-    	CheckBox task_completion = (CheckBox) findViewById(R.id.checkbox_already_completed);
-    	boolean is_completed = task_completion.isChecked();
+    	CheckBox is_completed = (CheckBox) findViewById(R.id.checkbox_already_completed);
     	
     	// Get task priority
     	RadioGroup task_priority = (RadioGroup) findViewById(R.id.radiogroup_add_task_priority);
@@ -120,49 +146,52 @@ public class AddTaskActivity extends SherlockActivity implements OnCheckedChange
     	
     	// Get task category
     	// TODO: Implement this
+    	int category = 0;
     	
-    	// Get has due date
-    	CheckBox task_has_due_date = (CheckBox) findViewById(R.id.checkbox_has_due_date);
-    	boolean has_due_date = task_has_due_date.isChecked();
-    	
-    	// Get has final due date
-    	CheckBox task_has_final_due_date = (CheckBox) findViewById(R.id.checkbox_has_final_due_date);
-    	boolean has_final_due_date = task_has_final_due_date.isChecked();
-    	
-    	// Get task creation date
-    	Calendar date_created = GregorianCalendar.getInstance();
+    	// Get repeat interval
+    	int interval = 1;
+    	String interval_string = repeat_interval.getText().toString();
+    	if (!interval_string.equals("")) {
+    		interval =  Integer.parseInt(interval_string);
+    		if (interval == 0)
+    			interval = 1;
+    	}
     	
     	// Get task due date
-    	/*DatePicker task_date = (DatePicker) findViewById(R.id.date_add_task_due);
-    	TimePicker task_time = (TimePicker) findViewById(R.id.time_add_task_due);
-    	Calendar date_due = new GregorianCalendar();
-    	date_due.set(task_date.getYear(), task_date.getMonth(), 
-    			task_date.getDayOfMonth(), task_time.getCurrentHour(), 
-    			task_time.getCurrentMinute());
-    	date_due.set(GregorianCalendar.SECOND, 0);
-    	date_due.set(GregorianCalendar.MILLISECOND, 0);*/
+    	long due_date_ms = 0;
+    	if (has_due_date.isChecked())
+    		due_date_ms = due_date_cal.getTimeInMillis();
+    	
+    	// Get task final due date
+    	long final_due_date_ms = 0;
+    	if (has_final_due_date.isChecked())
+    		final_due_date_ms = final_due_date_cal.getTimeInMillis();
+    	
+    	// Get stop repeating date
+    	long stop_repeating_date_ms = 0;
+    	if (stop_repeating.isChecked())
+    		stop_repeating_date_ms = stop_repeating_date_cal.getTimeInMillis();
     	
     	// Get task notes
-    	EditText task_notes = (EditText) findViewById(R.id.edit_add_task_notes);
-    	String notes = task_notes.getText().toString();
+    	EditText notes = (EditText) findViewById(R.id.edit_add_task_notes);
     	    	
     	// Create the task
     	Task task = new Task(
-    			name, 
-    			is_completed, 
+    			name.getText().toString(), 
+    			is_completed.isChecked(), 
     			priority, 
-    			0,
-    			has_due_date,
-    			has_final_due_date,
-    			false,
-    			false,
-    			0,
-    			0,
-    			date_created.getTimeInMillis(), 
-    			0, 
-    			0,
-    			0,
-    			notes);
+    			category,
+    			has_due_date.isChecked(),
+    			has_final_due_date.isChecked(),
+    			has_repetition.isChecked(),
+    			stop_repeating.isChecked(),
+    			repeat_type.getSelectedItemPosition(),
+    			interval,
+    			GregorianCalendar.getInstance().getTimeInMillis(), 
+    			due_date_ms, 
+    			final_due_date_ms,
+    			stop_repeating_date_ms,
+    			notes.getText().toString());
     	
     	// Create the return intent and add the task
     	intent = new Intent(this, MainActivity.class);    	
@@ -191,7 +220,37 @@ public class AddTaskActivity extends SherlockActivity implements OnCheckedChange
         repeats = (TextView) findViewById(R.id.text_add_task_repeats);
         repeat_interval = (EditText) findViewById(R.id.edit_add_task_repeat_interval);
         repeat_type = (Spinner) findViewById(R.id.spinner_add_task_repeat_type);
+        stop_repeating = (CheckBox) findViewById(R.id.checkbox_stop_repeating);
+        edit_stop_repeating_date = (Button) findViewById(R.id.button_edit_stop_repeating_date);
+        stop_repeating_date = (TextView) findViewById(R.id.text_add_task_stop_repeating_date);
+        
+        // Initialize calendars to default values
+        due_date_cal = GregorianCalendar.getInstance();
+        due_date_cal.set(Calendar.HOUR_OF_DAY, DEFAULT_HOUR);
+        due_date_cal.set(Calendar.MINUTE, DEFAULT_MINUTE);
+        due_date_cal.set(Calendar.SECOND, DEFAULT_SECOND);
+        due_date_cal.set(Calendar.MILLISECOND, DEFAULT_MILLISECOND);
+        
+        final_due_date_cal = GregorianCalendar.getInstance();
+        final_due_date_cal.set(Calendar.HOUR_OF_DAY, DEFAULT_HOUR);
+        final_due_date_cal.set(Calendar.MINUTE, DEFAULT_MINUTE);
+        final_due_date_cal.set(Calendar.SECOND, DEFAULT_SECOND);
+        final_due_date_cal.set(Calendar.MILLISECOND, DEFAULT_MILLISECOND);
+        
+        stop_repeating_date_cal = GregorianCalendar.getInstance();
+        stop_repeating_date_cal.set(Calendar.HOUR_OF_DAY, DEFAULT_HOUR);
+        stop_repeating_date_cal.set(Calendar.MINUTE, DEFAULT_MINUTE);
+        stop_repeating_date_cal.set(Calendar.SECOND, DEFAULT_SECOND);
+        stop_repeating_date_cal.set(Calendar.MILLISECOND, DEFAULT_MILLISECOND);
+        
+        // Set listeners
         has_due_date.setOnCheckedChangeListener(this);
+        has_final_due_date.setOnCheckedChangeListener(this);
+        has_repetition.setOnCheckedChangeListener(this);
+        stop_repeating.setOnCheckedChangeListener(this);
+        edit_due_date.setOnClickListener(this);
+        edit_final_due_date.setOnClickListener(this);
+        edit_stop_repeating_date.setOnClickListener(this);
         
         // Allow Action bar icon to act as a button
         getSupportActionBar().setHomeButtonEnabled(true);
@@ -247,13 +306,158 @@ public class AddTaskActivity extends SherlockActivity implements OnCheckedChange
 			if (isChecked) {
 				edit_due_date.setEnabled(true);
 				due_date.setEnabled(true);
+				due_date.setText(DateFormat.format("'Due:' MM/dd/yy 'at' h:mm AA", 
+						due_date_cal));
 				has_final_due_date.setEnabled(true);
 				has_repetition.setEnabled(true);
 			} else {
 				edit_due_date.setEnabled(false);
 				due_date.setEnabled(false);
+				due_date.setText(R.string.text_no_due_date);
 				has_final_due_date.setEnabled(false);
 				has_repetition.setEnabled(false);
+				
+				// Uncheck final due date and repetition boxes
+				if (has_final_due_date.isChecked())
+					has_final_due_date.setChecked(false);
+				if (has_repetition.isChecked())
+					has_repetition.setChecked(false);
+			}
+			break;
+			
+		case R.id.checkbox_has_final_due_date:
+			if (isChecked) {
+				edit_final_due_date.setEnabled(true);
+				final_due_date.setEnabled(true);
+				final_due_date.setText(DateFormat.format("'Alarm:' MM/dd/yy 'at' h:mm AA", 
+						final_due_date_cal));
+			} else {
+				edit_final_due_date.setEnabled(false);
+				final_due_date.setEnabled(false);
+				final_due_date.setText(R.string.text_no_final_due_date);
+			}
+			break;
+			
+		case R.id.checkbox_has_repetition:
+			if (isChecked) {
+				repeats.setEnabled(true);
+				repeat_interval.setEnabled(true);
+				repeat_interval.setText(DEFAULT_INTERVAL);
+				repeat_type.setEnabled(true);
+				stop_repeating.setEnabled(true);
+			} else {
+				repeats.setEnabled(false);
+				repeat_interval.setEnabled(false);
+				repeat_interval.setText("");
+				repeat_type.setEnabled(false);
+				stop_repeating.setEnabled(false);
+				
+				// Uncheck stop repeating box
+				if (stop_repeating.isChecked())
+					stop_repeating.setChecked(false);
+			}
+			break;
+			
+		case R.id.checkbox_stop_repeating:
+			if (isChecked) {
+				edit_stop_repeating_date.setEnabled(true);
+				stop_repeating_date.setEnabled(true);
+				stop_repeating_date.setText(DateFormat.format("'Ends:' MM/dd/yy 'at' h:mm AA", 
+						stop_repeating_date_cal));
+			} else {
+				edit_stop_repeating_date.setEnabled(false);
+				stop_repeating_date.setEnabled(false);
+				stop_repeating_date.setText(R.string.text_no_stop_repeating_date);
+			}
+		}
+	}
+
+	/**************************************************************************
+	 * Methods implementing OnClickListener interface                         *
+	 **************************************************************************/
+	
+	@Override
+	public void onClick(View v) {	
+		LayoutInflater li = LayoutInflater.from(this);
+		View picker_view = li.inflate(R.layout.date_time_picker, null);
+		
+		date_picker = (DatePicker) picker_view.findViewById(R.id.dialog_date_picker);
+        time_picker = (TimePicker) picker_view.findViewById(R.id.dialog_time_picker);
+		
+		switch (v.getId()) {
+		case R.id.button_edit_due_date:
+			selected_calendar = R.id.button_edit_due_date;
+			date_picker.updateDate(due_date_cal.get(Calendar.YEAR), 
+					due_date_cal.get(Calendar.MONTH), 
+					due_date_cal.get(Calendar.DAY_OF_MONTH));
+			time_picker.setCurrentHour(due_date_cal.get(Calendar.HOUR_OF_DAY));
+			time_picker.setCurrentMinute(due_date_cal.get(Calendar.MINUTE));
+			break;
+			
+		case R.id.button_edit_final_due_date:
+			selected_calendar = R.id.button_edit_final_due_date;
+			date_picker.updateDate(final_due_date_cal.get(Calendar.YEAR), 
+					final_due_date_cal.get(Calendar.MONTH), 
+					final_due_date_cal.get(Calendar.DAY_OF_MONTH));
+			time_picker.setCurrentHour(final_due_date_cal.get(Calendar.HOUR_OF_DAY));
+			time_picker.setCurrentMinute(final_due_date_cal.get(Calendar.MINUTE));
+			break;
+			
+		case R.id.button_edit_stop_repeating_date:
+			selected_calendar = R.id.button_edit_stop_repeating_date;
+			date_picker.updateDate(stop_repeating_date_cal.get(Calendar.YEAR), 
+					stop_repeating_date_cal.get(Calendar.MONTH), 
+					stop_repeating_date_cal.get(Calendar.DAY_OF_MONTH));
+			time_picker.setCurrentHour(stop_repeating_date_cal.get(Calendar.HOUR_OF_DAY));
+			time_picker.setCurrentMinute(stop_repeating_date_cal.get(Calendar.MINUTE));
+		}
+		
+		AlertDialog.Builder picker_dialog = new AlertDialog.Builder(this);
+		picker_dialog.setView(picker_view)
+		             .setTitle("Set date and time")
+		             .setCancelable(true)
+		             .setPositiveButton("Accept", this)
+		             .setNegativeButton("Cancel", this);
+		picker_dialog.show();
+	}
+
+	/**************************************************************************
+	 * Methods implementing DialogInterface.OnClickListener interface         *
+	 **************************************************************************/
+	
+	@Override
+	public void onClick(DialogInterface dialog, int id) {
+		if (id == DialogInterface.BUTTON_POSITIVE) {
+			switch (selected_calendar) {
+			case R.id.button_edit_due_date:
+				due_date_cal.set(Calendar.YEAR, date_picker.getYear());
+				due_date_cal.set(Calendar.MONTH, date_picker.getMonth());
+				due_date_cal.set(Calendar.DAY_OF_MONTH, date_picker.getDayOfMonth());
+				due_date_cal.set(Calendar.HOUR_OF_DAY, time_picker.getCurrentHour());
+				due_date_cal.set(Calendar.MINUTE, time_picker.getCurrentMinute());
+				due_date.setText(DateFormat.format("'Due:' MM/dd/yy 'at' h:mm AA", 
+						due_date_cal));
+				break;
+				
+			case R.id.button_edit_final_due_date:
+				final_due_date_cal.set(Calendar.YEAR, date_picker.getYear());
+				final_due_date_cal.set(Calendar.MONTH, date_picker.getMonth());
+				final_due_date_cal.set(Calendar.DAY_OF_MONTH, date_picker.getDayOfMonth());
+				final_due_date_cal.set(Calendar.HOUR_OF_DAY, time_picker.getCurrentHour());
+				final_due_date_cal.set(Calendar.MINUTE, time_picker.getCurrentMinute());
+				final_due_date.setText(DateFormat.format("'Alarm:' MM/dd/yy 'at' h:mm AA", 
+						final_due_date_cal));
+				break;
+			
+			case R.id.button_edit_stop_repeating_date:
+				stop_repeating_date_cal.set(Calendar.YEAR, date_picker.getYear());
+				stop_repeating_date_cal.set(Calendar.MONTH, date_picker.getMonth());
+				stop_repeating_date_cal.set(Calendar.DAY_OF_MONTH, date_picker.getDayOfMonth());
+				stop_repeating_date_cal.set(Calendar.HOUR_OF_DAY, time_picker.getCurrentHour());
+				stop_repeating_date_cal.set(Calendar.MINUTE, time_picker.getCurrentMinute());
+				stop_repeating_date.setText(DateFormat.format("'Ends:' MM/dd/yy 'at' h:mm AA", 
+						stop_repeating_date_cal));
+				break;
 			}
 		}
 	}

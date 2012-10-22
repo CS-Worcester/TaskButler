@@ -14,6 +14,8 @@
 	
 	    <!-- Group 1: Text name/is completed -->
 	    
+	    <requestFocus />
+	    
 	    <TextView
 	        android:id="@+id/text_add_task_name"
 	        android:layout_width="match_parent"
@@ -267,6 +269,7 @@
 	        android:textSize="18dp"
 	        android:gravity="center_vertical"
 	        android:inputType="number"
+	        android:maxLength="3"
 	        android:enabled="false" />
  	    
  	    <Spinner
@@ -282,11 +285,49 @@
 	        android:gravity="center_vertical"
 	        android:enabled="false" />
 
-	    <View
+	    <CheckBox
+	        android:id="@+id/checkbox_stop_repeating"
+	        android:layout_width="wrap_content"
+	        android:layout_height="40dp"
+	        android:layout_below="@id/text_add_task_repeats"
+	        android:layout_alignParentLeft="true"
+	        android:layout_marginTop="4dp"
+	        android:layout_marginBottom="4dp"
+	        android:text="@string/checkbox_stop_repeating"
+	        android:textSize="16dp"
+	        android:checked="false"
+	        android:enabled="false" />
+   	    
+   	    <Button
+   	        android:id="@+id/button_edit_stop_repeating_date"
+   	        android:layout_width="72dp"
+	        android:layout_height="40dp"
+	        android:layout_below="@id/text_add_task_repeats"
+	        android:layout_alignParentRight="true"
+	        android:layout_marginTop="4dp"
+	        android:layout_marginBottom="4dp"
+	        android:text="@string/button_edit_date"
+	        android:textSize="16dp"
+	        android:enabled="false" />
+   	        
+   	    
+   	    <TextView 
+   	        android:id="@+id/text_add_task_stop_repeating_date"
+   	        android:layout_width="match_parent"
+   	        android:layout_height="40dp"
+   	        android:layout_below="@id/checkbox_stop_repeating"
+	        android:layout_marginTop="4dp"
+	        android:layout_marginBottom="4dp"
+	        android:text="@string/text_no_stop_repeating_date"
+	        android:textSize="18dp"
+	        android:gravity="center_vertical"
+	        android:enabled="false" />
+   	    
+   	    <View
 	        android:id="@+id/ruler_4"
 	        android:layout_width="match_parent"
 			android:layout_height="1dp"
-			android:layout_below="@id/text_add_task_repeats"
+			android:layout_below="@id/text_add_task_stop_repeating_date"
 			android:layout_marginTop="4dp"
 			android:layout_marginBottom="4dp"
 			android:background="#33B5E5" />	
