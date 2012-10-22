@@ -26,10 +26,16 @@
 
     <!-- TextView items -->
     <string name="text_empty_list">No tasks found.\nClick the button above to create a task!</string>
-    <string name="text_task_name">Task name</string>
-    <string name="text_task_priority">Task priority</string>
-    <string name="text_task_due">Due date and time</string>
+    <string name="text_task_name">Name</string>
+    <string name="text_task_priority">Priority</string>
+    <string name="text_task_category">Category</string>
+    <string name="text_task_due">Due date</string>
     <string name="text_task_notes">Notes</string>
+    <string name="text_no_due_date">No due date</string>
+    <string name="text_no_final_due_date">No procrastination alarm</string>
+    <string name="text_no_stop_repeating_date">Repeat forever</string>
+    <string name="text_task_repeats">Repeat every </string>
+    <string name="text_date_time">Set date and time</string>
 
     <!-- EditText items -->
     <string name="edit_task_name">Enter task name</string>
@@ -43,7 +49,28 @@
     <!-- CheckBox items -->
     <string name="checkbox_hide_completed">Hide completed tasks</string>
     <string name="checkbox_auto_delete">Delete completed tasks automatically</string>
+    <string name="checkbox_already_completed">Already completed</string>
+    <string name="checkbox_has_due_date">Due date</string>
+    <string name="checkbox_has_final_due_date">Procrastination alarm</string>
+    <string name="checkbox_has_repetition">Repeats</string>
+    <string name="checkbox_stop_repeating">Stop repeating</string>
+    
+    <!-- Buttons -->
+    <string name="button_edit_date">Edit</string>
+    <string name="button_dialog_ok">Accept</string>
+    <string name="button_dialog_cancel">Cancel</string>
     
     <!-- Debug Value -->
 	<string name="tvHandleNotification">You can handle notification intent here.</string>
+	
+	<!-- Spinner items -->
+	<string-array name="spinner_repeat_types">
+	    <item>minutes</item>
+	    <item>hours</item>
+	    <item>days</item>
+	    <item>weeks</item>
+	    <item>months</item>
+	    <item>years</item>
+	</string-array>
+	
 </resources>

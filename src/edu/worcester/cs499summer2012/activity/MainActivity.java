@@ -245,7 +245,7 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
     public void onListItemClick(ListView list_view, View view, int position, 
     		long id) {
     	adapter.getItem(position).toggleIsCompleted();
-    	adapter.getItem(position).setDateModified((int) GregorianCalendar.getInstance().getTimeInMillis());
+    	adapter.getItem(position).setDateModified(GregorianCalendar.getInstance().getTimeInMillis());
     	
     	// Update database
     	data_source.updateTask(adapter.getItem(position));
@@ -269,8 +269,10 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
     		adapter.add(task);
     		adapter.sort();
     		
-    		TaskAlarm alarm = new TaskAlarm();
-    		alarm.setOnetimeAlarm(this, task.getID());
+    		if (task.hasDateDue() && !task.isCompleted()) {
+    			TaskAlarm alarm = new TaskAlarm();
+    			alarm.setOnetimeAlarm(this, task.getID());
+    		}
     	}
     }
     
