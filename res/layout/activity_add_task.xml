@@ -9,48 +9,90 @@
 	<RelativeLayout
 	    android:layout_width="match_parent"
 	    android:layout_height="wrap_content"
-	    android:paddingLeft="16dp"
-	    android:paddingRight="16dp" >
+	    android:paddingLeft="8dp"
+	    android:paddingRight="8dp" >
 	
+	    <!-- Group 1: Text name/is completed -->
+	    
+	    <requestFocus />
+	    
 	    <TextView
 	        android:id="@+id/text_add_task_name"
-	        android:layout_width="fill_parent"
+	        android:layout_width="match_parent"
 	        android:layout_height="wrap_content"
 	        android:layout_alignParentTop="true"
-	        android:text="@string/text_task_name" />
+	        android:layout_marginTop="4dp"
+	        android:layout_marginBottom="4dp"
+	        android:text="@string/text_task_name"
+	        android:textSize="20dp" />
 	
 	    <EditText
 	        android:id="@+id/edit_add_task_name"
-	        android:layout_width="fill_parent"
-	        android:layout_height="wrap_content"
+	        android:layout_width="match_parent"
+	        android:layout_height="40dp"
 	        android:layout_below="@id/text_add_task_name"
+     	    android:layout_marginTop="4dp"
+	        android:layout_marginBottom="4dp"
 	        android:hint="@string/edit_task_name"
-	        android:inputType="textCapSentences" />
+	        android:textSize="18dp"
+	        android:inputType="textCapSentences|textAutoCorrect" />
+	    
+	    <CheckBox
+	        android:id="@+id/checkbox_already_completed"
+	        android:layout_width="wrap_content"
+	        android:layout_height="40dp"
+	        android:layout_below="@id/edit_add_task_name"
+	        android:layout_alignParentLeft="true"
+	        android:layout_marginTop="4dp"
+	        android:layout_marginBottom="4dp"
+	        android:text="@string/checkbox_already_completed"
+	        android:textSize="16dp"
+	        android:checked="false" />
+	    
+	    <View
+	        android:id="@+id/ruler_1"
+	        android:layout_width="match_parent"
+			android:layout_height="1dp"
+			android:layout_below="@id/checkbox_already_completed"
+			android:layout_marginTop="4dp"
+			android:layout_marginBottom="4dp"
+			android:background="#33B5E5" />
+	    
+	    <!--  Group 2: Priority -->
 	    
 	    <TextView
 	        android:id="@+id/text_add_task_priority"
-	        android:layout_width="fill_parent"
+	        android:layout_width="match_parent"
 	        android:layout_height="wrap_content"
-	        android:layout_below="@id/edit_add_task_name"
-	        android:text="@string/text_task_priority" />
+	        android:layout_below="@id/ruler_1"
+	        android:layout_marginTop="4dp"
+	        android:layout_marginBottom="4dp"
+	        android:text="@string/text_task_priority"
+	        android:textSize="20dp" />
 	
 	    <RadioGroup
 	        android:id="@+id/radiogroup_add_task_priority"
-	        android:layout_width="fill_parent"
-	        android:layout_height="wrap_content"
+	        android:layout_width="match_parent"
+	        android:layout_height="40dp"
 	        android:layout_below="@id/text_add_task_priority"
-	        android:orientation="horizontal">
+	        android:layout_marginTop="4dp"
+	        android:layout_marginBottom="4dp"
+	        android:textSize="16dp"
+	        android:orientation="horizontal" >
 	        
 	        <RadioButton
 	            android:id="@+id/radio_add_task_urgent"
 	            android:layout_width="wrap_content"
 	            android:layout_height="wrap_content"
+	            android:layout_marginRight="4dp"
 	            android:text="@string/radio_urgent" />        
 	
 	        <RadioButton
 	            android:id="@+id/radio_add_task_normal"
 	            android:layout_width="wrap_content"
 	            android:layout_height="wrap_content"
+	            android:layout_marginLeft="4dp"
+	            android:layout_marginRight="4dp"
 	            android:checked="true"
 	            android:text="@string/radio_normal" />
 	        
@@ -58,44 +100,262 @@
 	            android:id="@+id/radio_add_task_trivial"
 	            android:layout_width="wrap_content"
 	            android:layout_height="wrap_content"
+	            android:layout_marginLeft="4dp"
 	            android:text="@string/radio_trivial" />        
 	
 	    </RadioGroup>
-	
+	    
+	    <View
+	        android:id="@+id/ruler_2"
+	        android:layout_width="match_parent"
+			android:layout_height="1dp"
+			android:layout_below="@id/radiogroup_add_task_priority"
+			android:layout_marginTop="4dp"
+			android:layout_marginBottom="4dp"
+			android:background="#33B5E5" />
+	    
+	    <!-- Group 3: Category -->
+	    
 	    <TextView
+	        android:id="@+id/text_add_task_category"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:layout_below="@id/ruler_2"
+	        android:layout_marginTop="4dp"
+			android:layout_marginBottom="4dp"
+	        android:text="@string/text_task_category"
+	        android:textSize="20dp" />
+	    
+	    <Spinner
+	        android:id="@+id/spinner_add_task_category"
+	        android:layout_width="wrap_content"
+	        android:layout_height="40dp"
+	        android:layout_below="@id/text_add_task_category"
+	        android:layout_marginTop="4dp"
+			android:layout_marginBottom="4dp"
+			android:textSize="18dp" />
+	    
+	    <View
+	        android:id="@+id/ruler_3"
+	        android:layout_width="match_parent"
+			android:layout_height="1dp"
+			android:layout_below="@id/spinner_add_task_category"
+			android:layout_marginTop="4dp"
+			android:layout_marginBottom="4dp"
+			android:background="#33B5E5" />	
+		
+	    <!-- Group 4: Due date -->	
+	    
+   	    <TextView
 	        android:id="@+id/text_add_task_due"
-	        android:layout_width="fill_parent"
+	        android:layout_width="match_parent"
 	        android:layout_height="wrap_content"
-	        android:layout_below="@id/radiogroup_add_task_priority"
-	        android:text="@string/text_task_due" />    
-	    
-	    <DatePicker
-	        android:id="@+id/date_add_task_due"
+	        android:layout_below="@id/ruler_3"
+	        android:layout_marginTop="4dp"
+			android:layout_marginBottom="4dp"
+	        android:text="@string/text_task_due"
+	        android:textSize="20dp" />
+   	    
+   	    <CheckBox
+	        android:id="@+id/checkbox_has_due_date"
 	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:layout_below="@id/text_add_task_due" />
-	    
-	    <TimePicker
-	        android:id="@+id/time_add_task_due"
+	        android:layout_height="40dp"
+	        android:layout_below="@id/text_add_task_due"
+	        android:layout_alignParentLeft="true"
+	        android:layout_marginTop="4dp"
+	        android:layout_marginBottom="4dp"
+	        android:text="@string/checkbox_has_due_date"
+	        android:textSize="16dp"
+	        android:checked="false" />
+   	    
+   	    <Button
+   	        android:id="@+id/button_edit_due_date"
+   	        android:layout_width="72dp"
+	        android:layout_height="40dp"
+	        android:layout_below="@id/text_add_task_due"
+	        android:layout_alignParentRight="true"
+	        android:layout_marginTop="4dp"
+	        android:layout_marginBottom="4dp"
+	        android:text="@string/button_edit_date"
+	        android:textSize="16dp"
+	        android:enabled="false" />
+   	        
+   	    
+   	    <TextView 
+   	        android:id="@+id/text_add_task_due_date"
+   	        android:layout_width="match_parent"
+   	        android:layout_height="40dp"
+   	        android:layout_below="@id/checkbox_has_due_date"
+	        android:layout_marginTop="4dp"
+	        android:layout_marginBottom="4dp"
+	        android:text="@string/text_no_due_date"
+	        android:textSize="18dp"
+	        android:gravity="center_vertical"
+	        android:enabled="false" />
+   	    
+   	    <CheckBox
+	        android:id="@+id/checkbox_has_final_due_date"
 	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:layout_below="@id/date_add_task_due" />    
+	        android:layout_height="40dp"
+	        android:layout_below="@id/text_add_task_due_date"
+	        android:layout_alignParentLeft="true"
+	        android:layout_marginTop="4dp"
+	        android:layout_marginBottom="4dp"
+	        android:text="@string/checkbox_has_final_due_date"
+	        android:textSize="16dp"
+	        android:checked="false"
+	        android:enabled="false" />
+   	    
+   	    <Button
+   	        android:id="@+id/button_edit_final_due_date"
+   	        android:layout_width="72dp"
+	        android:layout_height="40dp"
+	        android:layout_below="@id/text_add_task_due_date"
+	        android:layout_alignParentRight="true"
+	        android:layout_marginTop="4dp"
+	        android:layout_marginBottom="4dp"
+	        android:text="@string/button_edit_date"
+	        android:textSize="16dp"
+	        android:enabled="false" />
+   	        
+   	    <TextView 
+   	        android:id="@+id/text_add_task_final_due_date"
+   	        android:layout_width="match_parent"
+   	        android:layout_height="40dp"
+   	        android:layout_below="@id/checkbox_has_final_due_date"
+	        android:layout_marginTop="4dp"
+	        android:layout_marginBottom="4dp"
+	        android:text="@string/text_no_final_due_date"
+	        android:textSize="18dp"
+	        android:gravity="center_vertical"
+	        android:enabled="false" />
+   	    
+ 	    <CheckBox
+	        android:id="@+id/checkbox_has_repetition"
+	        android:layout_width="wrap_content"
+	        android:layout_height="40dp"
+	        android:layout_below="@id/text_add_task_final_due_date"
+	        android:layout_alignParentLeft="true"
+	        android:layout_marginTop="4dp"
+	        android:layout_marginBottom="4dp"
+	        android:text="@string/checkbox_has_repetition"
+	        android:textSize="16dp"
+	        android:checked="false"
+	        android:enabled="false" />
+ 	    
+ 	    <TextView 
+   	        android:id="@+id/text_add_task_repeats"
+   	        android:layout_width="wrap_content"
+   	        android:layout_height="40dp"
+   	        android:layout_below="@id/checkbox_has_repetition"
+	        android:layout_marginTop="4dp"
+	        android:layout_marginBottom="4dp"
+	        android:layout_marginRight="4dp"
+	        android:text="@string/text_task_repeats"
+	        android:textSize="18dp"
+	        android:gravity="center_vertical"
+	        android:enabled="false" />
+   	    
+ 	    <EditText 
+ 	        android:id="@+id/edit_add_task_repeat_interval"
+ 	        android:layout_width="56dp"
+   	        android:layout_height="40dp"
+   	        android:layout_below="@id/checkbox_has_repetition"
+	        android:layout_marginTop="4dp"
+	        android:layout_marginBottom="4dp"
+	        android:layout_marginLeft="4dp"
+	        android:layout_marginRight="4dp"
+	        android:layout_toRightOf="@id/text_add_task_repeats"
+	        android:textSize="18dp"
+	        android:gravity="center_vertical"
+	        android:inputType="number"
+	        android:maxLength="3"
+	        android:enabled="false" />
+ 	    
+ 	    <Spinner
+	        android:id="@+id/spinner_add_task_repeat_type"
+	        android:layout_width="126dp"
+	        android:layout_height="40dp"
+	        android:layout_below="@id/checkbox_has_repetition"
+	        android:layout_marginTop="4dp"
+	        android:layout_marginBottom="4dp"
+	        android:layout_marginLeft="4dp"
+			android:layout_toRightOf="@id/edit_add_task_repeat_interval"
+	        android:textSize="18dp"
+	        android:gravity="center_vertical"
+	        android:enabled="false" />
+
+	    <CheckBox
+	        android:id="@+id/checkbox_stop_repeating"
+	        android:layout_width="wrap_content"
+	        android:layout_height="40dp"
+	        android:layout_below="@id/text_add_task_repeats"
+	        android:layout_alignParentLeft="true"
+	        android:layout_marginTop="4dp"
+	        android:layout_marginBottom="4dp"
+	        android:text="@string/checkbox_stop_repeating"
+	        android:textSize="16dp"
+	        android:checked="false"
+	        android:enabled="false" />
+   	    
+   	    <Button
+   	        android:id="@+id/button_edit_stop_repeating_date"
+   	        android:layout_width="72dp"
+	        android:layout_height="40dp"
+	        android:layout_below="@id/text_add_task_repeats"
+	        android:layout_alignParentRight="true"
+	        android:layout_marginTop="4dp"
+	        android:layout_marginBottom="4dp"
+	        android:text="@string/button_edit_date"
+	        android:textSize="16dp"
+	        android:enabled="false" />
+   	        
+   	    
+   	    <TextView 
+   	        android:id="@+id/text_add_task_stop_repeating_date"
+   	        android:layout_width="match_parent"
+   	        android:layout_height="40dp"
+   	        android:layout_below="@id/checkbox_stop_repeating"
+	        android:layout_marginTop="4dp"
+	        android:layout_marginBottom="4dp"
+	        android:text="@string/text_no_stop_repeating_date"
+	        android:textSize="18dp"
+	        android:gravity="center_vertical"
+	        android:enabled="false" />
+   	    
+   	    <View
+	        android:id="@+id/ruler_4"
+	        android:layout_width="match_parent"
+			android:layout_height="1dp"
+			android:layout_below="@id/text_add_task_stop_repeating_date"
+			android:layout_marginTop="4dp"
+			android:layout_marginBottom="4dp"
+			android:background="#33B5E5" />	
+		
+	    <!-- Group 5: Notes -->	
 	    
-	    <TextView 
+   	    <TextView
 	        android:id="@+id/text_add_task_notes"
-	        android:layout_width="fill_parent"
+	        android:layout_width="match_parent"
 	        android:layout_height="wrap_content"
-	        android:layout_below="@id/time_add_task_due"
-	        android:text="@string/text_task_notes" />
+	        android:layout_below="@id/ruler_4"
+	        android:layout_marginTop="4dp"
+			android:layout_marginBottom="4dp"
+	        android:text="@string/text_task_notes"
+	        android:textSize="20dp" />    	    
 	    
 	    <EditText
 	        android:id="@+id/edit_add_task_notes"
-	        android:layout_width="fill_parent"
+	        android:layout_width="match_parent"
 	        android:layout_height="wrap_content"
 	        android:layout_below="@id/text_add_task_notes"
+	        android:layout_marginTop="4dp"
+			android:layout_marginBottom="4dp"
 	        android:hint="@string/edit_task_notes"
-	        android:inputType="textCapSentences"
-	        android:maxLength="1500" />
+	        android:inputType="textCapSentences|textMultiLine|textAutoCorrect"
+	        android:gravity="top|left"
+	        android:minHeight="40dp"
+	        android:textSize="18dp" />"
 	
 	</RelativeLayout>
 

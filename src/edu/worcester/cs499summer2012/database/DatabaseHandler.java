@@ -33,7 +33,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DatabaseHandler extends SQLiteOpenHelper {
 
 	// Database Version
-	private static final int DATABASE_VERSION = 1;
+	private static final int DATABASE_VERSION = 2;
 
 	// Database Name
 	private static final String DATABASE_NAME = "TaskButler.db";
@@ -44,16 +44,23 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 	// Column names
 	public static final String KEY_ID = "id";
-	public static final String KEY_NAME = "name"; //data type: TEXT
-	public static final String KEY_COMPLETION = "completion"; //data type: INTEGER, indirectly DATETIME as Unix Time
-	public static final String KEY_PRIORITY = "priority"; //data type: INTEGER, 2=URGENT, 1=REGULAR,0=TRIVIAL 
-	public static final String KEY_CATEGORY = "category"; //data type: INTEGER
-	public static final String KEY_CREATION_DATE = "creationDate"; //data type: DATETIME
-	public static final String KEY_MODIFICATION_DATE = "modificationDate"; //data type: DATETIME
-	public static final String KEY_DUE_DATE = "dueDate"; //data type: DATETIME
-	public static final String KEY_FINAL_DUE_DATE = "finalDueDate"; //data type: DATETIME
-	public static final String KEY_NOTES = "notes"; //data type: TEXT can be null
-	public static final String KEY_COLOR = "color"; //data type: INTEGER, used in category table
+	public static final String KEY_NAME = "name"; 									 // TEXT
+	public static final String KEY_COMPLETION = "completion"; 						 // INTEGER, indirectly boolean
+	public static final String KEY_PRIORITY = "priority"; 							 // INTEGER
+	public static final String KEY_CATEGORY = "category"; 							 // INTEGER
+	public static final String KEY_HAS_DUE_DATE = "hasDueDate"; 					 // INTEGER, indirectly boolean
+	public static final String KEY_HAS_FINAL_DUE_DATE = "hasFinalDueDate"; 			 // INTEGER, indirectly boolean
+	public static final String KEY_IS_REPEATING = "isRepeating"; 					 // INTEGER, indirectly boolean
+	public static final String KEY_HAS_STOP_REPEATING_DATE = "hasStopRepeatingDate"; // INTEGER, indirectly boolean
+	public static final String KEY_REPEAT_TYPE = "repeatType"; 						 // INTEGER
+	public static final String KEY_REPEAT_INTERVAL = "repeatInterval"; 				 // INTEGER
+	public static final String KEY_CREATION_DATE = "creationDate"; 					 // DATETIME
+	public static final String KEY_MODIFICATION_DATE = "modificationDate"; 			 // DATETIME
+	public static final String KEY_DUE_DATE = "dueDate"; 							 // DATETIME
+	public static final String KEY_FINAL_DUE_DATE = "finalDueDate";					 // DATETIME
+	public static final String KEY_STOP_REPEATING_DATE = "stopRepeatingDate"; 		 // DATETIME
+	public static final String KEY_NOTES = "notes"; 								 // TEXT, can be null
+	public static final String KEY_COLOR = "color"; 								 // INTEGER, used in category table
 
 
 	public DatabaseHandler(Context context) {
@@ -69,10 +76,17 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				+ KEY_COMPLETION + " INTEGER,"
 				+ KEY_PRIORITY + " INTEGER,"
 				+ KEY_CATEGORY + " INTEGER,"
+				+ KEY_HAS_DUE_DATE + " INTEGER,"
+				+ KEY_HAS_FINAL_DUE_DATE + " INTEGER,"
+				+ KEY_IS_REPEATING + " INTEGER,"
+				+ KEY_HAS_STOP_REPEATING_DATE + " INTEGER,"
+				+ KEY_REPEAT_TYPE + " INTEGER,"
+				+ KEY_REPEAT_INTERVAL + " INTEGER,"
 				+ KEY_CREATION_DATE + " DATETIME,"
 				+ KEY_MODIFICATION_DATE + " DATETIME,"
 				+ KEY_DUE_DATE + " DATETIME,"
 				+ KEY_FINAL_DUE_DATE + " DATETIME,"
+				+ KEY_STOP_REPEATING_DATE + " DATETIME,"
 				+ KEY_NOTES + " TEXT)";
 		
 		String create_categories_table = "CREATE TABLE " + TABLE_CATEGORIES + "(" 
