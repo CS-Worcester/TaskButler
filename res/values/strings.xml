@@ -72,5 +72,6 @@
 	    <item>months</item>
 	    <item>years</item>
 	</string-array>
+	<string name="title_activity_edit_task">edit the task</string>
 	
 </resources>

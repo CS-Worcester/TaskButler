@@ -313,6 +313,8 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
 	public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.menu_main_edit_task:
+			startActivityForResult(new Intent(this, EditTaskActivity.class), 
+        			ADD_TASK_REQUEST);
 			toast("Coming soon!");
 			mode.finish();
 			return true;
