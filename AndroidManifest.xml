@@ -52,6 +52,9 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="edu.worcester.cs499summer2012.MainActivity" />
+            <intent-filter>
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
         
         <activity
