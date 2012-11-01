@@ -19,8 +19,6 @@
 
 package edu.worcester.cs499summer2012.activity;
 
-import java.util.GregorianCalendar;
-
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -59,6 +57,7 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
 	 * Static fields and methods                                              *
 	 **************************************************************************/
 	
+	public final static String EXTRA_TASK = "edu.worcester.cs499summer2012.TASK";
 	public static final String TASK_FILE_NAME = "tasks";
 	public static final String PREF_SORT_TYPE = "sort_type";
 	public static final int ADD_TASK_REQUEST = 0;
@@ -244,14 +243,18 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
     @Override
     public void onListItemClick(ListView list_view, View view, int position, 
     		long id) {
-    	adapter.getItem(position).toggleIsCompleted();
+    	/*adapter.getItem(position).toggleIsCompleted();
     	adapter.getItem(position).setDateModified(GregorianCalendar.getInstance().getTimeInMillis());
     	
     	// Update database
     	data_source.updateTask(adapter.getItem(position));
     	
     	// Sort the list
-    	adapter.sort();
+    	adapter.sort();*/
+    	
+    	Intent intent = new Intent(this, ViewTaskActivity.class);
+    	intent.putExtra(EXTRA_TASK, adapter.getItem(position));
+    	startActivity(intent);
     }
     
     @Override

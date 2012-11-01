@@ -42,6 +42,7 @@ public class Task implements Parcelable {
 	
 	// Priority constants
 	public static final String[] LABELS = {"Trivial", "Normal", "Urgent"};
+	public static final String[] REPEAT_LABELS = {"minutes", "hours", "days", "weeks", "months", "years"};
 	public static final int TRIVIAL = 0;
 	public static final int NORMAL = 1;
 	public static final int URGENT = 2;
@@ -63,6 +64,7 @@ public class Task implements Parcelable {
 	private boolean isCompleted;
 	private int priority;
 	private int category;
+	//private Category cat;
 	private boolean hasDateDue;
 	private boolean hasFinalDateDue;
 	private boolean isRepeating;
