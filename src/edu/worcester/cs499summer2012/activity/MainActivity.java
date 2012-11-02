@@ -165,18 +165,6 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
     }
     
     @Override
-    protected void onResume() {
-    	//data_source.open();
-    	super.onResume();
-    }
-    
-    @Override
-    protected void onPause() {
-    	//data_source.close();
-    	super.onPause();
-    }
-    
-    @Override
 	public void onStop() {
     	// Save preferences to file
     	prefs_editor.commit();

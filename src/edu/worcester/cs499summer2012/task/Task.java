@@ -34,7 +34,7 @@ import android.os.Parcelable;
  */
 
 
-public class Task {
+public class Task implements Parcelable {
 
 	/**************************************************************************
 	 * Static fields and methods                                              *
@@ -333,17 +333,17 @@ public class Task {
 	 * Empty & unused method. Required for implementing Parcelable.
 	 * @return 0
 	 * @see Parcelable
-	 
+	 */
 	public int describeContents() {
 		return 0;
-	}*/
+	}
 	
 	/**
 	 * Converts task to a parcel.
 	 * @param out the parcel the task will be written to
 	 * @param flags unused
 	 * @see Parcelable
-	 
+	 */
 	public void writeToParcel(Parcel out, int flags) {
 		out.writeInt(id);
 		out.writeString(name);
@@ -398,7 +398,7 @@ public class Task {
 		updateDateDueCal();
 		updateFinalDateDueCal();
 		updateStopRepeatingDateCal();
-	}*/
+	}
 	
 	/**************************************************************************
 	 * Getters and setters                                                    *
