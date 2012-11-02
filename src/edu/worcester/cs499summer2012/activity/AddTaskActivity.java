@@ -112,7 +112,8 @@ public class AddTaskActivity extends SherlockActivity implements
      */
     public boolean addTask() {
     	// Get task name
-    	EditText name = (EditText) findViewById(R.id.edit_add_task_name);
+    	EditText et_name = (EditText) findViewById(R.id.edit_add_task_name);
+    	String name = et_name.getText().toString();
     	
     	// If there is no task name, don't create the task
     	if (name.equals(""))
@@ -174,7 +175,7 @@ public class AddTaskActivity extends SherlockActivity implements
     	    	
     	// Create the task
     	Task task = new Task(
-    			name.getText().toString(), 
+    			name, 
     			is_completed.isChecked(), 
     			priority, 
     			category,
