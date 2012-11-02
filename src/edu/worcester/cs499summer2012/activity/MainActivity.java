@@ -56,9 +56,7 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
 	/**************************************************************************
 	 * Static fields and methods                                              *
 	 **************************************************************************/
-	
-	public final static String EXTRA_TASK = "edu.worcester.cs499summer2012.TASK";
-	public static final String TASK_FILE_NAME = "tasks";
+
 	public static final String PREF_SORT_TYPE = "sort_type";
 	public static final int ADD_TASK_REQUEST = 0;
 	public static final int DELETE_MODE_SINGLE = 0;
@@ -253,7 +251,7 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
     	adapter.sort();*/
     	
     	Intent intent = new Intent(this, ViewTaskActivity.class);
-    	intent.putExtra(EXTRA_TASK, adapter.getItem(position));
+    	intent.putExtra(Task.EXTRA_TASK_ID, adapter.getItem(position).getID());
     	startActivity(intent);
     }
     
@@ -261,12 +259,8 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
 	public void onActivityResult(int request_code, int result_code, 
     		Intent intent) {
     	if (request_code == ADD_TASK_REQUEST && result_code == RESULT_OK) {
-    		Task task = intent.getParcelableExtra(AddTaskActivity.EXTRA_TASK);
-    		
-    		// Set the ID for the new task and update database
-    		//data_source.open();
-    		task.setID(data_source.getNextID());
-    		data_source.addTask(task);
+    		// Get the new task from the db using the ID in the intent
+    		Task task = data_source.getTask(intent.getIntExtra(Task.EXTRA_TASK_ID, 0));
     		
     		// Update the adapter
     		adapter.add(task);

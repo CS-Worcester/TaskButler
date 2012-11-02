@@ -34,11 +34,15 @@ import android.os.Parcelable;
  */
 
 
-public class Task implements Parcelable {
+public class Task {
 
 	/**************************************************************************
 	 * Static fields and methods                                              *
 	 **************************************************************************/
+	
+	// Extra intent flags
+	public static final String EXTRA_TASK = "edu.worcester.cs499summer2012.TASK";
+	public static final String EXTRA_TASK_ID = "edu.worcester.cs499summer2012.TASK_ID";
 	
 	// Priority constants
 	public static final String[] LABELS = {"Trivial", "Normal", "Urgent"};
@@ -329,17 +333,17 @@ public class Task implements Parcelable {
 	 * Empty & unused method. Required for implementing Parcelable.
 	 * @return 0
 	 * @see Parcelable
-	 */
+	 
 	public int describeContents() {
 		return 0;
-	}
+	}*/
 	
 	/**
 	 * Converts task to a parcel.
 	 * @param out the parcel the task will be written to
 	 * @param flags unused
 	 * @see Parcelable
-	 */
+	 
 	public void writeToParcel(Parcel out, int flags) {
 		out.writeInt(id);
 		out.writeString(name);
@@ -394,7 +398,7 @@ public class Task implements Parcelable {
 		updateDateDueCal();
 		updateFinalDateDueCal();
 		updateStopRepeatingDateCal();
-	}
+	}*/
 	
 	/**************************************************************************
 	 * Getters and setters                                                    *

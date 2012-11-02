@@ -20,7 +20,6 @@
 package edu.worcester.cs499summer2012.service;
 
 import edu.worcester.cs499summer2012.R;
-import edu.worcester.cs499summer2012.activity.HandleNotificationActivity;
 import edu.worcester.cs499summer2012.activity.ViewTaskActivity;
 import edu.worcester.cs499summer2012.database.TasksDataSource;
 import edu.worcester.cs499summer2012.task.Task;
@@ -51,7 +50,7 @@ public class NotificationHelper{
 		TasksDataSource db = TasksDataSource.getInstance(context);
 		Task task = db.getTask(id);
 		Intent intent =  new Intent(context, ViewTaskActivity.class);
-		intent.putExtra("edu.worcester.cs499summer2012.TASK", task);
+		intent.putExtra(Task.EXTRA_TASK_ID, task.getID());
 		
 		PendingIntent pi = PendingIntent.getActivity(context, task.getID(), intent, 0);
 		

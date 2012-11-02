@@ -19,7 +19,6 @@
 
 package edu.worcester.cs499summer2012.activity;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.view.View;
@@ -34,6 +33,7 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 
 import edu.worcester.cs499summer2012.R;
+import edu.worcester.cs499summer2012.database.TasksDataSource;
 import edu.worcester.cs499summer2012.task.Task;
 
 /**
@@ -49,10 +49,10 @@ public class ViewTaskActivity extends SherlockActivity implements OnClickListene
     /**************************************************************************
      * Private fields                                                         *
      **************************************************************************/
-	
-	// Intent to be returned
-    private Intent intent;
     
+	private TasksDataSource data_source;
+	private Task task;
+	
     /**************************************************************************
 	 * Class methods                                                          *
 	 **************************************************************************/
@@ -70,8 +70,11 @@ public class ViewTaskActivity extends SherlockActivity implements OnClickListene
         // Allow Action bar icon to act as a button
         getSupportActionBar().setHomeButtonEnabled(true);
         
+        // Get instance of the db
+        data_source = TasksDataSource.getInstance(this);
+        
         // Get the task from the intent
-        Task task = getIntent().getParcelableExtra(MainActivity.EXTRA_TASK);
+        task = data_source.getTask(getIntent().getIntExtra(Task.EXTRA_TASK_ID, 0));
         
         // Set name
         ((TextView) findViewById(R.id.text_view_task_name)).setText(task.getName());

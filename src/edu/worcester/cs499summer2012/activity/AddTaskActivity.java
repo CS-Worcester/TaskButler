@@ -49,6 +49,7 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 
 import edu.worcester.cs499summer2012.R;
+import edu.worcester.cs499summer2012.database.TasksDataSource;
 import edu.worcester.cs499summer2012.task.Task;
 
 /**
@@ -62,11 +63,7 @@ public class AddTaskActivity extends SherlockActivity implements
 	/**************************************************************************
 	 * Static fields and methods                                              *
 	 **************************************************************************/
-	
-	/**
-	 * Label for the extra task parcel which will be added to the returned intent
-	 */
-	public final static String EXTRA_TASK = "edu.worcester.cs499summer2012.TASK";
+
 	public final static int DEFAULT_HOUR = 12;
 	public final static int DEFAULT_MINUTE = 0;
 	public final static int DEFAULT_SECOND = 0;
@@ -193,9 +190,14 @@ public class AddTaskActivity extends SherlockActivity implements
     			stop_repeating_date_ms,
     			notes.getText().toString());
     	
-    	// Create the return intent and add the task
+    	// Assign the task a unique ID and store it in the database
+    	TasksDataSource tds = TasksDataSource.getInstance(this);
+    	task.setID(tds.getNextID());
+    	tds.addTask(task);
+    	
+    	// Create the return intent and add the task ID
     	intent = new Intent(this, MainActivity.class);    	
-    	intent.putExtra(EXTRA_TASK, task);
+    	intent.putExtra(Task.EXTRA_TASK_ID, task.getID());
     	
     	return true;
     }
