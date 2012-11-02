@@ -19,8 +19,6 @@
 
 package edu.worcester.cs499summer2012.activity;
 
-import java.util.GregorianCalendar;
-
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -58,8 +56,7 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
 	/**************************************************************************
 	 * Static fields and methods                                              *
 	 **************************************************************************/
-	
-	public static final String TASK_FILE_NAME = "tasks";
+
 	public static final String PREF_SORT_TYPE = "sort_type";
 	public static final int ADD_TASK_REQUEST = 0;
 	public static final int DELETE_MODE_SINGLE = 0;
@@ -168,18 +165,6 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
     }
     
     @Override
-    protected void onResume() {
-    	//data_source.open();
-    	super.onResume();
-    }
-    
-    @Override
-    protected void onPause() {
-    	//data_source.close();
-    	super.onPause();
-    }
-    
-    @Override
 	public void onStop() {
     	// Save preferences to file
     	prefs_editor.commit();
@@ -244,26 +229,26 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
     @Override
     public void onListItemClick(ListView list_view, View view, int position, 
     		long id) {
-    	adapter.getItem(position).toggleIsCompleted();
+    	/*adapter.getItem(position).toggleIsCompleted();
     	adapter.getItem(position).setDateModified(GregorianCalendar.getInstance().getTimeInMillis());
     	
     	// Update database
     	data_source.updateTask(adapter.getItem(position));
     	
     	// Sort the list
-    	adapter.sort();
+    	adapter.sort();*/
+    	
+    	Intent intent = new Intent(this, ViewTaskActivity.class);
+    	intent.putExtra(Task.EXTRA_TASK_ID, adapter.getItem(position).getID());
+    	startActivity(intent);
     }
     
     @Override
 	public void onActivityResult(int request_code, int result_code, 
     		Intent intent) {
     	if (request_code == ADD_TASK_REQUEST && result_code == RESULT_OK) {
-    		Task task = intent.getParcelableExtra(AddTaskActivity.EXTRA_TASK);
-    		
-    		// Set the ID for the new task and update database
-    		//data_source.open();
-    		task.setID(data_source.getNextID());
-    		data_source.addTask(task);
+    		// Get the new task from the db using the ID in the intent
+    		Task task = data_source.getTask(intent.getIntExtra(Task.EXTRA_TASK_ID, 0));
     		
     		// Update the adapter
     		adapter.add(task);

@@ -20,7 +20,7 @@
 package edu.worcester.cs499summer2012.service;
 
 import edu.worcester.cs499summer2012.R;
-import edu.worcester.cs499summer2012.activity.HandleNotificationActivity;
+import edu.worcester.cs499summer2012.activity.ViewTaskActivity;
 import edu.worcester.cs499summer2012.database.TasksDataSource;
 import edu.worcester.cs499summer2012.task.Task;
 
@@ -49,13 +49,17 @@ public class NotificationHelper{
 		Log.d("my notification method","beginning of sendBasicNotification");
 		TasksDataSource db = TasksDataSource.getInstance(context);
 		Task task = db.getTask(id);
+		Intent intent =  new Intent(context, ViewTaskActivity.class);
+		intent.putExtra(Task.EXTRA_TASK_ID, task.getID());
+		
+		PendingIntent pi = PendingIntent.getActivity(context, task.getID(), intent, 0);
 		
 		NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
 			.setContentText(task.getName())
 			.setContentTitle("Task Butler")
 			.setSmallIcon(R.drawable.ic_launcher)
 			.setAutoCancel(true)
-			.setContentIntent(getPendingIntent(context))
+			.setContentIntent(pi)
 			.setWhen(System.currentTimeMillis())
 			.setDefaults(Notification.DEFAULT_ALL);
 		Notification notification = builder.getNotification();
@@ -65,10 +69,10 @@ public class NotificationHelper{
 
 		Log.d("my notification method","after building notification"+Notification.DEFAULT_ALL);
 	}
-	//reuse this to make pending intents so that they match 100% 
+	//use this to make pending intents so that they match 100% 
 	PendingIntent getPendingIntent(Context context) {
 		return PendingIntent.getActivity(context, 0, new Intent(context,
-				HandleNotificationActivity.class), 0);
+				ViewTaskActivity.class), 0);
 	}
 	//get a NotificationManager
 	NotificationManager getNotificationManager(Context context) {

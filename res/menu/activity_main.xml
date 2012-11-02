@@ -33,7 +33,7 @@
     <item
         android:id="@+id/menu_delete_submenu"
         android:title="@string/menu_delete_submenu"
-        android:showAsAction="never"
+        android:showAsAction="ifRoom|withText"
         android:orderInCategory="2">
         
         <menu>
@@ -54,13 +54,13 @@
     <item
         android:id="@+id/menu_main_settings"
         android:title="@string/menu_settings"
-        android:showAsAction="never" 
+        android:showAsAction="ifRoom|withText" 
         android:orderInCategory="3"/>    
 
     <item
         android:id="@+id/menu_main_help"
         android:title="@string/menu_help"
-        android:showAsAction="never" 
+        android:showAsAction="ifRoom|withText" 
         android:orderInCategory="4"/>    
     
 </menu>
