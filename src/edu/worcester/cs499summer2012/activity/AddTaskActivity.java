@@ -312,6 +312,9 @@ public class AddTaskActivity extends SherlockActivity implements
 						due_date_cal));
 				has_final_due_date.setEnabled(true);
 				has_repetition.setEnabled(true);
+				
+				// Pop up date-time dialog as if user had clicked edit button
+				onClick(edit_due_date);
 			} else {
 				edit_due_date.setEnabled(false);
 				due_date.setEnabled(false);
@@ -333,6 +336,9 @@ public class AddTaskActivity extends SherlockActivity implements
 				final_due_date.setEnabled(true);
 				final_due_date.setText(DateFormat.format("'Alarm:' MM/dd/yy 'at' h:mm AA", 
 						final_due_date_cal));
+				
+				// Pop up date-time dialog as if user had clicked edit button
+				onClick(edit_final_due_date);
 			} else {
 				edit_final_due_date.setEnabled(false);
 				final_due_date.setEnabled(false);
@@ -366,6 +372,9 @@ public class AddTaskActivity extends SherlockActivity implements
 				stop_repeating_date.setEnabled(true);
 				stop_repeating_date.setText(DateFormat.format("'Ends:' MM/dd/yy 'at' h:mm AA", 
 						stop_repeating_date_cal));
+				
+				// Pop up date-time dialog as if user had clicked edit button
+				onClick(edit_stop_repeating_date);
 			} else {
 				edit_stop_repeating_date.setEnabled(false);
 				stop_repeating_date.setEnabled(false);
