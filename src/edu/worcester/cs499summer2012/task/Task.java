@@ -271,13 +271,12 @@ public class Task implements Parcelable {
 	 **************************************************************************/ 	
 	/**
 	 * Compares this object to another. To return true, the compared object must
-	 * have the same class and identical private fields.
+	 * have the same class and identical IDs.
 	 * @param o the object to be compared with
 	 * @return true if the objects are equal, false otherwise
 	 */
 	@Override
 	public boolean equals(Object o) {
-		// TODO: Needs to be updated
 		if (o == this)
 			return true;
 		if (o == null)
@@ -285,27 +284,7 @@ public class Task implements Parcelable {
 		if (o.getClass() != this.getClass())
 			return false;
 
-		Task t = (Task) o;
-		if (!this.name.equals(t.name))
-			return false;
-		if (this.isCompleted != t.isCompleted)
-			return false;
-		if (this.priority != t.priority)
-			return false;
-		if (this.category != t.category)
-			return false;
-		if (this.dateCreated != t.dateCreated)
-			return false;
-		if (this.dateModified != t.dateModified)
-			return false;
-		if (this.dateDue != t.dateDue)
-			return false;
-		if (this.finalDateDue != t.finalDateDue)
-			return false;
-		if (!this.notes.equals(t.notes))
-			return false;
-
-		return true;
+		return ((Task) o).id == this.id;
 	}
 
 	/**

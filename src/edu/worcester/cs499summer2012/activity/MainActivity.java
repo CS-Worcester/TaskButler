@@ -59,6 +59,7 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
 
 	public static final String PREF_SORT_TYPE = "sort_type";
 	public static final int ADD_TASK_REQUEST = 0;
+	public static final int VIEW_TASK_REQUEST = 1;
 	public static final int DELETE_MODE_SINGLE = 0;
 	public static final int DELETE_MODE_FINISHED = 1;
 	public static final int DELETE_MODE_ALL = 2;
@@ -96,7 +97,6 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
 		    		   int deleted_tasks;
 		    		   switch (mode) {
 		    		   case DELETE_MODE_SINGLE:
-		    			   toast("Task id: " + adapter.getItem(selected_task).getID());
 		    			   data_source.deleteTask(adapter.getItem(selected_task));
 		    			   adapter.remove(adapter.getItem(selected_task));
 		    			   toast("Task deleted");
@@ -240,17 +240,20 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
     	
     	Intent intent = new Intent(this, ViewTaskActivity.class);
     	intent.putExtra(Task.EXTRA_TASK_ID, adapter.getItem(position).getID());
-    	startActivity(intent);
+    	startActivityForResult(intent, VIEW_TASK_REQUEST);
     }
     
     @Override
 	public void onActivityResult(int request_code, int result_code, 
     		Intent intent) {
-    	if (request_code == ADD_TASK_REQUEST && result_code == RESULT_OK) {
-    		// Get the new task from the db using the ID in the intent
+    	if ((request_code == ADD_TASK_REQUEST || request_code == VIEW_TASK_REQUEST)
+    			&& result_code == RESULT_OK) {
+    		// Get the task from the db using the ID in the intent
     		Task task = data_source.getTask(intent.getIntExtra(Task.EXTRA_TASK_ID, 0));
     		
     		// Update the adapter
+    		if (request_code == VIEW_TASK_REQUEST)
+    			adapter.remove(task);
     		adapter.add(task);
     		adapter.sort();
     		
