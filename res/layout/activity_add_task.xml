@@ -14,8 +14,6 @@
 	
 	    <!-- Group 1: Text name/is completed -->
 	    
-	    <requestFocus />
-	    
 	    <TextView
 	        android:id="@+id/text_add_task_name"
 	        android:layout_width="match_parent"
@@ -177,8 +175,7 @@
 	        android:layout_marginTop="4dp"
 	        android:layout_marginBottom="4dp"
 	        android:text="@string/button_edit_date"
-	        android:textSize="16dp"
-	        android:enabled="false" />  
+	        android:textSize="16dp" />  
    	    
    	    <TextView 
    	        android:id="@+id/text_add_task_due_date"
@@ -187,10 +184,8 @@
    	        android:layout_below="@id/checkbox_has_due_date"
 	        android:layout_marginTop="4dp"
 	        android:layout_marginBottom="4dp"
-	        android:text="@string/text_no_due_date"
 	        android:textSize="18dp"
-	        android:gravity="center_vertical"
-	        android:enabled="false" />
+	        android:gravity="center_vertical" />
    	    
    	    <CheckBox
 	        android:id="@+id/checkbox_has_final_due_date"
@@ -202,8 +197,7 @@
 	        android:layout_marginBottom="4dp"
 	        android:text="@string/checkbox_has_final_due_date"
 	        android:textSize="16dp"
-	        android:checked="false"
-	        android:enabled="false" />
+	        android:checked="false" />
    	    
    	    <Button
    	        android:id="@+id/button_edit_final_due_date"
@@ -214,8 +208,7 @@
 	        android:layout_marginTop="4dp"
 	        android:layout_marginBottom="4dp"
 	        android:text="@string/button_edit_date"
-	        android:textSize="16dp"
-	        android:enabled="false" />
+	        android:textSize="16dp" />
    	        
    	    <TextView 
    	        android:id="@+id/text_add_task_final_due_date"
@@ -224,10 +217,8 @@
    	        android:layout_below="@id/checkbox_has_final_due_date"
 	        android:layout_marginTop="4dp"
 	        android:layout_marginBottom="4dp"
-	        android:text="@string/text_no_final_due_date"
 	        android:textSize="18dp"
-	        android:gravity="center_vertical"
-	        android:enabled="false" />
+	        android:gravity="center_vertical" />
    	    
  	    <CheckBox
 	        android:id="@+id/checkbox_has_repetition"
@@ -239,8 +230,7 @@
 	        android:layout_marginBottom="4dp"
 	        android:text="@string/checkbox_has_repetition"
 	        android:textSize="16dp"
-	        android:checked="false"
-	        android:enabled="false" />
+	        android:checked="false" />
  	    
  	    <TextView 
    	        android:id="@+id/text_add_task_repeats"
@@ -252,8 +242,7 @@
 	        android:layout_marginRight="4dp"
 	        android:text="@string/text_task_repeats"
 	        android:textSize="18dp"
-	        android:gravity="center_vertical"
-	        android:enabled="false" />
+	        android:gravity="center_vertical" />
    	    
  	    <EditText 
  	        android:id="@+id/edit_add_task_repeat_interval"
@@ -268,8 +257,7 @@
 	        android:textSize="18dp"
 	        android:gravity="center_vertical"
 	        android:inputType="number"
-	        android:maxLength="3"
-	        android:enabled="false" />
+	        android:maxLength="3" />
  	    
  	    <Spinner
 	        android:id="@+id/spinner_add_task_repeat_type"
@@ -281,8 +269,7 @@
 	        android:layout_marginLeft="4dp"
 			android:layout_toRightOf="@id/edit_add_task_repeat_interval"
 	        android:textSize="18dp"
-	        android:gravity="center_vertical"
-	        android:enabled="false" />
+	        android:gravity="center_vertical" />
 
 	    <CheckBox
 	        android:id="@+id/checkbox_stop_repeating"
@@ -294,8 +281,7 @@
 	        android:layout_marginBottom="4dp"
 	        android:text="@string/checkbox_stop_repeating"
 	        android:textSize="16dp"
-	        android:checked="false"
-	        android:enabled="false" />
+	        android:checked="false" />
    	    
    	    <Button
    	        android:id="@+id/button_edit_stop_repeating_date"
@@ -306,8 +292,7 @@
 	        android:layout_marginTop="4dp"
 	        android:layout_marginBottom="4dp"
 	        android:text="@string/button_edit_date"
-	        android:textSize="16dp"
-	        android:enabled="false" />
+	        android:textSize="16dp" />
    	        
    	    
    	    <TextView 
@@ -317,10 +302,8 @@
    	        android:layout_below="@id/checkbox_stop_repeating"
 	        android:layout_marginTop="4dp"
 	        android:layout_marginBottom="4dp"
-	        android:text="@string/text_no_stop_repeating_date"
 	        android:textSize="18dp"
-	        android:gravity="center_vertical"
-	        android:enabled="false" />
+	        android:gravity="center_vertical" />
    	    
    	    <View
 	        android:id="@+id/ruler_4"
