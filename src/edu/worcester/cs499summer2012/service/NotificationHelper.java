@@ -57,7 +57,7 @@ public class NotificationHelper{
 		NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
 			.setContentText(task.getName())
 			.setContentTitle("Task Butler")
-			.setSmallIcon(R.drawable.ic_launcher)
+			.setSmallIcon(R.drawable.ic_notification)
 			.setAutoCancel(true)
 			.setContentIntent(pi)
 			.setWhen(System.currentTimeMillis())
