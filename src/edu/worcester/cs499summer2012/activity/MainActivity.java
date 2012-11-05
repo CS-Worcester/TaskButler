@@ -217,8 +217,8 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
     		startActivity(new Intent(this, SettingsActivity.class));
     		return true;
     		
-    	case R.id.menu_main_help:
-    		toast("Help coming soon!");
+    	case R.id.menu_main_about:
+    		toast("Coming soon!");
     		return true;
     		
     	default:
