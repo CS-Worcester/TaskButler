@@ -23,6 +23,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.View;
@@ -50,8 +51,8 @@ import edu.worcester.cs499summer2012.task.Task;
  * @author Jonathan Hasenzahl
  * @author James Celona
  */
-public class MainActivity extends SherlockListActivity implements OnItemLongClickListener, 
-		ActionMode.Callback {
+public class MainActivity extends SherlockListActivity implements 
+		OnItemLongClickListener, ActionMode.Callback {
 
 	/**************************************************************************
 	 * Static fields and methods                                              *
@@ -91,7 +92,7 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
     {
     	AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setMessage(question)
-		       .setCancelable(false)
+		       .setCancelable(true)
 		       .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
 		    	   public void onClick(DialogInterface dialog, int id) {
 		    		   int deleted_tasks;
@@ -145,7 +146,6 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
     	
     	// Open the database
         data_source = TasksDataSource.getInstance(getApplicationContext());
-        //data_source.open();
         
         // Create an adapter for the task list
 		adapter = new TaskListAdapter(this, data_source.getAllTasks());
@@ -218,7 +218,28 @@ public class MainActivity extends SherlockListActivity implements OnItemLongClic
     		return true;
     		
     	case R.id.menu_main_about:
-    		toast("Coming soon!");
+    		AlertDialog.Builder about_builder = new AlertDialog.Builder(this);
+    		about_builder.setTitle("About Task Butler");
+    		about_builder.setMessage(R.string.dialog_about);
+    		about_builder.setCancelable(true);
+    		about_builder.setNeutralButton("OK", new DialogInterface.OnClickListener() {
+    			
+    			@Override
+    			public void onClick(DialogInterface dialog, int id) {
+    				dialog.dismiss();
+    		   	}
+    		});
+    		about_builder.setPositiveButton("Source", new DialogInterface.OnClickListener() {
+				
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/CS-Worcester/CS499Summer2012"));
+					startActivity(browserIntent);
+					dialog.dismiss();
+				}
+			});
+    		AlertDialog about_alert = about_builder.create();
+    		about_alert.show();
     		return true;
     		
     	default:
