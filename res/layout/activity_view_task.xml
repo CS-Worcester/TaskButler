@@ -22,7 +22,7 @@
 	        android:textSize="32dp"
 	        android:textStyle="bold"
 	        android:maxLines="1"
-	        android:ellipsize="end" />"
+	        android:ellipsize="end" />
 	    
 	    <Button
    	        android:id="@+id/button_complete_task"
@@ -190,7 +190,7 @@
 	        android:layout_marginLeft="4dp"
 	        android:textSize="18dp"
 	        android:minHeight="40dp"
-	        android:gravity="top|left" />"
+	        android:gravity="top|left" />
 	    
 	</RelativeLayout>
 	
