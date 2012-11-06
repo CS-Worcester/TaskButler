@@ -20,6 +20,7 @@
 
 package edu.worcester.cs499summer2012.service;
 
+import edu.worcester.cs499summer2012.task.Task;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -37,12 +38,11 @@ public class OnAlarmReceiver extends BroadcastReceiver {
 	public void onReceive(Context context, Intent intent) {
 		Log.d("onAlarmReciever","on Recieve before running service"); 
 		WakefulIntentService.acquireStaticLock(context); //acquire a partial WakeLock
+		
 		NotificationHelper notification = new NotificationHelper();
-		
 		Bundle bundle = intent.getExtras();
-		int id = bundle.getInt("TaskId");
-		
-		notification.sendBasicNotification(context, id); // basic notification
+		int id = bundle.getInt(Task.EXTRA_TASK_ID);
+		notification.sendBasicNotification(context, id); // send basic notification
 		
 		context.startService(new Intent(context, TaskButlerService.class)); //start TaskButlerService
 		Log.d("onAlarmReciever","on Recieve after trying service");

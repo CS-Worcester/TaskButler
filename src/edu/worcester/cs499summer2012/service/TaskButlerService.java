@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.ListIterator;
 
 import android.content.Intent;
-import android.util.Log;
 
 /**
  * An IntentService that takes care of setting up alarms for Task Butler
@@ -36,16 +35,13 @@ import android.util.Log;
  */
 public class TaskButlerService extends WakefulIntentService{
 	
-	
 	public TaskButlerService() {
 		super("TaskButlerService");
 	}
 
 	@Override
 	protected void onHandleIntent(Intent intent) {
-		Log.d("TAskButlerService","in onHandleIntent");
 		TasksDataSource db = TasksDataSource.getInstance(getApplicationContext()); //get access to the instance of TasksDataSource
-		//NotificationHelper notification = new NotificationHelper();//for testing
 		ArrayList<Task> tasks = db.getAllTasks(); //Get a list of all the tasks there
 		ListIterator<Task> iterator = tasks.listIterator(); //get an ListIterator over the list
 		TaskAlarm alarm = new TaskAlarm();
@@ -55,8 +51,7 @@ public class TaskButlerService extends WakefulIntentService{
 			
 			if(!task.isCompleted() && (task.getDateDue() >= System.currentTimeMillis()))
 				alarm.setOnetimeAlarm(getApplicationContext(), task.getID());
-			//notification.sendBasicNotification(getApplicationContext(), task.getID()); //for testing.
-			Log.d("Items in iterator", " "+task);
+			
 		}
 		super.onHandleIntent(intent);
 	}

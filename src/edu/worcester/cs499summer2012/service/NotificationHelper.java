@@ -30,7 +30,6 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 
 /**
  * Creates Notifications using NotificationCompat to allow for
@@ -46,33 +45,26 @@ public class NotificationHelper{
 	 * @param id id of task, call task.getID() and pass it to this parameter
 	 */
 	public void sendBasicNotification(Context context, int id) {
-		Log.d("my notification method","beginning of sendBasicNotification");
 		TasksDataSource db = TasksDataSource.getInstance(context);
 		Task task = db.getTask(id);
-		Intent intent =  new Intent(context, ViewTaskActivity.class);
-		intent.putExtra(Task.EXTRA_TASK_ID, task.getID());
-		
-		PendingIntent pi = PendingIntent.getActivity(context, task.getID(), intent, 0);
-		
+
 		NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
 			.setContentText(task.getName())
 			.setContentTitle("Task Butler")
 			.setSmallIcon(R.drawable.ic_launcher)
 			.setAutoCancel(true)
-			.setContentIntent(pi)
+			.setContentIntent(getPendingIntent(context, id))
 			.setWhen(System.currentTimeMillis())
 			.setDefaults(Notification.DEFAULT_ALL);
 		Notification notification = builder.getNotification();
-
 		NotificationManager notificationManager = getNotificationManager(context);
 		notificationManager.notify(task.getID(), notification);
-
-		Log.d("my notification method","after building notification"+Notification.DEFAULT_ALL);
 	}
-	//use this to make pending intents so that they match 100% 
-	PendingIntent getPendingIntent(Context context) {
-		return PendingIntent.getActivity(context, 0, new Intent(context,
-				ViewTaskActivity.class), 0);
+	//get a PendingIntent
+	PendingIntent getPendingIntent(Context context, int id) {
+		Intent intent =  new Intent(context, ViewTaskActivity.class)
+			.putExtra(Task.EXTRA_TASK_ID, id);
+		return PendingIntent.getActivity(context, id, intent, 0);
 	}
 	//get a NotificationManager
 	NotificationManager getNotificationManager(Context context) {
