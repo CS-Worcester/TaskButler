@@ -1,7 +1,7 @@
 /*
  * TaskListAdapter.java
  *
- * Copyright 2012 Jonathan Hasenzahl, James Celona
+ * Copyright 2012 Jonathan Hasenzahl, James Celona, Dhimitraq Jorgji
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,14 +21,21 @@ package edu.worcester.cs499summer2012.adapter;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+
 import android.app.Activity;
+import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.ImageView;
 import android.widget.TextView;
 import edu.worcester.cs499summer2012.R;
 import edu.worcester.cs499summer2012.comparator.TaskAutoComparator;
+import edu.worcester.cs499summer2012.database.TasksDataSource;
 import edu.worcester.cs499summer2012.task.Task;
 
 /**
@@ -37,7 +44,7 @@ import edu.worcester.cs499summer2012.task.Task;
  * comparators.
  * @author Jonathan Hasenzahl
  */
-public class TaskListAdapter extends ArrayAdapter<Task> {
+public class TaskListAdapter extends ArrayAdapter<Task> implements OnCheckedChangeListener {
 
 	/**************************************************************************
 	 * Static fields and methods                                              *
@@ -47,15 +54,13 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 	public static final int CUSTOM_SORT = 1;
 	
 	static class ViewHolder {
+		public CheckBox is_completed;
 		public TextView name;
-		public TextView is_completed;
-		public TextView priority;
-		public TextView category;
-		public TextView date_created;
-		public TextView date_modified;
-		public TextView date_due;
-		public TextView final_date_due;
-		public TextView notes;
+		public View category;
+		public ImageView priority;
+		public TextView due_date;
+		public ImageView alarm;
+		public ImageView recurrence;
 	}
 	
 	/**************************************************************************
@@ -105,77 +110,89 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 	@Override
 	public View getView(int position, View convert_view, ViewGroup parent) {
 		View row_view = convert_view;
-		if (row_view == null) {
+		if (row_view == null) {		
 			LayoutInflater inflater = activity.getLayoutInflater();
 			row_view = inflater.inflate(R.layout.row_task, null);
+			
 			ViewHolder view_holder = new ViewHolder();
-			view_holder.name = (TextView) 
-					row_view.findViewById(R.id.text_main_row_name);
-			view_holder.is_completed = (TextView)
-					row_view.findViewById(R.id.text_main_row_is_completed);
-			view_holder.priority = (TextView)
-					row_view.findViewById(R.id.text_main_row_priority);
-			view_holder.category = (TextView)
-					row_view.findViewById(R.id.text_main_row_category);
-			view_holder.date_created = (TextView)
-					row_view.findViewById(R.id.text_main_row_date_created);
-			view_holder.date_modified = (TextView)
-					row_view.findViewById(R.id.text_main_row_date_modified);
-			view_holder.date_due = (TextView)
-					row_view.findViewById(R.id.text_main_row_date_due);
-			view_holder.final_date_due = (TextView)
-					row_view.findViewById(R.id.text_main_row_final_date_due);
-			view_holder.notes = (TextView)
-					row_view.findViewById(R.id.text_main_row_notes);
+			view_holder.is_completed = (CheckBox) row_view.findViewById(R.id.checkbox_row_complete);
+			view_holder.name = (TextView) row_view.findViewById(R.id.text_row_name);
+			view_holder.category = (View) row_view.findViewById(R.id.view_row_category);
+			view_holder.priority = (ImageView) row_view.findViewById(R.id.image_row_priority);
+			view_holder.due_date = (TextView) row_view.findViewById(R.id.text_row_due_date);
+			view_holder.alarm = (ImageView) row_view.findViewById(R.id.image_row_alarm);
+			view_holder.recurrence = (ImageView) row_view.findViewById(R.id.image_row_recurrence);
 			
 			row_view.setTag(view_holder);
 		}
 
 		ViewHolder holder = (ViewHolder) row_view.getTag();
 		Task task = tasks.get(position);
+		boolean is_complete = task.isCompleted();
+		
+		// Set is completed
+		holder.is_completed.setChecked(is_complete);
+		holder.is_completed.setOnCheckedChangeListener(this);
+		holder.is_completed.setTag(new Integer(position)); // Tag the checkbox with the task ID
 		
 		// Set name
 		holder.name.setText(task.getName());
-		
-		// Set is completed
-		holder.is_completed.setText(task.isCompleted() ? "Finished" : 
-			"Unfinished");
-		
-		// Set priority
-		holder.priority.setText(Task.LABELS[task.getPriority()]);
+		holder.name.setEnabled(!is_complete);
 		
 		// Set category
-		holder.category.setText("Category: " + task.getCategory());
+		// TODO: Implement this
+		if (is_complete)
+			holder.category.setVisibility(View.GONE);
+		else
+			holder.category.setVisibility(View.VISIBLE);
 		
-		// Set date created
-		holder.date_created.setText("Created: " + task.getDateCreatedCal().getTime().toString());
-		
-		// Set date modified
-		holder.date_modified.setText("Modified: " + task.getDateModifiedCal().getTime().toString());
-		
-		// Set date due
-		holder.date_due.setText("Due: " + (task.getDateDueCal() == null 
-				? "N/A" : task.getDateDueCal().getTime().toString()));
-		
-		// Set final date due
-		holder.final_date_due.setText("Due: " + (task.getFinalDateDueCal() == null 
-				? "N/A" : task.getFinalDateDueCal().getTime().toString()));
-		
-		// Set notes
-		holder.notes.setText("Notes: " + task.getNotes());
-		
-		// Set styles
-		if (!tasks.get(position).isCompleted()) {
-			holder.name.setTextAppearance(getContext(), 
-					R.style.text_task_not_completed);
-			holder.is_completed.setTextAppearance(getContext(), 
-					R.style.text_task_not_completed);
-		} else {
-			holder.name.setTextAppearance(getContext(), 
-					R.style.text_task_completed);
-			holder.is_completed.setTextAppearance(getContext(), 
-					R.style.text_task_completed);
+		// Set priority
+		if (is_complete)
+			holder.priority.setVisibility(View.GONE);
+		else {
+			holder.priority.setVisibility(View.VISIBLE);
+			
+			switch (task.getPriority()) {
+			case Task.URGENT:
+				holder.priority.setImageResource(R.drawable.ic_urgent);
+				break;
+			case Task.TRIVIAL:
+				holder.priority.setImageResource(R.drawable.ic_trivial);
+				break;
+			case Task.NORMAL:
+			default:
+				holder.priority.setImageResource(R.drawable.ic_normal);
+				break;
+			}
 		}
+		
+		// Set due date
+		if (is_complete)
+			holder.due_date.setVisibility(View.GONE);
+		else {
+			holder.due_date.setVisibility(View.VISIBLE);
+			
+			if (task.hasDateDue())
+				holder.due_date.setText(DateFormat.format("'Due:' MM/dd/yy 'at' h:mm AA", task.getDateDueCal()));
+			else
+				holder.due_date.setText("");
+		}
+		
+		// Set alarm
+		if (is_complete)
+			holder.alarm.setVisibility(View.GONE);
+		else if (task.hasFinalDateDue())
+			holder.alarm.setVisibility(View.VISIBLE);
+		else
+			holder.alarm.setVisibility(View.INVISIBLE);
+		
+		// Set recurrence
+		if (is_complete)
+			holder.recurrence.setVisibility(View.GONE);
+		else if (task.isRepeating())
+			holder.recurrence.setVisibility(View.VISIBLE);
+		else
+			holder.recurrence.setVisibility(View.INVISIBLE);
 		
 		return row_view;
 	}
@@ -199,6 +216,21 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 	public void setSortType(int sort_type) {
 		if (sort_type == AUTO_SORT || sort_type == CUSTOM_SORT)
 			this.sort_type = sort_type;
+	}
+
+	/**************************************************************************
+	 * Methods implemented OnCheckedChangeListener interface                  *
+	 **************************************************************************/
+	
+	@Override
+	public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+		Integer selected_task = (Integer) buttonView.getTag();
+		getItem(selected_task).toggleIsCompleted();
+		
+		TasksDataSource data_source = TasksDataSource.getInstance(getContext());
+		data_source.updateTask(getItem(selected_task));
+		
+		sort();
 	}
 	
 }

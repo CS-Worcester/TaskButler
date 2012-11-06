@@ -19,6 +19,7 @@
 
 package edu.worcester.cs499summer2012.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.view.View;
@@ -26,6 +27,7 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
@@ -52,11 +54,19 @@ public class ViewTaskActivity extends SherlockActivity implements OnClickListene
     
 	private TasksDataSource data_source;
 	private Task task;
+	private Intent intent;
 	
     /**************************************************************************
 	 * Class methods                                                          *
 	 **************************************************************************/
     
+	/**
+     * Displays a message in a Toast notification for a short duration.
+     */
+    private void toast(String message)
+    {
+    	Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    }
     
 	/**************************************************************************
 	 * Overridden parent methods                                              *
@@ -143,7 +153,11 @@ public class ViewTaskActivity extends SherlockActivity implements OnClickListene
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
     	switch (item.getItemId()) {
+    	case android.R.id.home:
     	case R.id.menu_view_task_back:
+    		setResult(RESULT_CANCELED);
+    		finish();
+    		return true;
     		
     	case R.id.menu_view_task_edit:
     		
@@ -160,7 +174,20 @@ public class ViewTaskActivity extends SherlockActivity implements OnClickListene
 	
 	@Override
 	public void onClick(View v) {	
-
+		if (v.getId() == R.id.button_complete_task) {
+			task.toggleIsCompleted();
+			if (task.isCompleted())
+				toast("Task completed!");
+			else
+				toast("Task not completed");
+		}
+		
+		data_source.updateTask(task);
+		
+		intent = new Intent(this, MainActivity.class);
+		intent.putExtra(Task.EXTRA_TASK_ID, task.getID());
+		setResult(RESULT_OK, intent);
+		finish();
 	}
 	
 }

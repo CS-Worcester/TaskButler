@@ -218,8 +218,8 @@ public class TasksDataSource {
 		values.put(DatabaseHandler.KEY_COMPLETION, task.isCompleted());
 		values.put(DatabaseHandler.KEY_PRIORITY, task.getPriority());
 		values.put(DatabaseHandler.KEY_CATEGORY, task.getCategory());
-		values.put(DatabaseHandler.KEY_HAS_DUE_DATE, task.getDateDue());
-		values.put(DatabaseHandler.KEY_HAS_FINAL_DUE_DATE, task.getFinalDateDue());
+		values.put(DatabaseHandler.KEY_HAS_DUE_DATE, task.hasDateDue());
+		values.put(DatabaseHandler.KEY_HAS_FINAL_DUE_DATE, task.hasFinalDateDue());
 		values.put(DatabaseHandler.KEY_IS_REPEATING, task.isRepeating());
 		values.put(DatabaseHandler.KEY_HAS_STOP_REPEATING_DATE, task.hasStopRepeatingDate());
 		values.put(DatabaseHandler.KEY_REPEAT_TYPE, task.getRepeatType());
