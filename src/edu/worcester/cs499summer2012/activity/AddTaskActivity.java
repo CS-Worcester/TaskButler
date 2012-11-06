@@ -271,6 +271,7 @@ public class AddTaskActivity extends SherlockActivity implements
         
         // Allow Action bar icon to act as a button
         getSupportActionBar().setHomeButtonEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         
         // Populate the repeat type spinner
         ArrayAdapter<CharSequence> repeat_type_adapter = 
