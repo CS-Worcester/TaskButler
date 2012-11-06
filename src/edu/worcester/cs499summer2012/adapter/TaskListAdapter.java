@@ -23,17 +23,19 @@ import java.util.ArrayList;
 import java.util.Comparator;
 
 import android.app.Activity;
-import android.graphics.Color;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ImageView;
 import android.widget.TextView;
 import edu.worcester.cs499summer2012.R;
 import edu.worcester.cs499summer2012.comparator.TaskAutoComparator;
+import edu.worcester.cs499summer2012.database.TasksDataSource;
 import edu.worcester.cs499summer2012.task.Task;
 
 /**
@@ -42,7 +44,7 @@ import edu.worcester.cs499summer2012.task.Task;
  * comparators.
  * @author Jonathan Hasenzahl
  */
-public class TaskListAdapter extends ArrayAdapter<Task> {
+public class TaskListAdapter extends ArrayAdapter<Task> implements OnCheckedChangeListener {
 
 	/**************************************************************************
 	 * Static fields and methods                                              *
@@ -130,6 +132,8 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 		
 		// Set is completed
 		holder.is_completed.setChecked(is_complete);
+		holder.is_completed.setOnCheckedChangeListener(this);
+		holder.is_completed.setTag(new Integer(position)); // Tag the checkbox with the task ID
 		
 		// Set name
 		holder.name.setText(task.getName());
@@ -212,6 +216,21 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 	public void setSortType(int sort_type) {
 		if (sort_type == AUTO_SORT || sort_type == CUSTOM_SORT)
 			this.sort_type = sort_type;
+	}
+
+	/**************************************************************************
+	 * Methods implemented OnCheckedChangeListener interface                  *
+	 **************************************************************************/
+	
+	@Override
+	public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+		Integer selected_task = (Integer) buttonView.getTag();
+		getItem(selected_task).toggleIsCompleted();
+		
+		TasksDataSource data_source = TasksDataSource.getInstance(getContext());
+		data_source.updateTask(getItem(selected_task));
+		
+		sort();
 	}
 	
 }
