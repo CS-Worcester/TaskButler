@@ -126,63 +126,69 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 
 		ViewHolder holder = (ViewHolder) row_view.getTag();
 		Task task = tasks.get(position);
+		boolean is_complete = task.isCompleted();
 		
 		// Set is completed
-		if (task.isCompleted())
-			holder.is_completed.setChecked(true);
-		else
-			holder.is_completed.setChecked(false);
+		holder.is_completed.setChecked(is_complete);
 		
 		// Set name
 		holder.name.setText(task.getName());
+		holder.name.setEnabled(!is_complete);
 		
 		// Set category
 		// TODO: Implement this
-		holder.category.setVisibility(View.VISIBLE);
-		holder.category.setBackgroundColor(Color.parseColor("#AA66CC"));
+		if (is_complete)
+			holder.category.setVisibility(View.GONE);
+		else
+			holder.category.setVisibility(View.VISIBLE);
 		
 		// Set priority
-		switch (task.getPriority()) {
-		case Task.URGENT:
-			holder.priority.setImageResource(R.drawable.ic_urgent);
-			break;
-		case Task.TRIVIAL:
-			holder.priority.setImageResource(R.drawable.ic_trivial);
-			break;
-		case Task.NORMAL:
-		default:
-			holder.priority.setImageResource(R.drawable.ic_normal);
-			break;
+		if (is_complete)
+			holder.priority.setVisibility(View.GONE);
+		else {
+			holder.priority.setVisibility(View.VISIBLE);
+			
+			switch (task.getPriority()) {
+			case Task.URGENT:
+				holder.priority.setImageResource(R.drawable.ic_urgent);
+				break;
+			case Task.TRIVIAL:
+				holder.priority.setImageResource(R.drawable.ic_trivial);
+				break;
+			case Task.NORMAL:
+			default:
+				holder.priority.setImageResource(R.drawable.ic_normal);
+				break;
+			}
 		}
 		
 		// Set due date
-		if (task.hasDateDue())
-			holder.due_date.setText(DateFormat.format("'Due:' MM/dd/yy 'at' h:mm AA", task.getDateDueCal()));
+		if (is_complete)
+			holder.due_date.setVisibility(View.GONE);
+		else {
+			holder.due_date.setVisibility(View.VISIBLE);
+			
+			if (task.hasDateDue())
+				holder.due_date.setText(DateFormat.format("'Due:' MM/dd/yy 'at' h:mm AA", task.getDateDueCal()));
+			else
+				holder.due_date.setText("");
+		}
 		
 		// Set alarm
-		if (task.hasFinalDateDue())
+		if (is_complete)
+			holder.alarm.setVisibility(View.GONE);
+		else if (task.hasFinalDateDue())
 			holder.alarm.setVisibility(View.VISIBLE);
 		else
 			holder.alarm.setVisibility(View.INVISIBLE);
 		
 		// Set recurrence
-		if (task.isRepeating())
+		if (is_complete)
+			holder.recurrence.setVisibility(View.GONE);
+		else if (task.isRepeating())
 			holder.recurrence.setVisibility(View.VISIBLE);
 		else
 			holder.recurrence.setVisibility(View.INVISIBLE);
-		
-		// Set styles
-		/*if (!tasks.get(position).isCompleted()) {
-			holder.name.setTextAppearance(getContext(), 
-					R.style.text_task_not_completed);
-			holder.is_completed.setTextAppearance(getContext(), 
-					R.style.text_task_not_completed);
-		} else {
-			holder.name.setTextAppearance(getContext(), 
-					R.style.text_task_completed);
-			holder.is_completed.setTextAppearance(getContext(), 
-					R.style.text_task_completed);
-		}*/
 		
 		return row_view;
 	}
