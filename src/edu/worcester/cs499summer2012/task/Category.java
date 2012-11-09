@@ -24,7 +24,8 @@ public class Category {
 	private int id;
 	private String name;
 	private int color;
-	
+	private long updated;
+
 	public Category() {}
 	
 	public Category(String name, int color) {
@@ -32,20 +33,21 @@ public class Category {
 		this.color = color;
 	}
 	
-	public Category(int id, String name, int color) {
+	public Category(int id, String name, int color, long updated) {
 		this(name, color);
 		this.id = id;
+		this.updated = updated;
 	}
 	
 	public Category(Category c) {
-		this(c.id, c.name, c.color);
+		this(c.id, c.name, c.color, c.updated);
 	}
 
-	public int getId() {
+	public int getID() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setID(int id) {
 		this.id = id;
 	}
 
@@ -65,4 +67,11 @@ public class Category {
 		this.color = color;
 	}
 	
+	public long getUpdated(){
+		return updated;
+	}
+	
+	public void setUpdated(long updated){
+		this.updated = updated;
+	}
 }

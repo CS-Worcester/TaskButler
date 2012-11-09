@@ -33,7 +33,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DatabaseHandler extends SQLiteOpenHelper {
 
 	// Database Version
-	private static final int DATABASE_VERSION = 2;
+	private static final int DATABASE_VERSION = 3;
 
 	// Database Name
 	private static final String DATABASE_NAME = "TaskButler.db";
@@ -61,6 +61,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	public static final String KEY_STOP_REPEATING_DATE = "stopRepeatingDate"; 		 // DATETIME
 	public static final String KEY_NOTES = "notes"; 								 // TEXT, can be null
 	public static final String KEY_COLOR = "color"; 								 // INTEGER, used in category table
+	public static final String KEY_UPDATED = "update";
 
 
 	public DatabaseHandler(Context context) {
@@ -92,8 +93,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		String create_categories_table = "CREATE TABLE " + TABLE_CATEGORIES + "(" 
 				+ KEY_ID + " INTEGER PRIMARY KEY,"
 				+ KEY_NAME + " TEXT,"
-				+ KEY_COLOR + " INTEGER)";
-
+				+ KEY_COLOR + " INTEGER)"
+				+ KEY_UPDATED + " DATETIME,";
+				
 		db.execSQL(create_tasks_table);
 		db.execSQL(create_categories_table);
 	}
