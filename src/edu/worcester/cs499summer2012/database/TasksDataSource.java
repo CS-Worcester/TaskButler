@@ -287,7 +287,7 @@ public class TasksDataSource {
 	 * @param c
 	 * @param color
 	 */
-	public void addCategory(Category c, int color){
+	public void addCategory(Category c){
 		open();
 		ContentValues values = new ContentValues();
 		values.put(DatabaseHandler.KEY_ID, c.getID());
@@ -357,8 +357,118 @@ public class TasksDataSource {
 		return c;
 	}
 
+	
 	/************************************************************
 	 * 	Google Tasks											*
 	 ************************************************************/
+	
+	/**
+	 * Update a Task by using its name
+	 * @param task
+	 * @return number of rows affected 
+	 */
+	public int updateTaskByName(Task task) {
+		open();
+		ContentValues values = new ContentValues();
+		values.put(DatabaseHandler.KEY_NAME, task.getName());
+		values.put(DatabaseHandler.KEY_COMPLETION, task.isCompleted());
+		values.put(DatabaseHandler.KEY_PRIORITY, task.getPriority());
+		values.put(DatabaseHandler.KEY_CATEGORY, task.getCategory());
+		values.put(DatabaseHandler.KEY_HAS_DUE_DATE, task.hasDateDue());
+		values.put(DatabaseHandler.KEY_HAS_FINAL_DUE_DATE, task.hasFinalDateDue());
+		values.put(DatabaseHandler.KEY_IS_REPEATING, task.isRepeating());
+		values.put(DatabaseHandler.KEY_HAS_STOP_REPEATING_DATE, task.hasStopRepeatingDate());
+		values.put(DatabaseHandler.KEY_REPEAT_TYPE, task.getRepeatType());
+		values.put(DatabaseHandler.KEY_REPEAT_INTERVAL, task.getRepeatInterval());
+		values.put(DatabaseHandler.KEY_CREATION_DATE, task.getDateCreated());
+		values.put(DatabaseHandler.KEY_MODIFICATION_DATE, task.getDateModified());
+		values.put(DatabaseHandler.KEY_DUE_DATE, task.getDateDue());
+		values.put(DatabaseHandler.KEY_FINAL_DUE_DATE, task.getFinalDateDue());
+		values.put(DatabaseHandler.KEY_STOP_REPEATING_DATE, task.getStopRepeatingDate());
+		values.put(DatabaseHandler.KEY_NOTES, task.getNotes());
 
+		// updating row
+		int i = db.update(DatabaseHandler.TABLE_TASKS, values, 
+				DatabaseHandler.KEY_NAME + " = " + task.getName(), null);
+		close();
+		return i;		
+	}
+
+	/**
+	 * Query a task using its name
+	 * @param name
+	 * @return
+	 */
+	public Task getTask(String name) {
+		open();
+		Cursor cursor = db.query(DatabaseHandler.TABLE_TASKS, new String[] { 
+				DatabaseHandler.KEY_ID,
+				DatabaseHandler.KEY_NAME, 
+				DatabaseHandler.KEY_COMPLETION, 
+				DatabaseHandler.KEY_PRIORITY, 
+				DatabaseHandler.KEY_CATEGORY,
+				DatabaseHandler.KEY_HAS_DUE_DATE,
+				DatabaseHandler.KEY_HAS_FINAL_DUE_DATE,
+				DatabaseHandler.KEY_IS_REPEATING,
+				DatabaseHandler.KEY_HAS_STOP_REPEATING_DATE,
+				DatabaseHandler.KEY_REPEAT_TYPE,
+				DatabaseHandler.KEY_REPEAT_INTERVAL,
+				DatabaseHandler.KEY_CREATION_DATE,
+				DatabaseHandler.KEY_MODIFICATION_DATE, 
+				DatabaseHandler.KEY_DUE_DATE,
+				DatabaseHandler.KEY_FINAL_DUE_DATE,
+				DatabaseHandler.KEY_STOP_REPEATING_DATE,
+				DatabaseHandler.KEY_NOTES }, 
+				DatabaseHandler.KEY_NAME + " = " + name,
+				null, null, null, null, null);
+		if (cursor != null)
+			cursor.moveToFirst();
+		Task task = new Task(
+				cursor.getInt(0), 
+				cursor.getString(1), 
+				cursor.getInt(2) > 0, 
+				cursor.getInt(3),
+				cursor.getInt(4),
+				cursor.getInt(5) > 0,
+				cursor.getInt(6) > 0,
+				cursor.getInt(7) > 0,
+				cursor.getInt(8) > 0,
+				cursor.getInt(9),
+				cursor.getInt(10), 
+				cursor.getLong(11), 
+				cursor.getLong(12), 
+				cursor.getLong(13), 
+				cursor.getLong(14),
+				cursor.getLong(15),
+				cursor.getString(16));
+		close();
+		cursor.close();
+		return task;
+	}
+
+	/**
+	 * Query a category using its name
+	 * @param name
+	 * @return Category
+	 */
+	public Category getCategoryByID(int name){
+		open();
+		Cursor cursor = db.query(DatabaseHandler.TABLE_CATEGORIES, new String[] {
+				DatabaseHandler.KEY_ID,
+				DatabaseHandler.KEY_NAME,
+				DatabaseHandler.KEY_COLOR,
+				DatabaseHandler.KEY_UPDATED	}, 
+				DatabaseHandler.KEY_NAME + " = " + name,
+				null, null, null, null);
+		if (cursor != null)
+			cursor.moveToFirst();
+		Category c = new Category(
+				cursor.getInt(0),
+				cursor.getString(1),
+				cursor.getInt(2),
+				cursor.getLong(3));
+		close();
+		cursor.close();
+		return c;
+	}
 }
