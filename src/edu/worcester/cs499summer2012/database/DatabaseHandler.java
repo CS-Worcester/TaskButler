@@ -20,10 +20,13 @@
 
 package edu.worcester.cs499summer2012.database;
 
-import android.content.Context;
+import java.util.GregorianCalendar;
 
+import android.content.ContentValues;
+import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.graphics.Color;
 
 /**
  * Creates SQLite table for storing tasks to a database. DO NOT call this class directly
@@ -33,7 +36,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DatabaseHandler extends SQLiteOpenHelper {
 
 	// Database Version
-	private static final int DATABASE_VERSION = 2;
+	private static final int DATABASE_VERSION = 6;
+
 
 	// Database Name
 	private static final String DATABASE_NAME = "TaskButler.db";
@@ -61,6 +65,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	public static final String KEY_STOP_REPEATING_DATE = "stopRepeatingDate"; 		 // DATETIME
 	public static final String KEY_NOTES = "notes"; 								 // TEXT, can be null
 	public static final String KEY_COLOR = "color"; 								 // INTEGER, used in category table
+	public static final String KEY_UPDATED = "updated";
+	public static final String KEY_G_ID = "gID";
 
 
 	public DatabaseHandler(Context context) {
@@ -87,15 +93,28 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				+ KEY_DUE_DATE + " DATETIME,"
 				+ KEY_FINAL_DUE_DATE + " DATETIME,"
 				+ KEY_STOP_REPEATING_DATE + " DATETIME,"
+				+ KEY_G_ID + " TEXT,"
 				+ KEY_NOTES + " TEXT)";
-		
+
 		String create_categories_table = "CREATE TABLE " + TABLE_CATEGORIES + "(" 
 				+ KEY_ID + " INTEGER PRIMARY KEY,"
 				+ KEY_NAME + " TEXT,"
-				+ KEY_COLOR + " INTEGER)";
+				+ KEY_COLOR + " INTEGER,"
+				+ KEY_UPDATED + " DATETIME,"
+				+ KEY_G_ID + " TEXT)";
+
 
 		db.execSQL(create_tasks_table);
 		db.execSQL(create_categories_table);
+
+		// Create first entry of categories table
+		ContentValues values = new ContentValues();
+		values.put(KEY_ID, 1);
+		values.put(KEY_NAME, "No category");
+		values.put(KEY_COLOR, Color.parseColor("#00FFFFFF"));
+		values.put(KEY_UPDATED, GregorianCalendar.getInstance().getTimeInMillis());
+
+		db.insert(TABLE_CATEGORIES, null, values);
 	}
 
 	// Upgrading database

@@ -3,7 +3,8 @@
 	    android:layout_width="wrap_content"
 	    android:layout_height="wrap_content"
 	    android:paddingLeft="8dp"
-	    android:paddingRight="8dp" xmlns:android="http://schemas.android.com/apk/res/android">
+	    android:paddingRight="8dp" 
+	    xmlns:android="http://schemas.android.com/apk/res/android">
     	    
     <DatePicker 
         android:id="@+id/dialog_date_picker"
@@ -23,32 +24,5 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="4dp"
         android:layout_marginBottom="4dp" />
-    
-    <!-- <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/dialog_time_picker"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="4dp"
-        android:layout_marginBottom="4dp"
-        android:orientation="horizontal">
-    
-   	    <Button
-   	        android:id="@+id/button_dialog_ok"
-   	        android:layout_width="108dp"
-	        android:layout_height="40dp"
-	        android:layout_marginRight="4dp"
-	        android:text="@string/button_dialog_ok"
-	        android:textSize="16dp" />
-   	    
-   	    <Button
-   	        android:id="@+id/button_dialog_cancel"
-   	        android:layout_width="108dp"
-	        android:layout_height="40dp"
-	        android:layout_marginLeft="4dp"
-	        android:text="@string/button_dialog_cancel"
-	        android:textSize="16dp" />
-   	    
-   	</LinearLayout> -->
     	    
 </RelativeLayout>

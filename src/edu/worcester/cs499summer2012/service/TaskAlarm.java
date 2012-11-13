@@ -25,7 +25,6 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 
 
 /**
@@ -33,19 +32,6 @@ import android.util.Log;
  * @author Dhimitraq Jorgji
  */
 public class TaskAlarm {
-/*
-	public void setRepeatingAlarm(Context context)
-    {
-		Log.d("TaskAlarm", "In side setRepeating");
-        AlarmManager am=(AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
-        Intent intent = new Intent(context, OnAlarmReceiver.class);
-        //intent.putExtra("string field name", Boolean.FALSE);
-        PendingIntent pi = PendingIntent.getBroadcast(context, 0, intent, 0);
-        //After after 30 seconds
-        am.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 1000 * 5 , pi); 
-    }
-*/
-	
 	/**
 	 * Cancel alarm using the task id, PendingIntent is created using the Task id
 	 * @param context
@@ -53,11 +39,7 @@ public class TaskAlarm {
 	 */
     public void cancelAlarm(Context context, int id)
     {
-    	Log.d("TaskAlarm", "In side cancelAlarm");
-    	Intent intent = new Intent(context, OnAlarmReceiver.class)
-        	.putExtra("TaskId", id);
-        PendingIntent pi = PendingIntent.getBroadcast(context, id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        
+    	PendingIntent pi = getPendingIntent(context, id);
     	AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
     	alarmManager.cancel(pi);
     	pi.cancel();
@@ -69,16 +51,16 @@ public class TaskAlarm {
      * @param id id of task to retrieve task from SQLite database
      */
     public void setOnetimeAlarm(Context context, int id){
-    	Log.d("TaskAlarm", "Beginning setOnetimeAlarm");
-    	
 		TasksDataSource db = TasksDataSource.getInstance(context);
 		Task task = db.getTask(id);
-		
-        Intent intent = new Intent(context, OnAlarmReceiver.class)
-        	.putExtra("TaskId", id);
-        PendingIntent pi = PendingIntent.getBroadcast(context, id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        
         AlarmManager am=(AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
-        am.set(AlarmManager.RTC_WAKEUP, task.getDateDue(), pi);
+        am.set(AlarmManager.RTC_WAKEUP, task.getDateDue(), getPendingIntent(context, id));
     }
+    
+    //get a PendingIntent 
+	PendingIntent getPendingIntent(Context context, int id) {
+		Intent intent =  new Intent(context, OnAlarmReceiver.class)
+			.putExtra(Task.EXTRA_TASK_ID, id);
+		return PendingIntent.getBroadcast(context, id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+	}
 }

@@ -39,13 +39,18 @@ public class Task implements Parcelable {
 	/**************************************************************************
 	 * Static fields and methods                                              *
 	 **************************************************************************/
-	
+
+	// Extra intent flags
+	public static final String EXTRA_TASK = "edu.worcester.cs499summer2012.TASK";
+	public static final String EXTRA_TASK_ID = "edu.worcester.cs499summer2012.TASK_ID";
+
 	// Priority constants
 	public static final String[] LABELS = {"Trivial", "Normal", "Urgent"};
+	public static final String[] REPEAT_LABELS = {"minutes", "hours", "days", "weeks", "months", "years"};
 	public static final int TRIVIAL = 0;
 	public static final int NORMAL = 1;
 	public static final int URGENT = 2;
-	
+
 	// Repeat constants
 	public static final int MINUTES = 0;
 	public static final int HOURS = 1;
@@ -53,11 +58,11 @@ public class Task implements Parcelable {
 	public static final int WEEKS = 3;
 	public static final int MONTHS = 4;
 	public static final int YEARS = 5;
-	
+
 	/**************************************************************************
 	 * Private fields                                                         *
 	 **************************************************************************/
-	
+
 	private int id;
 	private String name;
 	private boolean isCompleted;
@@ -74,6 +79,7 @@ public class Task implements Parcelable {
 	private long dateDue;
 	private long finalDateDue;
 	private long stopRepeatingDate;
+	private String gID;
 	private String notes;
 	private Calendar dateCreatedCal;
 	private Calendar dateModifiedCal;
@@ -114,7 +120,7 @@ public class Task implements Parcelable {
 		finalDateDue = task.finalDateDue;
 		stopRepeatingDate = task.stopRepeatingDate;
 		notes = task.notes;
-		
+
 		updateDateCreatedCal();
 		updateDateModifiedCal();
 		updateDateDueCal();
@@ -161,14 +167,14 @@ public class Task implements Parcelable {
 		this.finalDateDue = finalDateDue;
 		this.stopRepeatingDate = stopRepeatingDate;
 		this.notes = notes;
-		
+
 		updateDateCreatedCal();
 		updateDateModifiedCal();
 		updateDateDueCal();
 		updateFinalDateDueCal();
 		updateStopRepeatingDateCal();
 	}
-	
+
 	/**
 	 * Constructor, with ID and with modification date (existing task)
 	 * @param id
@@ -193,7 +199,7 @@ public class Task implements Parcelable {
 			int category, boolean hasDateDue, boolean hasFinalDateDue, 
 			boolean isRepeating, boolean hasStopRepeatingDate, int repeatType, 
 			int repeatInterval, long dateCreated, long dateModified, 
-			long dateDue, long finalDateDue, long stopRepeatingDate, 
+			long dateDue, long finalDateDue, long stopRepeatingDate, String gID,
 			String notes) {
 		this(name, isCompleted, priority, category, hasDateDue,
 				hasFinalDateDue, isRepeating, hasStopRepeatingDate, repeatType,
@@ -201,63 +207,66 @@ public class Task implements Parcelable {
 				stopRepeatingDate, notes);
 		this.id = id;
 		this.dateModified = dateModified;
+		this.gID = gID;
+		updateDateModifiedCal();
+
 	}
 
 	/**************************************************************************
 	 * Class methods                                                          *
 	 **************************************************************************/ 
-	
+
 	private void updateDateCreatedCal() {
 		if (dateCreatedCal == null)
 			dateCreatedCal = new GregorianCalendar();
-		
-		dateCreatedCal.setTimeInMillis((long) dateCreated);
+
+		dateCreatedCal.setTimeInMillis(dateCreated);
 	}
-	
+
 	private void updateDateModifiedCal() {
 		if (dateModifiedCal == null)
 			dateModifiedCal = new GregorianCalendar();
-		
-		dateModifiedCal.setTimeInMillis((long) dateModified);
+
+		dateModifiedCal.setTimeInMillis(dateModified);
 	}
-	
+
 	private void updateDateDueCal() {
 		if (!hasDateDue)
 		{
 			dateDueCal = null;
 			return;
 		}
-		
+
 		if (dateDueCal == null)
 			dateDueCal = new GregorianCalendar();
-		
-		dateDueCal.setTimeInMillis((long) dateDue);
+
+		dateDueCal.setTimeInMillis(dateDue);
 	}
-	
+
 	private void updateFinalDateDueCal() {
 		if (!hasFinalDateDue)
 		{
 			finalDateDueCal = null;
 			return;
 		}
-		
+
 		if (finalDateDueCal == null)
 			finalDateDueCal = new GregorianCalendar();
-		
-		finalDateDueCal.setTimeInMillis((long) finalDateDue);
+
+		finalDateDueCal.setTimeInMillis(finalDateDue);
 	}
-	
+
 	private void updateStopRepeatingDateCal() {
 		if (!hasStopRepeatingDate)
 		{
 			stopRepeatingDateCal = null;
 			return;
 		}
-		
+
 		if (stopRepeatingDateCal == null)
 			stopRepeatingDateCal = new GregorianCalendar();
-		
-		stopRepeatingDateCal.setTimeInMillis((long) stopRepeatingDate);
+
+		stopRepeatingDateCal.setTimeInMillis(stopRepeatingDate);
 	}
 
 	/**************************************************************************
@@ -265,13 +274,12 @@ public class Task implements Parcelable {
 	 **************************************************************************/ 	
 	/**
 	 * Compares this object to another. To return true, the compared object must
-	 * have the same class and identical private fields.
+	 * have the same class and identical IDs.
 	 * @param o the object to be compared with
 	 * @return true if the objects are equal, false otherwise
 	 */
 	@Override
 	public boolean equals(Object o) {
-		// TODO: Needs to be updated
 		if (o == this)
 			return true;
 		if (o == null)
@@ -279,50 +287,22 @@ public class Task implements Parcelable {
 		if (o.getClass() != this.getClass())
 			return false;
 
-		Task t = (Task) o;
-		if (!this.name.equals(t.name))
-			return false;
-		if (this.isCompleted != t.isCompleted)
-			return false;
-		if (this.priority != t.priority)
-			return false;
-		if (this.category != t.category)
-			return false;
-		if (this.dateCreated != t.dateCreated)
-			return false;
-		if (this.dateModified != t.dateModified)
-			return false;
-		if (this.dateDue != t.dateDue)
-			return false;
-		if (this.finalDateDue != t.finalDateDue)
-			return false;
-		if (!this.notes.equals(t.notes))
-			return false;
-
-		return true;
+		return ((Task) o).id == this.id;
 	}
 
 	/**
-	 * Returns a string representation of the class. Used for writing to file.
-	 * The order of the fields in the string is:
-	 *     Name
-	 *     Is completed
-	 *     Priority
-	 *     Date created
-	 *     Date due
-	 *     Notes
+	 * Returns a string representation of the class.
 	 * @return a string representation of the class
 	 */
 	@Override
 	public String toString() {
-		// TODO: (Jon) Reimplement this method in a more useful form
 		return name;
 	}
 
 	/**************************************************************************
 	 * Methods implementing Parcelable interface                              *
 	 **************************************************************************/
-	
+
 	/**
 	 * Empty & unused method. Required for implementing Parcelable.
 	 * @return 0
@@ -331,7 +311,7 @@ public class Task implements Parcelable {
 	public int describeContents() {
 		return 0;
 	}
-	
+
 	/**
 	 * Converts task to a parcel.
 	 * @param out the parcel the task will be written to
@@ -357,17 +337,17 @@ public class Task implements Parcelable {
 		out.writeLong(stopRepeatingDate);
 		out.writeString(notes);
 	}
-	
+
 	public static final Parcelable.Creator<Task> CREATOR = new Parcelable.Creator<Task>() {
 		public Task createFromParcel(Parcel in) {
 			return new Task(in);
 		}
-		
+
 		public Task[] newArray(int size) {
 			return new Task[size];
 		}
 	};
-	
+
 	private Task(Parcel in) {
 		id = in.readInt();
 		name = in.readString();
@@ -386,14 +366,15 @@ public class Task implements Parcelable {
 		finalDateDue = in.readLong();
 		stopRepeatingDate = in.readLong();
 		notes = in.readString();
-		
+
 		updateDateCreatedCal();
 		updateDateModifiedCal();
 		updateDateDueCal();
 		updateFinalDateDueCal();
 		updateStopRepeatingDateCal();
 	}
-	
+
+
 	/**************************************************************************
 	 * Getters and setters                                                    *
 	 **************************************************************************/	
@@ -425,7 +406,7 @@ public class Task implements Parcelable {
 	public void toggleIsCompleted() {
 		isCompleted = isCompleted ? false : true;
 	}
-	
+
 	public int getPriority() {
 		return priority;
 	}
@@ -433,68 +414,70 @@ public class Task implements Parcelable {
 	public void setPriority(int priority) {
 		this.priority = priority;
 	}
-	
+
 	public int getCategory() {
 		return category;
 	}
-	
+
 	public void setCategory(int category) {
 		this.category = category;
 	}
-	
+
 	public boolean hasDateDue() {
 		return hasDateDue;
 	}
-	
+
 	public void setHasDateDue(boolean hasDateDue) {
 		this.hasDateDue = hasDateDue;
 	}
-	
+
 	public boolean hasFinalDateDue() {
 		return hasFinalDateDue;
 	}
-	
+
 	public void setHasFinalDateDue(boolean hasFinalDateDue) {
 		this.hasFinalDateDue = hasFinalDateDue;
 	}
-	
+
 	public boolean isRepeating() {
 		return isRepeating;
 	}
-	
+
 	public void setIsRepeating(boolean isRepeating) {
 		this.isRepeating = isRepeating;
 	}
-	
+
 	public boolean hasStopRepeatingDate() {
 		return hasStopRepeatingDate;
 	}
-	
+
 	public void setHasStopRepeatingDate(boolean hasStopRepeatingDate) {
 		this.hasStopRepeatingDate = hasStopRepeatingDate;
 	}
-	
+
 	public int getRepeatType() {
 		return repeatType;
 	}
-	
+
 	public void setRepeatType(int repeatType) {
-		if (repeatType >= 0 && repeatType <= 5)
+		if (repeatType >= 0 && repeatType <= 5){
+			this.isRepeating = true;
 			this.repeatType = repeatType;
+		}
 	}
-	
+
 	public int getRepeatInterval() {
 		return repeatInterval;
 	}
-	
+
 	public void setRepeatInterval(int repeatInterval) {
 		this.repeatInterval = repeatInterval;
 	}
-	
+
 	public long getDateCreated() {
 		return dateCreated;
 	}
-	
+
 	public Calendar getDateCreatedCal() {
 		return dateCreatedCal;
 	}
@@ -503,11 +486,11 @@ public class Task implements Parcelable {
 		this.dateCreated = date_created;
 		updateDateCreatedCal();
 	}
-	
+
 	public long getDateModified() {
 		return dateModified;
 	}
-	
+
 	public Calendar getDateModifiedCal() {
 		return dateModifiedCal;
 	}
@@ -520,38 +503,41 @@ public class Task implements Parcelable {
 	public long getDateDue() {
 		return dateDue;
 	}
-	
+
 	public Calendar getDateDueCal() {
 		return dateDueCal;
 	}
 
 	public void setDateDue(long date_due) {
+		this.hasDateDue = true;
 		this.dateDue = date_due;
 		updateDateDueCal();
 	}
-	
+
 	public long getFinalDateDue() {
 		return finalDateDue;
 	}
-	
+
 	public Calendar getFinalDateDueCal() {
 		return finalDateDueCal;
 	}
 
 	public void setFinalDateDue(long final_date_due) {
+		this.hasFinalDateDue = true;
 		this.finalDateDue = final_date_due;
 		updateFinalDateDueCal();
 	}
-	
+
 	public long getStopRepeatingDate() {
 		return stopRepeatingDate;
 	}
-	
+
 	public Calendar getStopRepeatingDateCal() {
 		return stopRepeatingDateCal;
 	}
 
 	public void setStopRepeatingDate(long stopRepeatingDate) {
+		this.isRepeating = true;
 		this.stopRepeatingDate = stopRepeatingDate;
 		updateStopRepeatingDateCal();
 	}
@@ -562,5 +548,13 @@ public class Task implements Parcelable {
 
 	public void setNotes(String notes) {
 		this.notes = notes;
+	}
+
+	public String getgID() {
+		return gID;
+	}
+
+	public void setgID(String gID) {
+		this.gID = gID;
 	}
 }

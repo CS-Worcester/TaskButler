@@ -2,15 +2,5 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
     <style name="app_theme" parent="Theme.Sherlock" />
-    
-    <style name="text_task_completed">
-        <item name="android:textStyle">italic</item>
-        <item name="android:textColor">#C0C0C0</item>
-    </style>
-    
-    <style name="text_task_not_completed">
-        <item name="android:textStyle">bold</item>
-        <item name="android:textColor">#FFFFFF</item>
-    </style>
 
 </resources>
