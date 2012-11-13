@@ -113,7 +113,67 @@ public class ComparatorListAdapter extends ArrayAdapter<Comparator> {
 			});
 			view_holder.name = (TextView) view.findViewById(R.id.text_row_comparator_name);
 			view_holder.up = (ImageView) view.findViewById(R.id.image_row_comparator_up);
+			view_holder.up.setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View v) {
+					// User wants to move this comparator up in the list (decrease order by 1)
+					Comparator comparator = (Comparator) view_holder.enabled.getTag();
+					int old_order = comparator.getOrder();
+					
+					// Check to see if this comparator is at the top of the list
+					if (old_order == 0)
+						return;
+					
+					// Grab the affected comparator and modify both of their orders
+					int new_order = old_order - 1;
+					Comparator displaced_comparator = comparators.get(new_order);
+					comparator.setOrder(new_order);
+					displaced_comparator.setOrder(old_order);
+					
+					// Update their positions in the adapter
+					comparators.set(old_order, displaced_comparator);
+					comparators.set(new_order, comparator);
+					
+					// Update both comparators in the database
+					data_source.updateComparator(comparator);
+					data_source.updateComparator(displaced_comparator);
+					
+					notifyDataSetChanged();
+				}
+				
+			});
 			view_holder.down = (ImageView) view.findViewById(R.id.image_row_comparator_down);
+			view_holder.down.setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View v) {
+					// User wants to move this comparator down in the list (increase order by 1)
+					Comparator comparator = (Comparator) view_holder.enabled.getTag();
+					int old_order = comparator.getOrder();
+					
+					// Check to see if this comparator is at the bottom of the list
+					if (old_order == Comparator.NUM_COMPARATORS - 1)
+						return;
+					
+					// Grab the affected comparator and modify both of their orders
+					int new_order = old_order + 1;
+					Comparator displaced_comparator = comparators.get(new_order);
+					comparator.setOrder(new_order);
+					displaced_comparator.setOrder(old_order);
+					
+					// Update their positions in the adapter
+					comparators.set(old_order, displaced_comparator);
+					comparators.set(new_order, comparator);
+					
+					// Update both comparators in the database
+					data_source.updateComparator(comparator);
+					data_source.updateComparator(displaced_comparator);
+					
+					notifyDataSetChanged();
+				}
+				
+			});
 			
 			view.setTag(view_holder);
 			view_holder.enabled.setTag(comparator);
@@ -129,10 +189,6 @@ public class ComparatorListAdapter extends ArrayAdapter<Comparator> {
 		// Set name
 		holder.name.setText(comparator.getName());
 		holder.name.setEnabled(is_enabled);
-		
-		// Set arrows
-		holder.up.setEnabled(is_enabled);
-		holder.down.setEnabled(is_enabled);
 		
 		return view;
 	}
