@@ -20,10 +20,13 @@
 
 package edu.worcester.cs499summer2012.database;
 
-import android.content.Context;
+import java.util.GregorianCalendar;
 
+import android.content.ContentValues;
+import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.graphics.Color;
 
 /**
  * Creates SQLite table for storing tasks to a database. DO NOT call this class directly
@@ -33,7 +36,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DatabaseHandler extends SQLiteOpenHelper {
 
 	// Database Version
-	private static final int DATABASE_VERSION = 1;
+	private static final int DATABASE_VERSION = 6;
+
 
 	// Database Name
 	private static final String DATABASE_NAME = "TaskButler.db";
@@ -44,16 +48,25 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 	// Column names
 	public static final String KEY_ID = "id";
-	public static final String KEY_NAME = "name"; //data type: TEXT
-	public static final String KEY_COMPLETION = "completion"; //data type: INTEGER, indirectly DATETIME as Unix Time
-	public static final String KEY_PRIORITY = "priority"; //data type: INTEGER, 2=URGENT, 1=REGULAR,0=TRIVIAL 
-	public static final String KEY_CATEGORY = "category"; //data type: INTEGER
-	public static final String KEY_CREATION_DATE = "creationDate"; //data type: DATETIME
-	public static final String KEY_MODIFICATION_DATE = "modificationDate"; //data type: DATETIME
-	public static final String KEY_DUE_DATE = "dueDate"; //data type: DATETIME
-	public static final String KEY_FINAL_DUE_DATE = "finalDueDate"; //data type: DATETIME
-	public static final String KEY_NOTES = "notes"; //data type: TEXT can be null
-	public static final String KEY_COLOR = "color"; //data type: INTEGER, used in category table
+	public static final String KEY_NAME = "name"; 									 // TEXT
+	public static final String KEY_COMPLETION = "completion"; 						 // INTEGER, indirectly boolean
+	public static final String KEY_PRIORITY = "priority"; 							 // INTEGER
+	public static final String KEY_CATEGORY = "category"; 							 // INTEGER
+	public static final String KEY_HAS_DUE_DATE = "hasDueDate"; 					 // INTEGER, indirectly boolean
+	public static final String KEY_HAS_FINAL_DUE_DATE = "hasFinalDueDate"; 			 // INTEGER, indirectly boolean
+	public static final String KEY_IS_REPEATING = "isRepeating"; 					 // INTEGER, indirectly boolean
+	public static final String KEY_HAS_STOP_REPEATING_DATE = "hasStopRepeatingDate"; // INTEGER, indirectly boolean
+	public static final String KEY_REPEAT_TYPE = "repeatType"; 						 // INTEGER
+	public static final String KEY_REPEAT_INTERVAL = "repeatInterval"; 				 // INTEGER
+	public static final String KEY_CREATION_DATE = "creationDate"; 					 // DATETIME
+	public static final String KEY_MODIFICATION_DATE = "modificationDate"; 			 // DATETIME
+	public static final String KEY_DUE_DATE = "dueDate"; 							 // DATETIME
+	public static final String KEY_FINAL_DUE_DATE = "finalDueDate";					 // DATETIME
+	public static final String KEY_STOP_REPEATING_DATE = "stopRepeatingDate"; 		 // DATETIME
+	public static final String KEY_NOTES = "notes"; 								 // TEXT, can be null
+	public static final String KEY_COLOR = "color"; 								 // INTEGER, used in category table
+	public static final String KEY_UPDATED = "updated";
+	public static final String KEY_G_ID = "gID";
 
 
 	public DatabaseHandler(Context context) {
@@ -69,19 +82,39 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				+ KEY_COMPLETION + " INTEGER,"
 				+ KEY_PRIORITY + " INTEGER,"
 				+ KEY_CATEGORY + " INTEGER,"
+				+ KEY_HAS_DUE_DATE + " INTEGER,"
+				+ KEY_HAS_FINAL_DUE_DATE + " INTEGER,"
+				+ KEY_IS_REPEATING + " INTEGER,"
+				+ KEY_HAS_STOP_REPEATING_DATE + " INTEGER,"
+				+ KEY_REPEAT_TYPE + " INTEGER,"
+				+ KEY_REPEAT_INTERVAL + " INTEGER,"
 				+ KEY_CREATION_DATE + " DATETIME,"
 				+ KEY_MODIFICATION_DATE + " DATETIME,"
 				+ KEY_DUE_DATE + " DATETIME,"
 				+ KEY_FINAL_DUE_DATE + " DATETIME,"
+				+ KEY_STOP_REPEATING_DATE + " DATETIME,"
+				+ KEY_G_ID + " TEXT,"
 				+ KEY_NOTES + " TEXT)";
-		
+
 		String create_categories_table = "CREATE TABLE " + TABLE_CATEGORIES + "(" 
 				+ KEY_ID + " INTEGER PRIMARY KEY,"
 				+ KEY_NAME + " TEXT,"
-				+ KEY_COLOR + " INTEGER)";
+				+ KEY_COLOR + " INTEGER,"
+				+ KEY_UPDATED + " DATETIME,"
+				+ KEY_G_ID + " TEXT)";
+
 
 		db.execSQL(create_tasks_table);
 		db.execSQL(create_categories_table);
+
+		// Create first entry of categories table
+		ContentValues values = new ContentValues();
+		values.put(KEY_ID, 1);
+		values.put(KEY_NAME, "No category");
+		values.put(KEY_COLOR, Color.parseColor("#00FFFFFF"));
+		values.put(KEY_UPDATED, GregorianCalendar.getInstance().getTimeInMillis());
+
+		db.insert(TABLE_CATEGORIES, null, values);
 	}
 
 	// Upgrading database

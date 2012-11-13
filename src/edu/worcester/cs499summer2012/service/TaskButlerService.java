@@ -19,14 +19,11 @@
 
 package edu.worcester.cs499summer2012.service;
 
-import edu.worcester.cs499summer2012.database.TasksDataSource;
-import edu.worcester.cs499summer2012.task.Task;
-
-import java.util.ArrayList;
-import java.util.ListIterator;
+import java.util.List;
 
 import android.content.Intent;
-import android.util.Log;
+import edu.worcester.cs499summer2012.database.TasksDataSource;
+import edu.worcester.cs499summer2012.task.Task;
 
 /**
  * An IntentService that takes care of setting up alarms for Task Butler
@@ -36,27 +33,19 @@ import android.util.Log;
  */
 public class TaskButlerService extends WakefulIntentService{
 	
-	
 	public TaskButlerService() {
 		super("TaskButlerService");
 	}
 
 	@Override
 	protected void onHandleIntent(Intent intent) {
-		Log.d("TAskButlerService","in onHandleIntent");
 		TasksDataSource db = TasksDataSource.getInstance(getApplicationContext()); //get access to the instance of TasksDataSource
-		//NotificationHelper notification = new NotificationHelper();//for testing
-		ArrayList<Task> tasks = db.getAllTasks(); //Get a list of all the tasks there
-		ListIterator<Task> iterator = tasks.listIterator(); //get an ListIterator over the list
+		List<Task> tasks = db.getAllTasks(); //Get a list of all the tasks there
 		TaskAlarm alarm = new TaskAlarm();
 	 		 	
-		while(iterator.hasNext()){ 
-			Task task = iterator.next();
-			
-			if(!task.isCompleted() && (task.getDateDue() >= System.currentTimeMillis()))
-				alarm.setOnetimeAlarm(getApplicationContext(), task.getID());
-			//notification.sendBasicNotification(getApplicationContext(), task.getID()); //for testing.
-			Log.d("Items in iterator", " "+task);
+		for (Task task : tasks) {
+			if(!task.isCompleted() && (task.getDateDue() >= System.currentTimeMillis())){
+				alarm.setOnetimeAlarm(getApplicationContext(), task.getID());	}
 		}
 		super.onHandleIntent(intent);
 	}

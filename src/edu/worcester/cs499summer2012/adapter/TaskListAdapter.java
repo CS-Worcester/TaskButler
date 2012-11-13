@@ -1,7 +1,7 @@
 /*
  * TaskListAdapter.java
  *
- * Copyright 2012 Jonathan Hasenzahl, James Celona
+ * Copyright 2012 Jonathan Hasenzahl, James Celona, Dhimitraq Jorgji
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,14 +21,21 @@ package edu.worcester.cs499summer2012.adapter;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.GregorianCalendar;
+
 import android.app.Activity;
+import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
+import android.widget.ImageView;
 import android.widget.TextView;
 import edu.worcester.cs499summer2012.R;
 import edu.worcester.cs499summer2012.comparator.TaskAutoComparator;
+import edu.worcester.cs499summer2012.database.TasksDataSource;
 import edu.worcester.cs499summer2012.task.Task;
 
 /**
@@ -47,15 +54,13 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 	public static final int CUSTOM_SORT = 1;
 	
 	static class ViewHolder {
+		public CheckBox is_completed;
 		public TextView name;
-		public TextView is_completed;
-		public TextView priority;
-		public TextView category;
-		public TextView date_created;
-		public TextView date_modified;
-		public TextView date_due;
-		public TextView final_date_due;
-		public TextView notes;
+		public View category;
+		public ImageView priority;
+		public TextView due_date;
+		public ImageView alarm;
+		public ImageView recurrence;
 	}
 	
 	/**************************************************************************
@@ -64,6 +69,7 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 	
 	private final Activity activity;
 	private final ArrayList<Task> tasks;
+	private TasksDataSource data_source;
 	private int sort_type;
 	private final Comparator<Task> auto_comparator = new TaskAutoComparator();
 	//private final Comparator<Task> name_comparator = new TaskNameComparator();
@@ -86,7 +92,8 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 		super(activity, R.layout.row_task, tasks);
 		this.activity = activity;
 		this.tasks = tasks;
-		this.setNotifyOnChange(true);
+		data_source = TasksDataSource.getInstance(this.activity);
+		setNotifyOnChange(true);
 	}
 	
 	/**************************************************************************
@@ -104,80 +111,108 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 	 */
 	@Override
 	public View getView(int position, View convert_view, ViewGroup parent) {
-		View row_view = convert_view;
-		if (row_view == null) {
-			LayoutInflater inflater = activity.getLayoutInflater();
-			row_view = inflater.inflate(R.layout.row_task, null);
-			ViewHolder view_holder = new ViewHolder();
-			view_holder.name = (TextView) 
-					row_view.findViewById(R.id.text_main_row_name);
-			view_holder.is_completed = (TextView)
-					row_view.findViewById(R.id.text_main_row_is_completed);
-			view_holder.priority = (TextView)
-					row_view.findViewById(R.id.text_main_row_priority);
-			view_holder.category = (TextView)
-					row_view.findViewById(R.id.text_main_row_category);
-			view_holder.date_created = (TextView)
-					row_view.findViewById(R.id.text_main_row_date_created);
-			view_holder.date_modified = (TextView)
-					row_view.findViewById(R.id.text_main_row_date_modified);
-			view_holder.date_due = (TextView)
-					row_view.findViewById(R.id.text_main_row_date_due);
-			view_holder.final_date_due = (TextView)
-					row_view.findViewById(R.id.text_main_row_final_date_due);
-			view_holder.notes = (TextView)
-					row_view.findViewById(R.id.text_main_row_notes);
-			
-			row_view.setTag(view_holder);
-		}
-
-		ViewHolder holder = (ViewHolder) row_view.getTag();
+		View view = convert_view;
 		Task task = tasks.get(position);
+		
+		if (view == null) {		
+			LayoutInflater inflater = activity.getLayoutInflater();
+			view = inflater.inflate(R.layout.row_task, null);
+			
+			final ViewHolder view_holder = new ViewHolder();
+			view_holder.is_completed = (CheckBox) view.findViewById(R.id.checkbox_row_complete);
+			view_holder.is_completed.setOnClickListener(new OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					Task task = (Task) view_holder.is_completed.getTag();
+					task.toggleIsCompleted();
+					task.setDateModified(GregorianCalendar.getInstance().getTimeInMillis());
+					
+					// Update DB
+					data_source.updateTask(task);
+					
+					sort();
+				}
+			});
+			view_holder.name = (TextView) view.findViewById(R.id.text_row_name);
+			view_holder.category = (View) view.findViewById(R.id.view_row_category);
+			view_holder.priority = (ImageView) view.findViewById(R.id.image_row_priority);
+			view_holder.due_date = (TextView) view.findViewById(R.id.text_row_due_date);
+			view_holder.alarm = (ImageView) view.findViewById(R.id.image_row_alarm);
+			view_holder.recurrence = (ImageView) view.findViewById(R.id.image_row_recurrence);
+			
+			view.setTag(view_holder);
+			view_holder.is_completed.setTag(task);
+		} else
+			((ViewHolder) view.getTag()).is_completed.setTag(task); 
+
+		ViewHolder holder = (ViewHolder) view.getTag();
+		
+		// Set is completed
+		boolean is_complete = task.isCompleted();
+		holder.is_completed.setChecked(is_complete);
 		
 		// Set name
 		holder.name.setText(task.getName());
-		
-		// Set is completed
-		holder.is_completed.setText(task.isCompleted() ? "Finished" : 
-			"Unfinished");
-		
-		// Set priority
-		holder.priority.setText(Task.LABELS[task.getPriority()]);
+		holder.name.setEnabled(!is_complete);
 		
 		// Set category
-		holder.category.setText("Category: " + task.getCategory());
-		
-		// Set date created
-		holder.date_created.setText("Created: " + task.getDateCreatedCal().getTime().toString());
-		
-		// Set date modified
-		holder.date_modified.setText("Modified: " + task.getDateModifiedCal().getTime().toString());
-		
-		// Set date due
-		holder.date_due.setText("Due: " + (task.getDateDueCal() == null 
-				? "N/A" : task.getDateDueCal().getTime().toString()));
-		
-		// Set final date due
-		holder.final_date_due.setText("Due: " + (task.getFinalDateDueCal() == null 
-				? "N/A" : task.getFinalDateDueCal().getTime().toString()));
-		
-		// Set notes
-		holder.notes.setText("Notes: " + task.getNotes());
-		
-		// Set styles
-		if (!tasks.get(position).isCompleted()) {
-			holder.name.setTextAppearance(getContext(), 
-					R.style.text_task_not_completed);
-			holder.is_completed.setTextAppearance(getContext(), 
-					R.style.text_task_not_completed);
-		} else {
-			holder.name.setTextAppearance(getContext(), 
-					R.style.text_task_completed);
-			holder.is_completed.setTextAppearance(getContext(), 
-					R.style.text_task_completed);
+		if (is_complete)
+			holder.category.setVisibility(View.GONE);
+		else {
+			holder.category.setVisibility(View.VISIBLE);
+			holder.category.setBackgroundColor(data_source.getCategory(task.getCategory()).getColor());
 		}
 		
-		return row_view;
+		// Set priority
+		if (is_complete)
+			holder.priority.setVisibility(View.GONE);
+		else {
+			holder.priority.setVisibility(View.VISIBLE);
+			
+			switch (task.getPriority()) {
+			case Task.URGENT:
+				holder.priority.setImageResource(R.drawable.ic_urgent);
+				break;
+			case Task.TRIVIAL:
+				holder.priority.setImageResource(R.drawable.ic_trivial);
+				break;
+			case Task.NORMAL:
+			default:
+				holder.priority.setImageResource(R.drawable.ic_normal);
+				break;
+			}
+		}
+		
+		// Set due date
+		if (is_complete)
+			holder.due_date.setVisibility(View.GONE);
+		else {
+			holder.due_date.setVisibility(View.VISIBLE);
+			
+			if (task.hasDateDue())
+				holder.due_date.setText(DateFormat.format("'Due' MM/dd/yy h:mmAA", task.getDateDueCal()));
+			else
+				holder.due_date.setText("");
+		}
+		
+		// Set alarm
+		if (is_complete)
+			holder.alarm.setVisibility(View.GONE);
+		else if (task.hasFinalDateDue())
+			holder.alarm.setVisibility(View.VISIBLE);
+		else
+			holder.alarm.setVisibility(View.INVISIBLE);
+		
+		// Set recurrence
+		if (is_complete)
+			holder.recurrence.setVisibility(View.GONE);
+		else if (task.isRepeating())
+			holder.recurrence.setVisibility(View.VISIBLE);
+		else
+			holder.recurrence.setVisibility(View.INVISIBLE);
+		
+		return view;
 	}
 	
 	public void sort() {
