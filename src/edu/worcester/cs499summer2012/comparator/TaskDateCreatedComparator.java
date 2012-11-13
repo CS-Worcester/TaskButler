@@ -1,7 +1,7 @@
 /*
  * TaskDateCreatedComparator.java
  * 
- * Copyright 2012 Jonathan Hasenzahl, James Celona
+ * Copyright 2012 Jonathan Hasenzahl, James Celona, Dhimitraq Jorgji
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
