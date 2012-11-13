@@ -160,7 +160,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		db.insert(TABLE_COMPARATORS, null, values);
 		values = new ContentValues();
 		values.put(KEY_ID, Comparator.FINAL_DATE_DUE);
-		values.put(KEY_NAME, "Procrastination alarm date");
+		values.put(KEY_NAME, "Alarm date");
 		values.put(KEY_ENABLED, 0);
 		values.put(KEY_ORDER, 5);
 		db.insert(TABLE_COMPARATORS, null, values);

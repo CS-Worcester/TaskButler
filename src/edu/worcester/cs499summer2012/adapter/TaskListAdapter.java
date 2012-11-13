@@ -20,7 +20,6 @@
 package edu.worcester.cs499summer2012.adapter;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.GregorianCalendar;
 
 import android.app.Activity;
@@ -35,6 +34,14 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import edu.worcester.cs499summer2012.R;
 import edu.worcester.cs499summer2012.comparator.TaskAutoComparator;
+import edu.worcester.cs499summer2012.comparator.TaskCategoryComparator;
+import edu.worcester.cs499summer2012.comparator.TaskCompletionComparator;
+import edu.worcester.cs499summer2012.comparator.TaskDateCreatedComparator;
+import edu.worcester.cs499summer2012.comparator.TaskDateDueComparator;
+import edu.worcester.cs499summer2012.comparator.TaskDateModifiedComparator;
+import edu.worcester.cs499summer2012.comparator.TaskFinalDateDueComparator;
+import edu.worcester.cs499summer2012.comparator.TaskNameComparator;
+import edu.worcester.cs499summer2012.comparator.TaskPriorityComparator;
 import edu.worcester.cs499summer2012.database.TasksDataSource;
 import edu.worcester.cs499summer2012.task.Task;
 
@@ -71,12 +78,6 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 	private final ArrayList<Task> tasks;
 	private TasksDataSource data_source;
 	private int sort_type;
-	private final Comparator<Task> auto_comparator = new TaskAutoComparator();
-	//private final Comparator<Task> name_comparator = new TaskNameComparator();
-	//private final Comparator<Task> completion_comparator = new TaskCompletionComparator();
-	//private final Comparator<Task> priority_comparator = new TaskPriorityComparator();
-	//private final Comparator<Task> date_created_comparator = new TaskDateCreatedComparator();
-	//private final Comparator<Task> date_due_comparator = new TaskDateDueComparator();
 	
 	/**************************************************************************
 	 * Constructors                                                           *
@@ -216,9 +217,52 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 	}
 	
 	public void sort() {
-		if (sort_type == AUTO_SORT)
-		{
-			this.sort(auto_comparator);
+		if (sort_type == AUTO_SORT) {
+			this.sort(new TaskAutoComparator());
+		} else {
+			ArrayList<edu.worcester.cs499summer2012.task.Comparator> comparators = data_source.getComparators();
+			// Must iterate through the list backwards so higher sorting is done later
+			for (int i = comparators.size(); i > 0; i--) {
+				edu.worcester.cs499summer2012.task.Comparator comparator = comparators.get(i - 1);
+				if (comparator.isEnabled()) {
+					switch (comparator.getId()) {
+					case edu.worcester.cs499summer2012.task.Comparator.NAME:
+						this.sort(new TaskNameComparator());
+						break;
+						
+					case edu.worcester.cs499summer2012.task.Comparator.COMPLETION:
+						this.sort(new TaskCompletionComparator());
+						break;
+						
+					case edu.worcester.cs499summer2012.task.Comparator.PRIORITY:
+						this.sort(new TaskPriorityComparator());
+						break;
+						
+					case edu.worcester.cs499summer2012.task.Comparator.CATEGORY:
+						this.sort(new TaskCategoryComparator());
+						break;
+						
+					case edu.worcester.cs499summer2012.task.Comparator.DATE_DUE:
+						this.sort(new TaskDateDueComparator());
+						break;
+						
+					case edu.worcester.cs499summer2012.task.Comparator.FINAL_DATE_DUE:
+						this.sort(new TaskFinalDateDueComparator());
+						break;
+						
+					case edu.worcester.cs499summer2012.task.Comparator.DATE_CREATED:
+						this.sort(new TaskDateCreatedComparator());
+						break;
+						
+					case edu.worcester.cs499summer2012.task.Comparator.DATE_MODIFIED:
+						this.sort(new TaskDateModifiedComparator());
+						break;
+						
+					default: 
+						break;
+					}
+				}
+			}
 		}
 		this.notifyDataSetChanged();
 	}

@@ -18,8 +18,8 @@
     <!-- Down Image -->
     <ImageView
     	android:id="@+id/image_row_comparator_down"
-    	android:layout_width="48dp"
-    	android:layout_height="48dp"
+    	android:layout_width="40dp"
+    	android:layout_height="40dp"
     	android:layout_alignParentRight="true"
     	android:layout_margin="4dp"
     	android:layout_centerInParent="true"
@@ -30,8 +30,8 @@
     <!-- Up Image -->
     <ImageView
     	android:id="@+id/image_row_comparator_up"
-    	android:layout_width="48dp"
-    	android:layout_height="48dp"
+    	android:layout_width="40dp"
+    	android:layout_height="40dp"
     	android:layout_toLeftOf="@id/image_row_comparator_down"
     	android:layout_margin="4dp"
     	android:layout_centerInParent="true"

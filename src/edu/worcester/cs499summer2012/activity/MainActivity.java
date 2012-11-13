@@ -229,6 +229,12 @@ OnItemLongClickListener, ActionMode.Callback {
 	}
 
 	@Override
+	public void onStart() {
+		super.onStart();
+		adapter.sort();
+	}
+	
+	@Override
 	public void onStop() {
 		// Save preferences to file
 		prefs_editor.commit();

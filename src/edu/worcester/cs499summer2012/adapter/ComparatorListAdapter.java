@@ -105,6 +105,7 @@ public class ComparatorListAdapter extends ArrayAdapter<Comparator> {
 				public void onClick(View v) {
 					Comparator comparator = (Comparator) view_holder.enabled.getTag();
 					comparator.toggleEnabled();
+					notifyDataSetChanged();
 					
 					// Update DB
 					data_source.updateComparator(comparator);
@@ -127,11 +128,11 @@ public class ComparatorListAdapter extends ArrayAdapter<Comparator> {
 		
 		// Set name
 		holder.name.setText(comparator.getName());
-		holder.name.setEnabled(!is_enabled);
+		holder.name.setEnabled(is_enabled);
 		
 		// Set arrows
-		holder.up.setEnabled(!is_enabled);
-		holder.down.setEnabled(!is_enabled);
+		holder.up.setEnabled(is_enabled);
+		holder.down.setEnabled(is_enabled);
 		
 		return view;
 	}
