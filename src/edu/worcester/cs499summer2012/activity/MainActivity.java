@@ -271,6 +271,7 @@ OnItemLongClickListener, ActionMode.Callback {
 		case R.id.menu_main_custom_sort:
 			adapter.setSortType(TaskListAdapter.CUSTOM_SORT);
 			prefs_editor.putInt(PREF_SORT_TYPE, TaskListAdapter.CUSTOM_SORT);
+			startActivity(new Intent(this, CustomSortActivity.class));
 			return true;
 
 		case R.id.menu_delete_finished:
@@ -323,15 +324,6 @@ OnItemLongClickListener, ActionMode.Callback {
 	@Override
 	public void onListItemClick(ListView list_view, View view, int position, 
 			long id) {
-		/*adapter.getItem(position).toggleIsCompleted();
-    	adapter.getItem(position).setDateModified(GregorianCalendar.getInstance().getTimeInMillis());
-
-    	// Update database
-    	data_source.updateTask(adapter.getItem(position));
-
-    	// Sort the list
-    	adapter.sort();*/
-
 		Intent intent = new Intent(this, ViewTaskActivity.class);
 		intent.putExtra(Task.EXTRA_TASK_ID, adapter.getItem(position).getID());
 		startActivityForResult(intent, VIEW_TASK_REQUEST);

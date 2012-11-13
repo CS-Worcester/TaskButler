@@ -27,6 +27,7 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import edu.worcester.cs499summer2012.task.Category;
+import edu.worcester.cs499summer2012.task.Comparator;
 import edu.worcester.cs499summer2012.task.Task;
 
 /**
@@ -330,6 +331,8 @@ public class TasksDataSource {
 		// updating row
 		int i = db.update(DatabaseHandler.TABLE_CATEGORIES, values, 
 				DatabaseHandler.KEY_ID + " = " + c.getID(), null);
+		
+		close();
 		return i;
 	}
 
@@ -389,12 +392,41 @@ public class TasksDataSource {
 
 		return categories;
 	}
-
-	public ArrayList<CharSequence> getCategoryNames() {
-		ArrayList<CharSequence> names = new ArrayList<CharSequence>();
+	
+	/************************************************************
+	 * Comparators   											*
+	 ************************************************************/
+	
+	public Comparator getComparator(int id) {
+		open();
+		Cursor cursor = db.query(DatabaseHandler.TABLE_COMPARATORS, new String[] {
+				DatabaseHandler.KEY_ID,
+				DatabaseHandler.KEY_NAME,
+				DatabaseHandler.KEY_ENABLED,
+				DatabaseHandler.KEY_ORDER}, 
+				DatabaseHandler.KEY_ID + " = " + id,
+				null, null, null, null);
+		if (cursor != null)
+			cursor.moveToFirst();
+		Comparator c = new Comparator(
+				cursor.getInt(0),
+				cursor.getString(1),
+				cursor.getInt(2) > 0,
+				cursor.getInt(3));
+		close();
+		cursor.close();
+		return c;
+	}
+	
+	/**
+	 * Creates an ArrayList of Comparators in the order specified by the comparators
+	 * @return an ArrayList of Comparators
+	 */
+	public ArrayList<Comparator> getComparators() {
+		Comparator[] comparators = new Comparator[Comparator.NUM_COMPARATORS];
 
 		// Select All Query
-		String selectQuery = "SELECT * FROM " + DatabaseHandler.TABLE_CATEGORIES;
+		String selectQuery = "SELECT * FROM " + DatabaseHandler.TABLE_COMPARATORS;
 
 		open();
 		Cursor cursor = db.rawQuery(selectQuery, null);
@@ -402,16 +434,42 @@ public class TasksDataSource {
 		// Loop through all rows and add to list
 		if (cursor.moveToFirst()) {
 			do {
-				// Add name to list
-				names.add(cursor.getString(1));
+				Comparator c = new Comparator(
+						cursor.getInt(0),
+						cursor.getString(1),
+						cursor.getInt(2) > 0,
+						cursor.getInt(3));
+				// Add comparactor to array
+				comparators[c.getOrder()] = c;
 			} while (cursor.moveToNext());
 		}
 
 		cursor.close();
 		close();
+		
+		// Copy array into ArrayList
+		ArrayList<Comparator> comparator_list = new ArrayList<Comparator>(Comparator.NUM_COMPARATORS);
+		for (int i = 0; i < Comparator.NUM_COMPARATORS; i++)
+			comparator_list.add(comparators[i]);
 
-		return names;
+		return comparator_list;
 	}
+	
+	public int updateComparator(Comparator c) {
+		open();
+		ContentValues values = new ContentValues();
+		values.put(DatabaseHandler.KEY_NAME, c.getName());
+		values.put(DatabaseHandler.KEY_ENABLED, c.isEnabled());
+		values.put(DatabaseHandler.KEY_ORDER, c.getOrder());
+
+		// Update row
+		int i = db.update(DatabaseHandler.TABLE_COMPARATORS, values, 
+				DatabaseHandler.KEY_ID + " = " + c.getId(), null);
+		
+		close();
+		return i;
+	}
+	
 	/************************************************************
 	 * 	Google Tasks											*
 	 ************************************************************/
