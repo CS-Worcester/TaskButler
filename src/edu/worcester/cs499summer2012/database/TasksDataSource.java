@@ -172,9 +172,10 @@ public class TasksDataSource {
 	/**
 	 * Returns the next available ID to be assigned to a new task. This
 	 * number is equal to the highest current ID + 1.
+	 * @param tableTasks 
 	 * @return the next available task ID to be assigned to a new task
 	 */
-	public int getNextID() {
+	public int getNextID(String tableTasks) {
 
 		String selectQuery = "SELECT MAX(" + DatabaseHandler.KEY_ID +
 				") FROM " + DatabaseHandler.TABLE_TASKS;
@@ -344,7 +345,8 @@ public class TasksDataSource {
 				DatabaseHandler.KEY_ID,
 				DatabaseHandler.KEY_NAME,
 				DatabaseHandler.KEY_COLOR,
-				DatabaseHandler.KEY_UPDATED	}, 
+				DatabaseHandler.KEY_UPDATED,
+				DatabaseHandler.KEY_G_ID}, 
 				DatabaseHandler.KEY_ID + " = " + id,
 				null, null, null, null);
 		if (cursor != null)
@@ -353,13 +355,64 @@ public class TasksDataSource {
 				cursor.getInt(0),
 				cursor.getString(1),
 				cursor.getInt(2),
-				cursor.getLong(3));
+				cursor.getLong(3),
+				cursor.getString(4));
 		close();
 		cursor.close();
 		return c;
 	}
 
+	public ArrayList<Category> getCategories() {
+		ArrayList<Category> categories = new ArrayList<Category>();
 
+		// Select All Query
+		String selectQuery = "SELECT * FROM " + DatabaseHandler.TABLE_CATEGORIES;
+
+		open();
+		Cursor cursor = db.rawQuery(selectQuery, null);
+
+		// Loop through all rows and add to list
+		if (cursor.moveToFirst()) {
+			do {
+				Category category = new Category(
+						cursor.getInt(0),
+						cursor.getString(1),
+						cursor.getInt(2),
+						cursor.getLong(3),
+						cursor.getString(4));
+				// Add category to list
+				categories.add(category);
+			} while (cursor.moveToNext());
+		}
+
+		cursor.close();
+		close();
+		
+		return categories;
+	}
+	
+	public ArrayList<CharSequence> getCategoryNames() {
+		ArrayList<CharSequence> names = new ArrayList<CharSequence>();
+
+		// Select All Query
+		String selectQuery = "SELECT * FROM " + DatabaseHandler.TABLE_CATEGORIES;
+
+		open();
+		Cursor cursor = db.rawQuery(selectQuery, null);
+
+		// Loop through all rows and add to list
+		if (cursor.moveToFirst()) {
+			do {
+				// Add name to list
+				names.add(cursor.getString(1));
+			} while (cursor.moveToNext());
+		}
+
+		cursor.close();
+		close();
+		
+		return names;
+	}
 	/************************************************************
 	 * 	Google Tasks											*
 	 ************************************************************/
@@ -391,7 +444,7 @@ public class TasksDataSource {
 
 		// updating row
 		int i = db.update(DatabaseHandler.TABLE_TASKS, values, 
-				DatabaseHandler.KEY_NAME + " = " + "\"" + task.getName() + "\"", null);
+				DatabaseHandler.KEY_NAME + " = " + "\"" + task.getgID() + "\"", null);
 		close();
 		return i;		
 	}

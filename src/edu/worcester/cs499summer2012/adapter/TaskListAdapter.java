@@ -21,16 +21,16 @@ package edu.worcester.cs499summer2012.adapter;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.GregorianCalendar;
 
 import android.app.Activity;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ImageView;
 import android.widget.TextView;
 import edu.worcester.cs499summer2012.R;
@@ -44,7 +44,7 @@ import edu.worcester.cs499summer2012.task.Task;
  * comparators.
  * @author Jonathan Hasenzahl
  */
-public class TaskListAdapter extends ArrayAdapter<Task> implements OnCheckedChangeListener {
+public class TaskListAdapter extends ArrayAdapter<Task> {
 
 	/**************************************************************************
 	 * Static fields and methods                                              *
@@ -69,6 +69,7 @@ public class TaskListAdapter extends ArrayAdapter<Task> implements OnCheckedChan
 	
 	private final Activity activity;
 	private final ArrayList<Task> tasks;
+	private TasksDataSource data_source;
 	private int sort_type;
 	private final Comparator<Task> auto_comparator = new TaskAutoComparator();
 	//private final Comparator<Task> name_comparator = new TaskNameComparator();
@@ -91,7 +92,8 @@ public class TaskListAdapter extends ArrayAdapter<Task> implements OnCheckedChan
 		super(activity, R.layout.row_task, tasks);
 		this.activity = activity;
 		this.tasks = tasks;
-		this.setNotifyOnChange(true);
+		data_source = TasksDataSource.getInstance(this.activity);
+		setNotifyOnChange(true);
 	}
 	
 	/**************************************************************************
@@ -109,42 +111,58 @@ public class TaskListAdapter extends ArrayAdapter<Task> implements OnCheckedChan
 	 */
 	@Override
 	public View getView(int position, View convert_view, ViewGroup parent) {
-		View row_view = convert_view;
-		if (row_view == null) {		
-			LayoutInflater inflater = activity.getLayoutInflater();
-			row_view = inflater.inflate(R.layout.row_task, null);
-			
-			ViewHolder view_holder = new ViewHolder();
-			view_holder.is_completed = (CheckBox) row_view.findViewById(R.id.checkbox_row_complete);
-			view_holder.name = (TextView) row_view.findViewById(R.id.text_row_name);
-			view_holder.category = (View) row_view.findViewById(R.id.view_row_category);
-			view_holder.priority = (ImageView) row_view.findViewById(R.id.image_row_priority);
-			view_holder.due_date = (TextView) row_view.findViewById(R.id.text_row_due_date);
-			view_holder.alarm = (ImageView) row_view.findViewById(R.id.image_row_alarm);
-			view_holder.recurrence = (ImageView) row_view.findViewById(R.id.image_row_recurrence);
-			
-			row_view.setTag(view_holder);
-		}
-
-		ViewHolder holder = (ViewHolder) row_view.getTag();
+		View view = convert_view;
 		Task task = tasks.get(position);
-		boolean is_complete = task.isCompleted();
+		
+		if (view == null) {		
+			LayoutInflater inflater = activity.getLayoutInflater();
+			view = inflater.inflate(R.layout.row_task, null);
+			
+			final ViewHolder view_holder = new ViewHolder();
+			view_holder.is_completed = (CheckBox) view.findViewById(R.id.checkbox_row_complete);
+			view_holder.is_completed.setOnClickListener(new OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					Task task = (Task) view_holder.is_completed.getTag();
+					task.toggleIsCompleted();
+					task.setDateModified(GregorianCalendar.getInstance().getTimeInMillis());
+					
+					// Update DB
+					data_source.updateTask(task);
+					
+					sort();
+				}
+			});
+			view_holder.name = (TextView) view.findViewById(R.id.text_row_name);
+			view_holder.category = (View) view.findViewById(R.id.view_row_category);
+			view_holder.priority = (ImageView) view.findViewById(R.id.image_row_priority);
+			view_holder.due_date = (TextView) view.findViewById(R.id.text_row_due_date);
+			view_holder.alarm = (ImageView) view.findViewById(R.id.image_row_alarm);
+			view_holder.recurrence = (ImageView) view.findViewById(R.id.image_row_recurrence);
+			
+			view.setTag(view_holder);
+			view_holder.is_completed.setTag(task);
+		} else
+			((ViewHolder) view.getTag()).is_completed.setTag(task); 
+
+		ViewHolder holder = (ViewHolder) view.getTag();
 		
 		// Set is completed
+		boolean is_complete = task.isCompleted();
 		holder.is_completed.setChecked(is_complete);
-		holder.is_completed.setOnCheckedChangeListener(this);
-		holder.is_completed.setTag(new Integer(position)); // Tag the checkbox with the task ID
 		
 		// Set name
 		holder.name.setText(task.getName());
 		holder.name.setEnabled(!is_complete);
 		
 		// Set category
-		// TODO: Implement this
 		if (is_complete)
 			holder.category.setVisibility(View.GONE);
-		else
+		else {
 			holder.category.setVisibility(View.VISIBLE);
+			holder.category.setBackgroundColor(data_source.getCategory(task.getCategory()).getColor());
+		}
 		
 		// Set priority
 		if (is_complete)
@@ -173,7 +191,7 @@ public class TaskListAdapter extends ArrayAdapter<Task> implements OnCheckedChan
 			holder.due_date.setVisibility(View.VISIBLE);
 			
 			if (task.hasDateDue())
-				holder.due_date.setText(DateFormat.format("'Due:' MM/dd/yy 'at' h:mm AA", task.getDateDueCal()));
+				holder.due_date.setText(DateFormat.format("'Due' MM/dd/yy h:mmAA", task.getDateDueCal()));
 			else
 				holder.due_date.setText("");
 		}
@@ -194,7 +212,7 @@ public class TaskListAdapter extends ArrayAdapter<Task> implements OnCheckedChan
 		else
 			holder.recurrence.setVisibility(View.INVISIBLE);
 		
-		return row_view;
+		return view;
 	}
 	
 	public void sort() {
@@ -216,21 +234,6 @@ public class TaskListAdapter extends ArrayAdapter<Task> implements OnCheckedChan
 	public void setSortType(int sort_type) {
 		if (sort_type == AUTO_SORT || sort_type == CUSTOM_SORT)
 			this.sort_type = sort_type;
-	}
-
-	/**************************************************************************
-	 * Methods implemented OnCheckedChangeListener interface                  *
-	 **************************************************************************/
-	
-	@Override
-	public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-		Integer selected_task = (Integer) buttonView.getTag();
-		getItem(selected_task).toggleIsCompleted();
-		
-		TasksDataSource data_source = TasksDataSource.getInstance(getContext());
-		data_source.updateTask(getItem(selected_task));
-		
-		sort();
 	}
 	
 }

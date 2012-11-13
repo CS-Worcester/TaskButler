@@ -3,6 +3,7 @@ package edu.worcester.cs499summer2012.activity;
 import com.google.api.services.tasks.model.Task;
 
 import edu.worcester.cs499summer2012.adapter.TaskListAdapter;
+import edu.worcester.cs499summer2012.database.DatabaseHandler;
 import edu.worcester.cs499summer2012.database.TasksDataSource;
 
 import android.app.ProgressDialog;
@@ -77,7 +78,7 @@ class AsyncLoadTasks extends AsyncTask<Void, Void, List<String>> {
 			task = new edu.worcester.cs499summer2012.task.Task(string,
 					false, 0,0,false, false, false, false, 0, 0, 0, 0, 0, 0, string);
 			// Assign the task a unique ID and store it in the database, and display it in the 
-			task.setID(tds.getNextID());
+			task.setID(tds.getNextID(DatabaseHandler.TABLE_TASKS));
 	    	tds.addTask(task);
 			adapter.add(task);
 		}

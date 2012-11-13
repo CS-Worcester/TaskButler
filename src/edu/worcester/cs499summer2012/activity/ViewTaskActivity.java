@@ -19,6 +19,8 @@
 
 package edu.worcester.cs499summer2012.activity;
 
+import java.util.GregorianCalendar;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.format.DateFormat;
@@ -29,6 +31,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
@@ -36,6 +39,7 @@ import com.actionbarsherlock.view.MenuItem;
 
 import edu.worcester.cs499summer2012.R;
 import edu.worcester.cs499summer2012.database.TasksDataSource;
+import edu.worcester.cs499summer2012.task.Category;
 import edu.worcester.cs499summer2012.task.Task;
 
 /**
@@ -78,7 +82,9 @@ public class ViewTaskActivity extends SherlockActivity implements OnClickListene
         setContentView(R.layout.activity_view_task);
         
         // Allow Action bar icon to act as a button
-        getSupportActionBar().setHomeButtonEnabled(true);
+        ActionBar action_bar = getSupportActionBar();
+        action_bar.setHomeButtonEnabled(true);
+        action_bar.setDisplayHomeAsUpEnabled(true);
         
         // Get instance of the db
         data_source = TasksDataSource.getInstance(this);
@@ -113,8 +119,12 @@ public class ViewTaskActivity extends SherlockActivity implements OnClickListene
         	break;
         }
         
-        // Set category
-        // TODO Implement this
+        // Set category (if category ID is not 1, i.e. no category)
+        if (task.getCategory() != 1) {
+        	Category category = data_source.getCategory(task.getCategory());
+        	((ImageView) findViewById(R.id.image_category)).setBackgroundColor(category.getColor());
+        	((TextView) findViewById(R.id.text_category)).setText(category.getName());
+        }
         
         // Set due date
         if (task.hasDateDue())
@@ -136,11 +146,19 @@ public class ViewTaskActivity extends SherlockActivity implements OnClickListene
         		((TextView) findViewById(R.id.text_repeat_2)).setText(DateFormat.format("'until' MM/dd/yy 'at' h:mm AA", task.getStopRepeatingDateCal()));
         	else
         		((TextView) findViewById(R.id.text_repeat_2)).setText(R.string.text_no_stop_repeating_date);
-        } else
+        } else {
         	((TextView) findViewById(R.id.text_repeat)).setText(R.string.text_no_repetition);
+        	((TextView) findViewById(R.id.text_repeat_2)).setVisibility(View.GONE);
+        }
         
         // Set notes
         ((TextView) findViewById(R.id.text_notes)).setText(task.getNotes());
+        
+        // Set date created
+        ((TextView) findViewById(R.id.text_date_created)).setText(DateFormat.format("MM/dd/yy 'at' h:mm AA", task.getDateCreatedCal()));
+        
+        // Set date modified
+        ((TextView) findViewById(R.id.text_date_modified)).setText(DateFormat.format("MM/dd/yy 'at' h:mm AA", task.getDateModifiedCal()));
     }
     
     @Override
@@ -176,6 +194,7 @@ public class ViewTaskActivity extends SherlockActivity implements OnClickListene
 	public void onClick(View v) {	
 		if (v.getId() == R.id.button_complete_task) {
 			task.toggleIsCompleted();
+			task.setDateModified(GregorianCalendar.getInstance().getTimeInMillis());
 			if (task.isCompleted())
 				toast("Task completed!");
 			else

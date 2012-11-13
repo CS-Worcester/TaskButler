@@ -42,10 +42,13 @@
     <string name="text_priority_urgent">Urgent</string>
     <string name="text_priority_normal">Normal</string>
     <string name="text_priority_trivial">Trivial</string>
+    <string name="text_date_created_label">Created:</string>
+    <string name="text_date_modified_label">Modified:</string>
 
     <!-- EditText items -->
     <string name="edit_task_name">Enter task name</string>
     <string name="edit_task_notes">You can enter notes here</string>
+    <string name="edit_category_name">Enter category name</string>
 
     <!-- RadioButton items -->
     <string name="radio_trivial">Trivial</string>
@@ -74,6 +77,7 @@
     <string name="image_alarm">Alarm:</string>
     <string name="image_repeat">Repetition:</string>
     <string name="image_notes">Notes:</string>
+    <string name="image_about">About:</string>
     
     <!-- Dialog items -->
     <string name="dialog_about">Task Butler 1.0\n\nCopyright 2012 Jonathan Hasenzahl, James Celona, Dhimitraq Jorgji.\n\nTask Butler is licensed under the GNU General Public License.</string>

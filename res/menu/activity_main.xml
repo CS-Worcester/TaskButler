@@ -5,14 +5,14 @@
         android:id="@+id/menu_main_add_task"
         android:title="@string/menu_add_task"
         android:icon="@drawable/ic_new"
-        android:showAsAction="ifRoom" 
+        android:showAsAction="ifRoom|withText" 
         android:orderInCategory="0"/>
     
     <item
         android:id="@+id/menu_main_sort"
         android:title="@string/menu_sort"
         android:icon="@drawable/ic_sort"
-        android:showAsAction="ifRoom"
+        android:showAsAction="ifRoom|withText"
         android:orderInCategory="1">
         
         <menu>
@@ -34,7 +34,7 @@
         android:id="@+id/menu_delete_submenu"
         android:title="@string/menu_delete_submenu"
         android:icon="@drawable/ic_delete"
-        android:showAsAction="ifRoom"
+        android:showAsAction="never"
         android:orderInCategory="2">
         
         <menu>
@@ -56,14 +56,14 @@
         android:id="@+id/menu_main_settings"
         android:title="@string/menu_settings"
         android:icon="@drawable/ic_settings"
-        android:showAsAction="ifRoom" 
+        android:showAsAction="never" 
         android:orderInCategory="3"/>    
 
     <item
         android:id="@+id/menu_main_about"
         android:title="@string/menu_about"
         android:icon="@drawable/ic_about"
-        android:showAsAction="ifRoom" 
+        android:showAsAction="never" 
         android:orderInCategory="4"/>    
     
 </menu>

@@ -230,80 +230,71 @@ OnItemLongClickListener, ActionMode.Callback {
 
 	@Override
 	public void onStop() {
-		// Save preferences to file
-		prefs_editor.commit();
-
-		super.onStop();
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getSupportMenuInflater();
-		inflater.inflate(R.menu.activity_main, menu);
-
-		//add switch account button if more than 2 accounts on the device
-		if (accountManager.getAccounts().length >= 2) {
-			menu.add(0, MENU_ACCOUNTS, 0, "Switch Account");
-		}
-		return true;
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-		case R.id.menu_main_add_task:
-			startActivityForResult(new Intent(this, AddTaskActivity.class), 
-					ADD_TASK_REQUEST);
-			return true;
-
-		case R.id.menu_main_sort:
-			SubMenu sort_menu = item.getSubMenu();
-			sort_menu.getItem(adapter.getSortType()).setChecked(true);
-			return true;
-
-		case R.id.menu_main_auto_sort:
-			adapter.setSortType(TaskListAdapter.AUTO_SORT);
-			prefs_editor.putInt(PREF_SORT_TYPE, TaskListAdapter.AUTO_SORT);
-			adapter.sort();
-			return true;
-
-		case R.id.menu_main_custom_sort:
-			adapter.setSortType(TaskListAdapter.CUSTOM_SORT);
-			prefs_editor.putInt(PREF_SORT_TYPE, TaskListAdapter.CUSTOM_SORT);
-			return true;
-
-		case R.id.menu_delete_finished:
-			deleteAlert("Are you sure you want to delete all completed tasks? This cannot be undone.",
-					DELETE_MODE_FINISHED);
-			return true;
-
-		case R.id.menu_delete_all:
-			deleteAlert("Are you sure you want to delete all tasks? This cannot be undone.",
-					DELETE_MODE_ALL);
-			return true;
-
-		case R.id.menu_main_settings:
-			startActivity(new Intent(this, SettingsActivity.class));
-			return true;
-
-		case MENU_ACCOUNTS:
-			chooseAccount();
-			return true;
-
-		case R.id.menu_main_about:
-			AlertDialog.Builder about_builder = new AlertDialog.Builder(this);
-			about_builder.setTitle("About Task Butler");
-			about_builder.setMessage(R.string.dialog_about);
-			about_builder.setCancelable(true);
-			about_builder.setNeutralButton("OK", new DialogInterface.OnClickListener() {
-
-				@Override
-				public void onClick(DialogInterface dialog, int id) {
-					dialog.dismiss();
-				}
-			});
-			about_builder.setPositiveButton("Source", new DialogInterface.OnClickListener() {
-
+    	// Save preferences to file
+    	prefs_editor.commit();
+    	
+    	super.onStop();
+    }
+    
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+    	MenuInflater inflater = getSupportMenuInflater();
+    	inflater.inflate(R.menu.activity_main, menu);
+    	return true;
+    }
+    
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+    	switch (item.getItemId()) {
+    	case R.id.menu_main_add_task:
+    		startActivityForResult(new Intent(this, AddTaskActivity.class), 
+        			ADD_TASK_REQUEST);
+    		return true;
+    		
+    	case R.id.menu_main_sort:
+    		SubMenu sort_menu = item.getSubMenu();
+    		sort_menu.getItem(adapter.getSortType()).setChecked(true);
+    		return true;
+    		
+    	case R.id.menu_main_auto_sort:
+    		adapter.setSortType(TaskListAdapter.AUTO_SORT);
+    		prefs_editor.putInt(PREF_SORT_TYPE, TaskListAdapter.AUTO_SORT);
+    		adapter.sort();
+    		return true;
+    		
+    	case R.id.menu_main_custom_sort:
+    		adapter.setSortType(TaskListAdapter.CUSTOM_SORT);
+    		prefs_editor.putInt(PREF_SORT_TYPE, TaskListAdapter.CUSTOM_SORT);
+    		return true;
+    		
+    	case R.id.menu_delete_finished:
+    		deleteAlert("Are you sure you want to delete all completed tasks? This cannot be undone.",
+    				DELETE_MODE_FINISHED);
+    		return true;
+    		
+    	case R.id.menu_delete_all:
+    		deleteAlert("Are you sure you want to delete all tasks? This cannot be undone.",
+    				DELETE_MODE_ALL);
+    		return true;
+    		
+    	case R.id.menu_main_settings:
+    		startActivity(new Intent(this, SettingsActivity.class));
+    		return true;
+    		
+    	case R.id.menu_main_about:
+    		AlertDialog.Builder about_builder = new AlertDialog.Builder(this);
+    		about_builder.setTitle("About Task Butler");
+    		about_builder.setMessage(R.string.dialog_about);
+    		about_builder.setCancelable(true);
+    		about_builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+    			
+    			@Override
+    			public void onClick(DialogInterface dialog, int id) {
+    				dialog.dismiss();
+    		   	}
+    		});
+    		about_builder.setNeutralButton("Source", new DialogInterface.OnClickListener() {
+				
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/CS-Worcester/CS499Summer2012"));
@@ -311,14 +302,13 @@ OnItemLongClickListener, ActionMode.Callback {
 					dialog.dismiss();
 				}
 			});
-			AlertDialog about_alert = about_builder.create();
-			about_alert.show();
-			return true;
-
-		default:
-			return super.onOptionsItemSelected(item);
-		}
-	}
+    		about_builder.create().show();
+    		return true;
+    		
+    	default:
+    		return super.onOptionsItemSelected(item);
+    	}
+    }
 
 	@Override
 	public void onListItemClick(ListView list_view, View view, int position, 

@@ -12,38 +12,37 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="12dp"
+        android:layout_marginLeft="12dp"
+        android:layout_marginRight="4dp"
         android:focusable="false" />
     
     <!-- Category View (solid color) -->
     <View 
         android:id="@+id/view_row_category"
         android:layout_width="16dp"
-        android:layout_height="72dp"
+        android:layout_height="60dp"
         android:layout_alignParentRight="true"
-        android:layout_marginLeft="4dp"
-        android:background="#AA66CC" />
+        android:layout_marginLeft="4dp" />
     
     <!-- Task Name -->
     <TextView 
         android:id="@+id/text_row_name"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="32dp"
         android:layout_alignParentTop="true"
         android:layout_toRightOf="@id/checkbox_row_complete"
         android:layout_toLeftOf="@id/view_row_category"
         android:gravity="center_vertical"
         android:padding="4dp"
-        android:textSize="24dp"
+        android:textSize="18dp"
         android:maxLines="1"
         android:ellipsize="end" />
     
     <!-- Priority Image -->
     <ImageView
     	android:id="@+id/image_row_priority"
-    	android:layout_width="32dp"
-    	android:layout_height="32dp"
+    	android:layout_width="28dp"
+    	android:layout_height="28dp"
     	android:layout_toRightOf="@id/checkbox_row_complete"
     	android:layout_below="@id/text_row_name"
     	android:layout_alignParentBottom="true"
@@ -56,8 +55,8 @@
     <!-- Recurrence Image -->
     <ImageView
     	android:id="@+id/image_row_recurrence"
-    	android:layout_width="32dp"
-    	android:layout_height="32dp"
+    	android:layout_width="28dp"
+    	android:layout_height="28dp"
     	android:layout_toLeftOf="@id/view_row_category"
     	android:layout_below="@id/text_row_name"
     	android:layout_alignParentBottom="true"
@@ -71,8 +70,8 @@
     <!-- Alarm Image -->
     <ImageView
     	android:id="@+id/image_row_alarm"
-    	android:layout_width="32dp"
-    	android:layout_height="32dp"
+    	android:layout_width="28dp"
+    	android:layout_height="28dp"
     	android:layout_toLeftOf="@id/image_row_recurrence"
     	android:layout_below="@id/text_row_name"
     	android:layout_alignParentBottom="true"
@@ -87,7 +86,7 @@
     <TextView 
         android:id="@+id/text_row_due_date"
         android:layout_width="match_parent"
-        android:layout_height="32dp"
+        android:layout_height="28dp"
         android:layout_toRightOf="@id/image_row_priority"
         android:layout_toLeftOf="@id/image_row_alarm"
         android:layout_below="@id/text_row_name"
@@ -97,7 +96,7 @@
         android:paddingLeft="2dp"
         android:paddingRight="2dp"
         android:gravity="center"
-        android:textSize="14dp"
+        android:textSize="12dp"
         android:maxLines="1"
         android:ellipsize="end" />
 
