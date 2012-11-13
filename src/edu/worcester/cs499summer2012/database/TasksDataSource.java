@@ -96,6 +96,7 @@ public class TasksDataSource {
 				DatabaseHandler.KEY_DUE_DATE,
 				DatabaseHandler.KEY_FINAL_DUE_DATE,
 				DatabaseHandler.KEY_STOP_REPEATING_DATE,
+				DatabaseHandler.KEY_G_ID,
 				DatabaseHandler.KEY_NOTES }, 
 				DatabaseHandler.KEY_ID + " = " + id,
 				null, null, null, null, null);
@@ -118,7 +119,8 @@ public class TasksDataSource {
 				cursor.getLong(13), 
 				cursor.getLong(14),
 				cursor.getLong(15),
-				cursor.getString(16));
+				cursor.getString(16),
+				cursor.getString(17));
 		close();
 		cursor.close();
 		return task;
@@ -153,7 +155,8 @@ public class TasksDataSource {
 						cursor.getLong(13), 
 						cursor.getLong(14),
 						cursor.getLong(15),
-						cursor.getString(16));
+						cursor.getString(16),
+						cursor.getString(17));
 
 				// Adding task to list
 				taskList.add(task);
@@ -320,7 +323,6 @@ public class TasksDataSource {
 	public int updateCategory(Category c){
 		open();
 		ContentValues values = new ContentValues();
-		values.put(DatabaseHandler.KEY_ID, c.getID());
 		values.put(DatabaseHandler.KEY_NAME, c.getName());
 		values.put(DatabaseHandler.KEY_COLOR, c.getColor());
 		values.put(DatabaseHandler.KEY_UPDATED, c.getUpdated());
@@ -357,17 +359,17 @@ public class TasksDataSource {
 		return c;
 	}
 
-	
+
 	/************************************************************
 	 * 	Google Tasks											*
 	 ************************************************************/
-	
+
 	/**
 	 * Update a Task by using its name
 	 * @param task
 	 * @return number of rows affected 
 	 */
-	public int updateTaskByName(Task task) {
+	public int updateTaskBygID(Task task) {
 		open();
 		ContentValues values = new ContentValues();
 		values.put(DatabaseHandler.KEY_NAME, task.getName());
@@ -389,7 +391,7 @@ public class TasksDataSource {
 
 		// updating row
 		int i = db.update(DatabaseHandler.TABLE_TASKS, values, 
-				DatabaseHandler.KEY_NAME + " = " + task.getName(), null);
+				DatabaseHandler.KEY_NAME + " = " + "\"" + task.getName() + "\"", null);
 		close();
 		return i;		
 	}
@@ -399,7 +401,7 @@ public class TasksDataSource {
 	 * @param name
 	 * @return
 	 */
-	public Task getTask(String name) {
+	public Task getTaskBygID(String gID) {
 		open();
 		Cursor cursor = db.query(DatabaseHandler.TABLE_TASKS, new String[] { 
 				DatabaseHandler.KEY_ID,
@@ -418,11 +420,13 @@ public class TasksDataSource {
 				DatabaseHandler.KEY_DUE_DATE,
 				DatabaseHandler.KEY_FINAL_DUE_DATE,
 				DatabaseHandler.KEY_STOP_REPEATING_DATE,
+				DatabaseHandler.KEY_G_ID,
 				DatabaseHandler.KEY_NOTES }, 
-				DatabaseHandler.KEY_NAME + " = " + name,
+				DatabaseHandler.KEY_G_ID + " = " + "\"" + gID + "\"",
 				null, null, null, null, null);
 		if (cursor != null)
 			cursor.moveToFirst();
+		else return null;
 		Task task = new Task(
 				cursor.getInt(0), 
 				cursor.getString(1), 
@@ -440,35 +444,58 @@ public class TasksDataSource {
 				cursor.getLong(13), 
 				cursor.getLong(14),
 				cursor.getLong(15),
-				cursor.getString(16));
+				cursor.getString(16),
+				cursor.getString(17));
 		close();
 		cursor.close();
 		return task;
 	}
 
 	/**
-	 * Query a category using its name
-	 * @param name
+	 * Query a category using its google ID of the task
+	 * @param google ID
 	 * @return Category
 	 */
-	public Category getCategoryByID(int name){
+	public Category getCategoryBygID(String gID){
 		open();
 		Cursor cursor = db.query(DatabaseHandler.TABLE_CATEGORIES, new String[] {
 				DatabaseHandler.KEY_ID,
 				DatabaseHandler.KEY_NAME,
 				DatabaseHandler.KEY_COLOR,
-				DatabaseHandler.KEY_UPDATED	}, 
-				DatabaseHandler.KEY_NAME + " = " + name,
+				DatabaseHandler.KEY_UPDATED,
+				DatabaseHandler.KEY_G_ID}, 
+				DatabaseHandler.KEY_G_ID + " = " + "\"" + gID + "\"",
 				null, null, null, null);
 		if (cursor != null)
 			cursor.moveToFirst();
+		else
+			return null;
 		Category c = new Category(
 				cursor.getInt(0),
 				cursor.getString(1),
 				cursor.getInt(2),
-				cursor.getLong(3));
+				cursor.getLong(3),
+				cursor.getString(4));
 		close();
 		cursor.close();
 		return c;
+	}
+
+	/**
+	 * Update the database information on an category
+	 * @param c
+	 * @return
+	 */
+	public int updateCategoryByName(Category c){
+		open();
+		ContentValues values = new ContentValues();
+		values.put(DatabaseHandler.KEY_NAME, c.getName());
+		values.put(DatabaseHandler.KEY_COLOR, c.getColor());
+		values.put(DatabaseHandler.KEY_UPDATED, c.getUpdated());
+		values.put(DatabaseHandler.KEY_G_ID, c.getgID());
+		// updating row
+		int i = db.update(DatabaseHandler.TABLE_CATEGORIES, values, 
+				DatabaseHandler.KEY_G_ID + " = " + "\"" + c.getgID() + "\"", null);
+		return i;
 	}
 }

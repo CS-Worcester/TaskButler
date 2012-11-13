@@ -212,6 +212,9 @@ OnItemLongClickListener, ActionMode.Callback {
 				TaskListAdapter.AUTO_SORT));
 		adapter.sort();
 		
+		// Set up a long item click listener
+		getListView().setOnItemLongClickListener(this);
+		
 		// Get Google Tasks service and account
 		ClientCredentials.errorIfNotSpecified();
 		service = new com.google.api.services.tasks.Tasks.Builder(
@@ -222,10 +225,7 @@ OnItemLongClickListener, ActionMode.Callback {
 		credential.setAccessToken(settings.getString(PREF_AUTH_TOKEN, null));
 		Logger.getLogger("com.google.api.client").setLevel(LOGGING_LEVEL);
 		accountManager = new GoogleAccountManager(this);
-		gotAccount();
-
-		// Set up a long item click listener
-		getListView().setOnItemLongClickListener(this);
+		//gotAccount(); //uncomment if you want to check out the way tasks are accessed on google tasks
 	}
 
 	@Override

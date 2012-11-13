@@ -25,6 +25,7 @@ public class Category {
 	private String name;
 	private int color;
 	private long updated;
+	private String gID;
 
 	public Category() {}
 	
@@ -41,6 +42,12 @@ public class Category {
 	
 	public Category(Category c) {
 		this(c.id, c.name, c.color, c.updated);
+	}
+
+	public Category(int id, String name, int color, long updated, String gID) {
+		this(id,name,color,updated);
+		this.gID = gID;
+		
 	}
 
 	public int getID() {
@@ -73,5 +80,13 @@ public class Category {
 	
 	public void setUpdated(long updated){
 		this.updated = updated;
+	}
+
+	public String getgID() {
+		return gID;
+	}
+
+	public void setgID(String gID) {
+		this.gID = gID;
 	}
 }

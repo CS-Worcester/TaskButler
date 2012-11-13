@@ -23,6 +23,7 @@ class AsyncLoadTasks extends AsyncTask<Void, Void, List<String>> {
 	private final MainActivity mainActivity;
 	private final ProgressDialog dialog;
 	private com.google.api.services.tasks.Tasks service;
+	TasksDataSource tds ;
 	
 	AsyncLoadTasks(MainActivity mainActivity) {
 		this.mainActivity = mainActivity;
@@ -34,6 +35,7 @@ class AsyncLoadTasks extends AsyncTask<Void, Void, List<String>> {
 	protected void onPreExecute() {
 		dialog.setMessage("Loading tasks...");
 		dialog.show();
+		tds = TasksDataSource.getInstance(mainActivity);
 	}
 
 	@Override
@@ -42,12 +44,15 @@ class AsyncLoadTasks extends AsyncTask<Void, Void, List<String>> {
 			List<String> result = new ArrayList<String>();
 			com.google.api.services.tasks.Tasks.TasksOperations.List listRequest =
 					service.tasks().list("@default");
-			//listRequest.setFields("items/title");
-			listRequest.getUpdatedMin();
+			listRequest.setFields("items");
+			
 			List<Task> tasks = listRequest.execute().getItems();
 			if (tasks != null) {
 				for (Task task : tasks) {
+					result.add(task.getId());
 					result.add(task.getTitle());
+					result.add(""+task.getUpdated());
+					
 				}
 			} else {
 				result.add("No tasks.");
