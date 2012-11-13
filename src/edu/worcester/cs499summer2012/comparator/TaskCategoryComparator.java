@@ -1,7 +1,7 @@
 /*
  * TaskCategoryComparator.java
  * 
- * Copyright 2012 Jonathan Hasenzahl, James Celona
+ * Copyright 2012 Jonathan Hasenzahl, James Celona, Dhimitraq Jorgji
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@ public class TaskCategoryComparator implements Comparator<Task> {
 
 	/**
 	 * Compares two tasks by category. Categories have no hierarchy and are
-	 * ranked by their ID.
+	 * ranked by category ID.
 	 * @param lhs the first task
 	 * @param rhs the second task
 	 * @return A negative value if the first task if the first task is ordered 

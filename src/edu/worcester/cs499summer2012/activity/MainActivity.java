@@ -178,7 +178,7 @@ OnItemLongClickListener, ActionMode.Callback {
 				dialog.cancel();
 			}
 		});
-		AlertDialog alert = builder.create();		alert.show();
+		builder.create().show();
 	}
 
 	public static synchronized TaskListAdapter getAdapter(){
@@ -242,9 +242,10 @@ OnItemLongClickListener, ActionMode.Callback {
 		inflater.inflate(R.menu.activity_main, menu);
 
 		//add switch account button if more than 2 accounts on the device
-		if (accountManager.getAccounts().length >= 2) {
+		// TODO: (Jon) Figure out why this isn't working for me
+		/*if (accountManager.getAccounts().length >= 2) {
 			menu.add(0, MENU_ACCOUNTS, 0, "Switch Account");
-		}
+		}*/
 		return true;
 	}
 
