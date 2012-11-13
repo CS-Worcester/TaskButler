@@ -172,13 +172,12 @@ public class TasksDataSource {
 	/**
 	 * Returns the next available ID to be assigned to a new task. This
 	 * number is equal to the highest current ID + 1.
-	 * @param tableTasks 
 	 * @return the next available task ID to be assigned to a new task
 	 */
-	public int getNextID(String tableTasks) {
+	public int getNextID(String table) {
 
 		String selectQuery = "SELECT MAX(" + DatabaseHandler.KEY_ID +
-				") FROM " + DatabaseHandler.TABLE_TASKS;
+				") FROM " + table;
 		open();
 		Cursor cursor = db.rawQuery(selectQuery, null);
 
@@ -387,10 +386,10 @@ public class TasksDataSource {
 
 		cursor.close();
 		close();
-		
+
 		return categories;
 	}
-	
+
 	public ArrayList<CharSequence> getCategoryNames() {
 		ArrayList<CharSequence> names = new ArrayList<CharSequence>();
 
@@ -410,7 +409,7 @@ public class TasksDataSource {
 
 		cursor.close();
 		close();
-		
+
 		return names;
 	}
 	/************************************************************

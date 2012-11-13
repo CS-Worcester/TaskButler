@@ -95,7 +95,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				+ KEY_STOP_REPEATING_DATE + " DATETIME,"
 				+ KEY_G_ID + " TEXT,"
 				+ KEY_NOTES + " TEXT)";
-		
+
 		String create_categories_table = "CREATE TABLE " + TABLE_CATEGORIES + "(" 
 				+ KEY_ID + " INTEGER PRIMARY KEY,"
 				+ KEY_NAME + " TEXT,"
@@ -103,17 +103,17 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				+ KEY_UPDATED + " DATETIME,"
 				+ KEY_G_ID + " TEXT)";
 
-				
+
 		db.execSQL(create_tasks_table);
 		db.execSQL(create_categories_table);
-		
+
 		// Create first entry of categories table
 		ContentValues values = new ContentValues();
 		values.put(KEY_ID, 1);
 		values.put(KEY_NAME, "No category");
 		values.put(KEY_COLOR, Color.parseColor("#00FFFFFF"));
-		values.put(KEY_MODIFICATION_DATE, GregorianCalendar.getInstance().getTimeInMillis());
-		
+		values.put(KEY_UPDATED, GregorianCalendar.getInstance().getTimeInMillis());
+
 		db.insert(TABLE_CATEGORIES, null, values);
 	}
 
