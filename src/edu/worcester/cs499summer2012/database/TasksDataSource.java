@@ -435,6 +435,26 @@ public class TasksDataSource {
 		return categories;
 	}
 	
+	public boolean doesCategoryNameExist(String name) {
+		// Select All Query
+		String selectQuery = "SELECT * FROM " + 
+				DatabaseHandler.TABLE_CATEGORIES + " WHERE " +
+				DatabaseHandler.KEY_NAME + " = '" + name + "'";
+		
+		boolean exists = false;
+
+		open();
+		Cursor cursor = db.rawQuery(selectQuery, null);
+
+		if (cursor.moveToFirst())
+			exists = true;
+
+		cursor.close();
+		close();
+
+		return exists;
+	}
+	
 	/************************************************************
 	 * Comparators   											*
 	 ************************************************************/
