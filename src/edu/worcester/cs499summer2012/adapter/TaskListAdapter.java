@@ -215,7 +215,7 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 		
 		return view;
 	}
-	
+
 	public void sort() {
 		if (sort_type == AUTO_SORT) {
 			this.sort(new TaskAutoComparator());

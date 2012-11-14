@@ -20,14 +20,19 @@
 package edu.worcester.cs499summer2012.activity;
 
 import android.os.Bundle;
+import android.view.View;
+import android.widget.ListView;
+
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockListActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
+
 import edu.worcester.cs499summer2012.R;
 import edu.worcester.cs499summer2012.adapter.ComparatorListAdapter;
 import edu.worcester.cs499summer2012.database.TasksDataSource;
+import edu.worcester.cs499summer2012.task.Comparator;
 
 /**
  * 
@@ -91,5 +96,14 @@ public final class CustomSortActivity extends SherlockListActivity {
 		default:
 			return super.onOptionsItemSelected(item);
 		}
+	}
+	
+	@Override
+	public void onListItemClick(ListView list_view, View view, int position, 
+			long id) {
+		Comparator comparator = adapter.getItem(position);
+		comparator.toggleEnabled();
+		adapter.notifyDataSetChanged();
+		data_source.updateComparator(comparator);
 	}
 }

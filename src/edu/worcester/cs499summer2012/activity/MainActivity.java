@@ -20,6 +20,7 @@
 package edu.worcester.cs499summer2012.activity;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -34,13 +35,18 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemLongClickListener;
+import android.widget.LinearLayout;
+import android.widget.LinearLayout.LayoutParams;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockListActivity;
@@ -49,7 +55,6 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.SubMenu;
-
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.googleapis.extensions.android.accounts.GoogleAccountManager;
@@ -63,6 +68,7 @@ import edu.worcester.cs499summer2012.R;
 import edu.worcester.cs499summer2012.adapter.TaskListAdapter;
 import edu.worcester.cs499summer2012.database.TasksDataSource;
 import edu.worcester.cs499summer2012.service.TaskAlarm;
+import edu.worcester.cs499summer2012.task.Category;
 import edu.worcester.cs499summer2012.task.Task;
 
 /**
@@ -73,18 +79,20 @@ import edu.worcester.cs499summer2012.task.Task;
  * @author James Celona
  */
 public final class MainActivity extends SherlockListActivity implements 
-OnItemLongClickListener, ActionMode.Callback {
+OnItemLongClickListener, ActionMode.Callback, OnClickListener {
 
 	/**************************************************************************
 	 * Static fields and methods                                              *
 	 **************************************************************************/
 
 	public static final String PREF_SORT_TYPE = "sort_type";
+	public static final String DISPLAY_CATEGORY = "display_category";
 	public static final int ADD_TASK_REQUEST = 0;
 	public static final int VIEW_TASK_REQUEST = 1;
 	public static final int DELETE_MODE_SINGLE = 0;
 	public static final int DELETE_MODE_FINISHED = 1;
 	public static final int DELETE_MODE_ALL = 2;
+	public static final int DISPLAY_ALL_CATEGORIES = 1;
 
 	/**************************************************************************
 	 * Private fields                                                         *
@@ -199,13 +207,20 @@ OnItemLongClickListener, ActionMode.Callback {
 		// Open the database
 		data_source = TasksDataSource.getInstance(getApplicationContext());
 
-		// Create an adapter for the task list
-		adapter = new TaskListAdapter(this, data_source.getAllTasks());
-		setListAdapter(adapter);
-
 		// Read preferences from file
 		prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		prefs_editor = prefs.edit();
+		
+		int display_category = prefs.getInt(DISPLAY_CATEGORY, DISPLAY_ALL_CATEGORIES);
+		
+		// Create an adapter for the task list
+		if (display_category == DISPLAY_ALL_CATEGORIES)
+			adapter = new TaskListAdapter(this, data_source.getAllTasks());
+		else
+			adapter = new TaskListAdapter(this, data_source.getTasksByCategory(data_source.getCategory(display_category)));
+		setListAdapter(adapter);
+
+		
 
 		// Set sort type and sort the list
 		adapter.setSortType(prefs.getInt(PREF_SORT_TYPE, 
@@ -215,6 +230,27 @@ OnItemLongClickListener, ActionMode.Callback {
 		// Set up a long item click listener
 		getListView().setOnItemLongClickListener(this);
 
+		// Populate bottom category bar
+		LinearLayout category_bar = (LinearLayout) findViewById(R.id.main_category_bar);
+		ArrayList<Category> categories = data_source.getCategories();
+		for (Category category : categories) {
+			TextView view = new TextView(this);
+			LayoutParams params = new LayoutParams(0, LayoutParams.MATCH_PARENT, 1.0f);
+			view.setLayoutParams(params);
+			view.setBackgroundColor(category.getColor());
+			if (category.getID() != DISPLAY_ALL_CATEGORIES)
+				view.setText(category.getName());
+			else
+				view.setText("All tasks");
+			view.setSingleLine();
+			view.setMinWidth(192);
+			view.setGravity(0x11);
+			view.setPadding(8, 8, 8, 8);
+			view.setTag(category);
+			view.setOnClickListener(this);
+			category_bar.addView(view);
+		}
+		
 		// Get Google Tasks service and account
 		ClientCredentials.errorIfNotSpecified();
 		service = new com.google.api.services.tasks.Tasks.Builder(
@@ -535,5 +571,35 @@ OnItemLongClickListener, ActionMode.Callback {
 			}
 		}
 		Log.e(TAG, e.getMessage(), e);
+	}
+
+	/**************************************************************************
+	 * Methods implementing OnClickListener interface                         *
+	 **************************************************************************/  
+	
+	@Override
+	public void onClick(View v) {
+		Category category = (Category) v.getTag();
+		adapter.clear();
+		
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+			if (category.getID() != DISPLAY_ALL_CATEGORIES)
+				adapter.addAll(data_source.getTasksByCategory(category));
+			else
+				adapter.addAll(data_source.getAllTasks());
+		} else {
+			// addAll is not supported in under API 11
+			if (category.getID() != DISPLAY_ALL_CATEGORIES) {
+				for (Task task : data_source.getTasksByCategory(category))
+					adapter.add(task);
+			} else {
+				for (Task task : data_source.getAllTasks())
+					adapter.add(task);
+			}
+		}
+		
+		adapter.sort();
+		
+		prefs_editor.putInt(DISPLAY_CATEGORY, category.getID());
 	}
 }

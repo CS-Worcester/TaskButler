@@ -4,16 +4,30 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
     
+    <HorizontalScrollView android:id="@+id/main_category_bar_scroll"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_alignParentBottom="true">
+    
+	    <LinearLayout android:id="@+id/main_category_bar"
+	        android:orientation="horizontal"
+	        android:layout_width="wrap_content"
+	        android:layout_height="match_parent" />
+	
+	</HorizontalScrollView>
+    
     <ListView android:id="@android:id/list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true" />
+        android:layout_alignParentTop="true"
+        android:layout_above="@id/main_category_bar_scroll" />
     
     <TextView android:id="@android:id/empty"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentTop="true"
+        android:layout_above="@id/main_category_bar_scroll"
         android:gravity="center"
-        android:text="@string/text_empty_list" />  
+        android:text="@string/text_empty_list" />
 
 </RelativeLayout>

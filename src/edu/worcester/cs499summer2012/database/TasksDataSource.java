@@ -126,6 +126,48 @@ public class TasksDataSource {
 		cursor.close();
 		return task;
 	}
+	
+	public ArrayList<Task> getTasksByCategory(Category c) {
+		ArrayList<Task> taskList = new ArrayList<Task>();
+		
+		String selectQuery = "SELECT * FROM " + DatabaseHandler.TABLE_TASKS + 
+				" WHERE " + DatabaseHandler.KEY_CATEGORY + " = " + c.getID();
+		
+		open();
+		Cursor cursor = db.rawQuery(selectQuery, null);
+
+		if (cursor.moveToFirst()) {
+			do {
+				Task task = new Task(
+						cursor.getInt(0), 
+						cursor.getString(1), 
+						cursor.getInt(2) > 0, 
+						cursor.getInt(3),
+						cursor.getInt(4),
+						cursor.getInt(5) > 0,
+						cursor.getInt(6) > 0,
+						cursor.getInt(7) > 0,
+						cursor.getInt(8) > 0,
+						cursor.getInt(9),
+						cursor.getInt(10), 
+						cursor.getLong(11), 
+						cursor.getLong(12), 
+						cursor.getLong(13), 
+						cursor.getLong(14),
+						cursor.getLong(15),
+						cursor.getString(16),
+						cursor.getString(17));
+
+				// Adding task to list
+				taskList.add(task);
+			} while (cursor.moveToNext());
+		}
+
+		cursor.close();
+		close();
+		
+		return taskList;
+	}
 
 	public ArrayList<Task> getAllTasks() {
 		ArrayList<Task> taskList = new ArrayList<Task>();

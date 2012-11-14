@@ -9,7 +9,7 @@
     <string name="title_activity_add_task">Create New Task</string>
     <string name="title_activity_view_task">View Task</string>
     <string name="title_activity_settings">Settings</string>
-    <string name="title_activity_custom_sort">Configure Task List Sorting</string>
+    <string name="title_activity_custom_sort">Customize Task Sorting</string>
     
     <!-- Menu items -->
     <string name="menu_confirm">Add</string>
@@ -84,7 +84,7 @@
     <string name="image_down">Down</string>
     
     <!-- Dialog items -->
-    <string name="dialog_about">Task Butler 1.0\n\nCopyright 2012 Jonathan Hasenzahl, James Celona, Dhimitraq Jorgji.\n\nTask Butler is licensed under the GNU General Public License.</string>
+    <string name="dialog_about">Task Butler 1.0\n\nCopyright 2012 Jonathan Hasenzahl, James Celona, Dhimitraq Jorgji.\n\nTask Butler is distributed under the GNU General Public License.</string>
 	
 	<!-- Spinner items -->
 	<string-array name="spinner_repeat_types">
