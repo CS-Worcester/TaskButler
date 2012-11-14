@@ -39,12 +39,13 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemLongClickListener;
+import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
-import android.widget.LinearLayout.LayoutParams;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -231,24 +232,34 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener {
 		getListView().setOnItemLongClickListener(this);
 
 		// Populate bottom category bar
-		LinearLayout category_bar = (LinearLayout) findViewById(R.id.main_category_bar);
 		ArrayList<Category> categories = data_source.getCategories();
-		for (Category category : categories) {
-			TextView view = new TextView(this);
-			LayoutParams params = new LayoutParams(0, LayoutParams.MATCH_PARENT, 1.0f);
-			view.setLayoutParams(params);
-			view.setBackgroundColor(category.getColor());
-			if (category.getID() != DISPLAY_ALL_CATEGORIES)
-				view.setText(category.getName());
-			else
-				view.setText("All tasks");
-			view.setSingleLine();
-			view.setMinWidth(192);
-			view.setGravity(0x11);
-			view.setPadding(8, 8, 8, 8);
-			view.setTag(category);
-			view.setOnClickListener(this);
-			category_bar.addView(view);
+		
+		if (categories.size() == 1) {
+			findViewById(R.id.main_ruler).setVisibility(View.GONE);
+			((HorizontalScrollView) findViewById(R.id.main_category_bar_scroll)).setVisibility(View.GONE);
+		} else {
+			LinearLayout category_bar = (LinearLayout) findViewById(R.id.main_category_bar);
+			LayoutInflater inflater = getLayoutInflater();
+			
+			for (Category category : categories) {
+				View view = inflater.inflate(R.layout.category_bar_item, null);
+				TextView name = (TextView) view.findViewById(R.id.main_category_bar_item_name);
+				View color = view.findViewById(R.id.main_category_bar_item_color);
+				
+				color.setBackgroundColor(category.getColor());
+				
+				if (category.getID() == DISPLAY_ALL_CATEGORIES)
+					name.setText(R.string.text_main_all_categories);
+				else
+					name.setText(category.getName());
+				
+				view.setTag(category);
+				view.setOnClickListener(this);
+				
+				LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1);
+				params.setMargins(2, 2, 2, 2);
+				category_bar.addView(view, params);
+			}
 		}
 		
 		// Get Google Tasks service and account
