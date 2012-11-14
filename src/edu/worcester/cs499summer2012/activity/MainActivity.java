@@ -178,7 +178,7 @@ OnItemLongClickListener, ActionMode.Callback {
 				dialog.cancel();
 			}
 		});
-		AlertDialog alert = builder.create();		alert.show();
+		builder.create().show();
 	}
 
 	public static synchronized TaskListAdapter getAdapter(){
@@ -229,6 +229,12 @@ OnItemLongClickListener, ActionMode.Callback {
 	}
 
 	@Override
+	public void onStart() {
+		super.onStart();
+		adapter.sort();
+	}
+	
+	@Override
 	public void onStop() {
 		// Save preferences to file
 		prefs_editor.commit();
@@ -242,9 +248,10 @@ OnItemLongClickListener, ActionMode.Callback {
 		inflater.inflate(R.menu.activity_main, menu);
 
 		//add switch account button if more than 2 accounts on the device
-		if (accountManager.getAccounts().length >= 2) {
+		// TODO: (Jon) Figure out why this isn't working for me
+		/*if (accountManager.getAccounts().length >= 2) {
 			menu.add(0, MENU_ACCOUNTS, 0, "Switch Account");
-		}
+		}*/
 		return true;
 	}
 
@@ -270,6 +277,7 @@ OnItemLongClickListener, ActionMode.Callback {
 		case R.id.menu_main_custom_sort:
 			adapter.setSortType(TaskListAdapter.CUSTOM_SORT);
 			prefs_editor.putInt(PREF_SORT_TYPE, TaskListAdapter.CUSTOM_SORT);
+			startActivity(new Intent(this, CustomSortActivity.class));
 			return true;
 
 		case R.id.menu_delete_finished:
@@ -322,15 +330,6 @@ OnItemLongClickListener, ActionMode.Callback {
 	@Override
 	public void onListItemClick(ListView list_view, View view, int position, 
 			long id) {
-		/*adapter.getItem(position).toggleIsCompleted();
-    	adapter.getItem(position).setDateModified(GregorianCalendar.getInstance().getTimeInMillis());
-
-    	// Update database
-    	data_source.updateTask(adapter.getItem(position));
-
-    	// Sort the list
-    	adapter.sort();*/
-
 		Intent intent = new Intent(this, ViewTaskActivity.class);
 		intent.putExtra(Task.EXTRA_TASK_ID, adapter.getItem(position).getID());
 		startActivityForResult(intent, VIEW_TASK_REQUEST);
