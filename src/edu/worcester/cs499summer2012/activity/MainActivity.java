@@ -34,6 +34,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -193,6 +194,51 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener {
 	public static synchronized TaskListAdapter getAdapter(){
 		return adapter;
 	}
+	
+	private void createCategoryBar(int display_category) {
+		// Populate bottom category bar
+		ArrayList<Category> categories = data_source.getCategories();
+		
+		if (categories.size() == 1) {
+			findViewById(R.id.main_ruler).setVisibility(View.GONE);
+			((HorizontalScrollView) findViewById(R.id.main_category_bar_scroll)).setVisibility(View.GONE);
+		} else {
+			LinearLayout category_bar = (LinearLayout) findViewById(R.id.main_category_bar);
+			category_bar.removeAllViews();
+			LayoutInflater inflater = getLayoutInflater();
+			
+			for (Category category : categories) {
+				View view = inflater.inflate(R.layout.category_bar_item, null);
+				
+				TextView name = (TextView) view.findViewById(R.id.main_category_bar_item_name);
+				View color = view.findViewById(R.id.main_category_bar_item_color);
+				
+				color.setBackgroundColor(category.getColor());
+				
+				if (category.getID() == DISPLAY_ALL_CATEGORIES)
+					name.setText(R.string.text_main_all_categories);
+				else
+					name.setText(category.getName());
+				
+				Resources r = getResources();
+				
+				if (display_category == category.getID()) {
+					name.setBackgroundColor(r.getColor(android.R.color.background_light));
+					name.setTextColor(r.getColor(android.R.color.secondary_text_light));
+				} else {
+					name.setBackgroundColor(r.getColor(android.R.color.background_dark));
+					name.setTextColor(r.getColor(android.R.color.secondary_text_dark));
+				}
+				
+				view.setTag(category);
+				view.setOnClickListener(this);
+				
+				LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1);
+				params.setMargins(2, 2, 2, 2);
+				category_bar.addView(view, params);
+			}
+		}
+	}
 
 	/**************************************************************************
 	 * Overridden parent methods                                              *
@@ -245,37 +291,7 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener {
 				TaskListAdapter.AUTO_SORT));
 		adapter.sort();
 		
-		// Populate bottom category bar
-		ArrayList<Category> categories = data_source.getCategories();
-		
-		if (categories.size() == 1) {
-			findViewById(R.id.main_ruler).setVisibility(View.GONE);
-			((HorizontalScrollView) findViewById(R.id.main_category_bar_scroll)).setVisibility(View.GONE);
-		} else {
-			LinearLayout category_bar = (LinearLayout) findViewById(R.id.main_category_bar);
-			category_bar.removeAllViews();
-			LayoutInflater inflater = getLayoutInflater();
-			
-			for (Category category : categories) {
-				View view = inflater.inflate(R.layout.category_bar_item, null);
-				TextView name = (TextView) view.findViewById(R.id.main_category_bar_item_name);
-				View color = view.findViewById(R.id.main_category_bar_item_color);
-				
-				color.setBackgroundColor(category.getColor());
-				
-				if (category.getID() == DISPLAY_ALL_CATEGORIES)
-					name.setText(R.string.text_main_all_categories);
-				else
-					name.setText(category.getName());
-				
-				view.setTag(category);
-				view.setOnClickListener(this);
-				
-				LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1);
-				params.setMargins(2, 2, 2, 2);
-				category_bar.addView(view, params);
-			}
-		}
+		createCategoryBar(display_category);
 	}
 	
 	@Override
@@ -607,6 +623,8 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener {
 		}
 		
 		adapter.sort();
+		
+		createCategoryBar(category.getID());
 		
 		prefs_editor.putInt(DISPLAY_CATEGORY, category.getID());
 	}
