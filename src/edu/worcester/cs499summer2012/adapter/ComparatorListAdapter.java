@@ -99,18 +99,6 @@ public class ComparatorListAdapter extends ArrayAdapter<Comparator> {
 			
 			final ViewHolder view_holder = new ViewHolder();
 			view_holder.enabled = (CheckBox) view.findViewById(R.id.checkbox_row_comparator_enabled);
-			view_holder.enabled.setOnClickListener(new OnClickListener() {
-				
-				@Override
-				public void onClick(View v) {
-					Comparator comparator = (Comparator) view_holder.enabled.getTag();
-					comparator.toggleEnabled();
-					notifyDataSetChanged();
-					
-					// Update DB
-					data_source.updateComparator(comparator);
-				}
-			});
 			view_holder.name = (TextView) view.findViewById(R.id.text_row_comparator_name);
 			view_holder.up = (ImageView) view.findViewById(R.id.image_row_comparator_up);
 			view_holder.up.setOnClickListener(new OnClickListener() {
@@ -192,5 +180,4 @@ public class ComparatorListAdapter extends ArrayAdapter<Comparator> {
 		
 		return view;
 	}
-	
 }

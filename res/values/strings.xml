@@ -9,7 +9,7 @@
     <string name="title_activity_add_task">Create New Task</string>
     <string name="title_activity_view_task">View Task</string>
     <string name="title_activity_settings">Settings</string>
-    <string name="title_activity_custom_sort">Configure Task List Sorting</string>
+    <string name="title_activity_custom_sort">Customize Task Sorting</string>
     
     <!-- Menu items -->
     <string name="menu_confirm">Add</string>
