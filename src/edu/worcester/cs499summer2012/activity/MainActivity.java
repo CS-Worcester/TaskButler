@@ -211,26 +211,40 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener {
 		// Read preferences from file
 		prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		prefs_editor = prefs.edit();
+
+		// Set up a long item click listener
+		getListView().setOnItemLongClickListener(this);
 		
-		int display_category = prefs.getInt(DISPLAY_CATEGORY, DISPLAY_ALL_CATEGORIES);
+		// Get Google Tasks service and account
+		ClientCredentials.errorIfNotSpecified();
+		service = new com.google.api.services.tasks.Tasks.Builder(
+				transport, jsonFactory, credential).setApplicationName("Google-TasksAndroidSample/1.0")
+				.setJsonHttpRequestInitializer(new GoogleKeyInitializer(ClientCredentials.KEY)).build();
+		settings = getPreferences(MODE_PRIVATE);
+		accountName = settings.getString(PREF_ACCOUNT_NAME, null);
+		credential.setAccessToken(settings.getString(PREF_AUTH_TOKEN, null));
+		Logger.getLogger("com.google.api.client").setLevel(LOGGING_LEVEL);
+		accountManager = new GoogleAccountManager(this);
+		//gotAccount(); //uncomment if you want to check out the way tasks are accessed on google tasks
+	}
+
+	@Override
+	public void onStart() {
+		super.onStart();
 		
 		// Create an adapter for the task list
+		int display_category = prefs.getInt(DISPLAY_CATEGORY, DISPLAY_ALL_CATEGORIES);
 		if (display_category == DISPLAY_ALL_CATEGORIES)
 			adapter = new TaskListAdapter(this, data_source.getAllTasks());
 		else
 			adapter = new TaskListAdapter(this, data_source.getTasksByCategory(data_source.getCategory(display_category)));
 		setListAdapter(adapter);
 
-		
-
 		// Set sort type and sort the list
 		adapter.setSortType(prefs.getInt(PREF_SORT_TYPE, 
 				TaskListAdapter.AUTO_SORT));
 		adapter.sort();
-
-		// Set up a long item click listener
-		getListView().setOnItemLongClickListener(this);
-
+		
 		// Populate bottom category bar
 		ArrayList<Category> categories = data_source.getCategories();
 		
@@ -239,6 +253,7 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener {
 			((HorizontalScrollView) findViewById(R.id.main_category_bar_scroll)).setVisibility(View.GONE);
 		} else {
 			LinearLayout category_bar = (LinearLayout) findViewById(R.id.main_category_bar);
+			category_bar.removeAllViews();
 			LayoutInflater inflater = getLayoutInflater();
 			
 			for (Category category : categories) {
@@ -261,30 +276,15 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener {
 				category_bar.addView(view, params);
 			}
 		}
-		
-		// Get Google Tasks service and account
-		ClientCredentials.errorIfNotSpecified();
-		service = new com.google.api.services.tasks.Tasks.Builder(
-				transport, jsonFactory, credential).setApplicationName("Google-TasksAndroidSample/1.0")
-				.setJsonHttpRequestInitializer(new GoogleKeyInitializer(ClientCredentials.KEY)).build();
-		settings = getPreferences(MODE_PRIVATE);
-		accountName = settings.getString(PREF_ACCOUNT_NAME, null);
-		credential.setAccessToken(settings.getString(PREF_AUTH_TOKEN, null));
-		Logger.getLogger("com.google.api.client").setLevel(LOGGING_LEVEL);
-		accountManager = new GoogleAccountManager(this);
-		//gotAccount(); //uncomment if you want to check out the way tasks are accessed on google tasks
-	}
-
-	@Override
-	public void onStart() {
-		super.onStart();
-		adapter.sort();
 	}
 	
 	@Override
 	public void onStop() {
 		// Save preferences to file
 		prefs_editor.commit();
+		
+		// Destroy the adapter, it will be recreated in onStart
+		adapter = null;
 
 		super.onStop();
 	}
@@ -391,8 +391,7 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener {
 			if(result_code == RESULT_OK){
 				// Get the task from the db using the ID in the intent
 				task = data_source.getTask(intent.getIntExtra(Task.EXTRA_TASK_ID, 0));
-				adapter.add(task);
-				adapter.sort();
+
 				if (task.hasDateDue() && !task.isCompleted()) {
 					TaskAlarm alarm = new TaskAlarm();
 					alarm.setOnetimeAlarm(this, task.getID());
@@ -404,9 +403,7 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener {
 			if(result_code == RESULT_OK){
 				// Get the task from the db using the ID in the intent
 				task = data_source.getTask(intent.getIntExtra(Task.EXTRA_TASK_ID, 0));
-				adapter.remove(task);	// Update the adapter
-				adapter.add(task);
-				adapter.sort();
+				
 				if (task.hasDateDue() && !task.isCompleted()) {
 					TaskAlarm alarm = new TaskAlarm();
 					alarm.setOnetimeAlarm(this, task.getID());
