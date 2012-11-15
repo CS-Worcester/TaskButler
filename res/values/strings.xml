@@ -46,6 +46,7 @@
     <string name="text_priority_trivial">Trivial</string>
     <string name="text_date_created_label">Created:</string>
     <string name="text_date_modified_label">Modified:</string>
+    <string name="text_main_all_categories">All tasks</string>
 
     <!-- EditText items -->
     <string name="edit_task_name">Enter task name</string>

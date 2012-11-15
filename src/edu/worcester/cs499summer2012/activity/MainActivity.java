@@ -34,17 +34,19 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemLongClickListener;
+import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
-import android.widget.LinearLayout.LayoutParams;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -192,6 +194,51 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener {
 	public static synchronized TaskListAdapter getAdapter(){
 		return adapter;
 	}
+	
+	private void createCategoryBar(int display_category) {
+		// Populate bottom category bar
+		ArrayList<Category> categories = data_source.getCategories();
+		
+		if (categories.size() == 1) {
+			findViewById(R.id.main_ruler).setVisibility(View.GONE);
+			((HorizontalScrollView) findViewById(R.id.main_category_bar_scroll)).setVisibility(View.GONE);
+		} else {
+			LinearLayout category_bar = (LinearLayout) findViewById(R.id.main_category_bar);
+			category_bar.removeAllViews();
+			LayoutInflater inflater = getLayoutInflater();
+			
+			for (Category category : categories) {
+				View view = inflater.inflate(R.layout.category_bar_item, null);
+				
+				TextView name = (TextView) view.findViewById(R.id.main_category_bar_item_name);
+				View color = view.findViewById(R.id.main_category_bar_item_color);
+				
+				color.setBackgroundColor(category.getColor());
+				
+				if (category.getID() == DISPLAY_ALL_CATEGORIES)
+					name.setText(R.string.text_main_all_categories);
+				else
+					name.setText(category.getName());
+				
+				Resources r = getResources();
+				
+				if (display_category == category.getID()) {
+					name.setBackgroundColor(r.getColor(android.R.color.background_light));
+					name.setTextColor(r.getColor(android.R.color.secondary_text_light));
+				} else {
+					name.setBackgroundColor(r.getColor(android.R.color.background_dark));
+					name.setTextColor(r.getColor(android.R.color.secondary_text_dark));
+				}
+				
+				view.setTag(category);
+				view.setOnClickListener(this);
+				
+				LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1);
+				params.setMargins(2, 2, 2, 2);
+				category_bar.addView(view, params);
+			}
+		}
+	}
 
 	/**************************************************************************
 	 * Overridden parent methods                                              *
@@ -210,46 +257,9 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener {
 		// Read preferences from file
 		prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		prefs_editor = prefs.edit();
-		
-		int display_category = prefs.getInt(DISPLAY_CATEGORY, DISPLAY_ALL_CATEGORIES);
-		
-		// Create an adapter for the task list
-		if (display_category == DISPLAY_ALL_CATEGORIES)
-			adapter = new TaskListAdapter(this, data_source.getAllTasks());
-		else
-			adapter = new TaskListAdapter(this, data_source.getTasksByCategory(data_source.getCategory(display_category)));
-		setListAdapter(adapter);
-
-		
-
-		// Set sort type and sort the list
-		adapter.setSortType(prefs.getInt(PREF_SORT_TYPE, 
-				TaskListAdapter.AUTO_SORT));
-		adapter.sort();
 
 		// Set up a long item click listener
 		getListView().setOnItemLongClickListener(this);
-
-		// Populate bottom category bar
-		LinearLayout category_bar = (LinearLayout) findViewById(R.id.main_category_bar);
-		ArrayList<Category> categories = data_source.getCategories();
-		for (Category category : categories) {
-			TextView view = new TextView(this);
-			LayoutParams params = new LayoutParams(0, LayoutParams.MATCH_PARENT, 1.0f);
-			view.setLayoutParams(params);
-			view.setBackgroundColor(category.getColor());
-			if (category.getID() != DISPLAY_ALL_CATEGORIES)
-				view.setText(category.getName());
-			else
-				view.setText("All tasks");
-			view.setSingleLine();
-			view.setMinWidth(192);
-			view.setGravity(0x11);
-			view.setPadding(8, 8, 8, 8);
-			view.setTag(category);
-			view.setOnClickListener(this);
-			category_bar.addView(view);
-		}
 		
 		// Get Google Tasks service and account
 		ClientCredentials.errorIfNotSpecified();
@@ -267,13 +277,30 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener {
 	@Override
 	public void onStart() {
 		super.onStart();
+		
+		// Create an adapter for the task list
+		int display_category = prefs.getInt(DISPLAY_CATEGORY, DISPLAY_ALL_CATEGORIES);
+		if (display_category == DISPLAY_ALL_CATEGORIES)
+			adapter = new TaskListAdapter(this, data_source.getAllTasks());
+		else
+			adapter = new TaskListAdapter(this, data_source.getTasksByCategory(data_source.getCategory(display_category)));
+		setListAdapter(adapter);
+
+		// Set sort type and sort the list
+		adapter.setSortType(prefs.getInt(PREF_SORT_TYPE, 
+				TaskListAdapter.AUTO_SORT));
 		adapter.sort();
+		
+		createCategoryBar(display_category);
 	}
 	
 	@Override
 	public void onStop() {
 		// Save preferences to file
 		prefs_editor.commit();
+		
+		// Destroy the adapter, it will be recreated in onStart
+		adapter = null;
 
 		super.onStop();
 	}
@@ -380,8 +407,7 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener {
 			if(result_code == RESULT_OK){
 				// Get the task from the db using the ID in the intent
 				task = data_source.getTask(intent.getIntExtra(Task.EXTRA_TASK_ID, 0));
-				adapter.add(task);
-				adapter.sort();
+
 				if (task.hasDateDue() && !task.isCompleted()) {
 					TaskAlarm alarm = new TaskAlarm();
 					alarm.setOnetimeAlarm(this, task.getID());
@@ -393,9 +419,7 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener {
 			if(result_code == RESULT_OK){
 				// Get the task from the db using the ID in the intent
 				task = data_source.getTask(intent.getIntExtra(Task.EXTRA_TASK_ID, 0));
-				adapter.remove(task);	// Update the adapter
-				adapter.add(task);
-				adapter.sort();
+				
 				if (task.hasDateDue() && !task.isCompleted()) {
 					TaskAlarm alarm = new TaskAlarm();
 					alarm.setOnetimeAlarm(this, task.getID());
@@ -599,6 +623,8 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener {
 		}
 		
 		adapter.sort();
+		
+		createCategoryBar(category.getID());
 		
 		prefs_editor.putInt(DISPLAY_CATEGORY, category.getID());
 	}
