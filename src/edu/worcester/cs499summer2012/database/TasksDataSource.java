@@ -317,7 +317,7 @@ public class TasksDataSource {
 
 	/**
 	 * Update the database information on an category
-	 * @param c
+	 * @param c the category to be updated
 	 * @return
 	 */
 	public int updateCategory(Category c){
@@ -335,7 +335,7 @@ public class TasksDataSource {
 
 	/**
 	 * Query a category using its id
-	 * @param id
+	 * @param id the id of the task
 	 * @return
 	 */
 	public Category getCategory(int id){
