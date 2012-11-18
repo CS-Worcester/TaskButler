@@ -22,6 +22,7 @@ package edu.worcester.cs499summer2012.service;
 import java.util.List;
 
 import android.content.Intent;
+
 import edu.worcester.cs499summer2012.database.TasksDataSource;
 import edu.worcester.cs499summer2012.task.Task;
 
@@ -32,20 +33,35 @@ import edu.worcester.cs499summer2012.task.Task;
  *
  */
 public class TaskButlerService extends WakefulIntentService{
-	
+
 	public TaskButlerService() {
 		super("TaskButlerService");
 	}
-
+	
 	@Override
 	protected void onHandleIntent(Intent intent) {
-		TasksDataSource db = TasksDataSource.getInstance(getApplicationContext()); //get access to the instance of TasksDataSource
-		List<Task> tasks = db.getAllTasks(); //Get a list of all the tasks there
+		TasksDataSource db = TasksDataSource.getInstance(this); //get access to the instance of TasksDataSource
 		TaskAlarm alarm = new TaskAlarm();
-	 		 	
+
+
+		List<Task> tasks = db.getAllTasks(); //Get a list of all the tasks there
 		for (Task task : tasks) {
+			//handle edge case of phone being off during an alarm going off.
+			if(task.isRepeating()){
+				if(task.hasStopRepeatingDate() && task.getStopRepeatingDate() <= System.currentTimeMillis()){
+					/*Indented do nothing*/
+				} else {
+					while(task.getDateDue() <= System.currentTimeMillis())
+						task = alarm.setRepeatingAlarm(this, task.getID());
+						//TODO: maybe set a different flag for when a task is permanently complete
+				}
+			}
+			//set procrastinator alarm if the task has a finalDateDue
+			if(!task.isCompleted() && task.hasFinalDateDue())
+				alarm.setPrograstinatorAlarm(this, task.getID());
+
 			if(!task.isCompleted() && (task.getDateDue() >= System.currentTimeMillis())){
-				alarm.setOnetimeAlarm(getApplicationContext(), task.getID());	}
+				alarm.setAlarm(this, task.getID());	}
 		}
 		super.onHandleIntent(intent);
 	}
