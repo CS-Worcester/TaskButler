@@ -17,15 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package edu.worcester.cs499summer2012.service;
 
+
 import edu.worcester.cs499summer2012.task.Task;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 
 /**
  * BroadCastReceiver for Alarms, displays notifications as it receives alarm
@@ -36,15 +36,14 @@ import android.util.Log;
 public class OnAlarmReceiver extends BroadcastReceiver {
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		Log.d("onAlarmReciever","on Recieve before running service"); 
 		WakefulIntentService.acquireStaticLock(context); //acquire a partial WakeLock
 		
+		//send notification, bundle intent with taskID
 		NotificationHelper notification = new NotificationHelper();
 		Bundle bundle = intent.getExtras();
 		int id = bundle.getInt(Task.EXTRA_TASK_ID);
 		notification.sendBasicNotification(context, id); // send basic notification
 		
 		context.startService(new Intent(context, TaskButlerService.class)); //start TaskButlerService
-		Log.d("onAlarmReciever","on Recieve after trying service");
 	}
 }

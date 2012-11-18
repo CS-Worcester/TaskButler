@@ -408,9 +408,10 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener {
 				// Get the task from the db using the ID in the intent
 				task = data_source.getTask(intent.getIntExtra(Task.EXTRA_TASK_ID, 0));
 
-				if (task.hasDateDue() && !task.isCompleted()) {
+				if (!task.isCompleted() && task.hasDateDue() &&
+						(task.getDateDue() >= System.currentTimeMillis())) {
 					TaskAlarm alarm = new TaskAlarm();
-					alarm.setOnetimeAlarm(this, task.getID());
+					alarm.setAlarm(this, task.getID());
 				}
 			}
 			break;
@@ -420,9 +421,10 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener {
 				// Get the task from the db using the ID in the intent
 				task = data_source.getTask(intent.getIntExtra(Task.EXTRA_TASK_ID, 0));
 				
-				if (task.hasDateDue() && !task.isCompleted()) {
+				if (!task.isCompleted() && task.hasDateDue() &&
+						(task.getDateDue() >= System.currentTimeMillis())) {
 					TaskAlarm alarm = new TaskAlarm();
-					alarm.setOnetimeAlarm(this, task.getID());
+					alarm.setAlarm(this, task.getID());
 				}
 			}
 			break;
