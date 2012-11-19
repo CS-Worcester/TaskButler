@@ -92,6 +92,12 @@ public class ViewTaskActivity extends SherlockActivity implements OnClickListene
         // Get the task from the intent
         task = data_source.getTask(getIntent().getIntExtra(Task.EXTRA_TASK_ID, 0));
         
+        // Exit the task if it no longer exists (has been deleted)
+        if (task == null) {
+        	toast("This task has been deleted!");
+        	finish();
+        }
+        
         // Set name
         ((TextView) findViewById(R.id.text_view_task_name)).setText(task.getName());
         
