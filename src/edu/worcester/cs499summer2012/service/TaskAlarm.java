@@ -132,10 +132,10 @@ public class TaskAlarm {
 		
     }
     
-    public void setPrograstinatorAlarm(Context context, int id){
+    public void setProcrastinatorAlarm(Context context, int id){
     	TasksDataSource db = TasksDataSource.getInstance(context);
     	Task task = db.getTask(id);
-    	if(task.getDateDue() >= System.currentTimeMillis() || task.getFinalDateDue() <= System.currentTimeMillis())
+    	if(task.getDateDue() >= System.currentTimeMillis() && task.getFinalDateDue() <= System.currentTimeMillis())
     		return;
     	
     	AlarmManager am=(AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
