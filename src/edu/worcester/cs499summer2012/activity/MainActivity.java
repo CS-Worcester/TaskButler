@@ -111,8 +111,13 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener {
 				int deleted_tasks;
 				switch (mode) {
 				case DELETE_MODE_SINGLE:
-					data_source.deleteTask(adapter.getItem(selected_task));
-					adapter.remove(adapter.getItem(selected_task));
+					Task task = adapter.getItem(selected_task);
+					data_source.deleteTask(task);
+					adapter.remove(task);
+					if (task.hasDateDue()) {
+						TaskAlarm alarm = new TaskAlarm();
+						alarm.cancelAlarm(getApplicationContext(), task.getID());
+					}
 					toast("Task deleted");
 					break;
 
@@ -130,6 +135,12 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener {
 					break;
 
 				case DELETE_MODE_ALL:
+					ArrayList<Task> tasks = data_source.getAllTasks();
+					TaskAlarm alarm = new TaskAlarm();
+					for (Task t : tasks) {
+						if (t.hasDateDue())
+							alarm.cancelAlarm(getApplicationContext(), t.getID());
+					}
 					deleted_tasks = data_source.deleteAllTasks();
 					adapter.clear();
 					toast(deleted_tasks + " tasks deleted");

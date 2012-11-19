@@ -96,6 +96,7 @@ public class ViewTaskActivity extends SherlockActivity implements OnClickListene
         if (task == null) {
         	toast("This task has been deleted!");
         	finish();
+        	return;
         }
         
         // Set name
