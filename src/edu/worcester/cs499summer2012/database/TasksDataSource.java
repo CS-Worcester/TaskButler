@@ -103,6 +103,8 @@ public class TasksDataSource {
 				null, null, null, null, null);
 		if (cursor != null)
 			cursor.moveToFirst();
+		else
+			return null;
 		Task task = new Task(
 				cursor.getInt(0), 
 				cursor.getString(1), 
