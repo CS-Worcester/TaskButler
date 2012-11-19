@@ -21,6 +21,7 @@ package edu.worcester.cs499summer2012.activity;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -107,34 +108,6 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener {
 	private Object action_mode;
 	private int selected_task;
 
-	/**************************************************************************
-	 * Google Tasks Fields                                                    *
-	 **************************************************************************/
-
-	/** Logging level for HTTP requests/responses. */
-	private static final Level LOGGING_LEVEL = Level.OFF;
-	private static final String TAG = "MainActivity";
-
-	// This must be the exact string, and is a special for alias OAuth 2 scope
-	// "https://www.googleapis.com/auth/tasks"
-	private static final String AUTH_TOKEN_TYPE = "Manage your tasks";
-	private static final int MENU_ACCOUNTS = 0;
-	private static final int REQUEST_AUTHENTICATE = 2;
-
-	final HttpTransport transport = AndroidHttp.newCompatibleTransport();
-	final JsonFactory jsonFactory = new GsonFactory();
-
-	static final String PREF_ACCOUNT_NAME = "accountName";
-	static final String PREF_AUTH_TOKEN = "authToken";
-
-	GoogleAccountManager accountManager;
-	SharedPreferences settings;
-	String accountName;
-
-	GoogleCredential credential = new GoogleCredential();
-	com.google.api.services.tasks.Tasks service;
-
-	private boolean received401;
 	/**************************************************************************
 	 * Class methods                                                          *
 	 **************************************************************************/
@@ -260,18 +233,6 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener {
 
 		// Set up a long item click listener
 		getListView().setOnItemLongClickListener(this);
-		
-		// Get Google Tasks service and account
-		ClientCredentials.errorIfNotSpecified();
-		service = new com.google.api.services.tasks.Tasks.Builder(
-				transport, jsonFactory, credential).setApplicationName("Google-TasksAndroidSample/1.0")
-				.setJsonHttpRequestInitializer(new GoogleKeyInitializer(ClientCredentials.KEY)).build();
-		settings = getPreferences(MODE_PRIVATE);
-		accountName = settings.getString(PREF_ACCOUNT_NAME, null);
-		credential.setAccessToken(settings.getString(PREF_AUTH_TOKEN, null));
-		Logger.getLogger("com.google.api.client").setLevel(LOGGING_LEVEL);
-		accountManager = new GoogleAccountManager(this);
-		//gotAccount(); //uncomment if you want to check out the way tasks are accessed on google tasks
 	}
 
 	@Override
@@ -351,10 +312,6 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener {
 		case R.id.menu_delete_all:
 			deleteAlert("Are you sure you want to delete all tasks? This cannot be undone.",
 					DELETE_MODE_ALL);
-			return true;
-
-		case MENU_ACCOUNTS:
-			chooseAccount();
 			return true;	
 
 		case R.id.menu_main_settings:
@@ -428,14 +385,6 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener {
 				}
 			}
 			break;
-
-		case REQUEST_AUTHENTICATE:
-			if (result_code == RESULT_OK) {
-				gotAccount();
-			} else {
-				chooseAccount();
-			}
-			break;
 		}
 	}
 
@@ -496,108 +445,6 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener {
 		action_mode = null;			
 	}
 
-	/**************************************************************************
-	 * Google Tasks methods implementation				                      *
-	 **************************************************************************/
-
-	@SuppressWarnings("deprecation")
-	void gotAccount() {
-		Account account = accountManager.getAccountByName(accountName);
-		if (account == null) {
-			chooseAccount();
-			return;
-		}
-		if (credential.getAccessToken() != null) {
-			onAuthToken();
-			return;
-		}
-		accountManager.getAccountManager()
-		.getAuthToken(account, AUTH_TOKEN_TYPE, true, new AccountManagerCallback<Bundle>() {
-
-			public void run(AccountManagerFuture<Bundle> future) {
-				try {
-					Bundle bundle = future.getResult();
-					if (bundle.containsKey(AccountManager.KEY_INTENT)) {
-						Intent intent = bundle.getParcelable(AccountManager.KEY_INTENT);
-						intent.setFlags(intent.getFlags() & ~Intent.FLAG_ACTIVITY_NEW_TASK);
-						startActivityForResult(intent, REQUEST_AUTHENTICATE);
-					} else if (bundle.containsKey(AccountManager.KEY_AUTHTOKEN)) {
-						setAuthToken(bundle.getString(AccountManager.KEY_AUTHTOKEN));
-						onAuthToken();
-					}
-				} catch (Exception e) {
-					Log.e(TAG, e.getMessage(), e);
-				}
-			}
-		}, null);
-	}
-
-	private void chooseAccount() {
-		accountManager.getAccountManager().getAuthTokenByFeatures(GoogleAccountManager.ACCOUNT_TYPE,
-				AUTH_TOKEN_TYPE,
-				null,
-				MainActivity.this,
-				null,
-				null,
-				new AccountManagerCallback<Bundle>() {
-
-			public void run(AccountManagerFuture<Bundle> future) {
-				Bundle bundle;
-				try {
-					bundle = future.getResult();
-					setAccountName(bundle.getString(AccountManager.KEY_ACCOUNT_NAME));
-					setAuthToken(bundle.getString(AccountManager.KEY_AUTHTOKEN));
-					onAuthToken();
-				} catch (OperationCanceledException e) {
-					// user canceled
-				} catch (AuthenticatorException e) {
-					Log.e(TAG, e.getMessage(), e);
-				} catch (IOException e) {
-					Log.e(TAG, e.getMessage(), e);
-				}
-			}
-		},
-		null);
-	}
-
-	void setAccountName(String accountName) {
-		SharedPreferences.Editor editor = settings.edit();
-		editor.putString(PREF_ACCOUNT_NAME, accountName);
-		editor.commit();
-		this.accountName = accountName;
-	}
-
-	void setAuthToken(String authToken) {
-		SharedPreferences.Editor editor = settings.edit();
-		editor.putString(PREF_AUTH_TOKEN, authToken);
-		editor.commit();
-		credential.setAccessToken(authToken);
-	}
-
-	void onAuthToken() {
-		new AsyncLoadTasks(this).execute();
-	}
-
-	void onRequestCompleted() {
-		received401 = false;
-	}
-
-	void handleGoogleException(IOException e) {
-		if (e instanceof GoogleJsonResponseException) {
-			GoogleJsonResponseException exception = (GoogleJsonResponseException) e;
-			if (exception.getStatusCode() == 401 && !received401) {
-				received401 = true;
-				accountManager.invalidateAuthToken(credential.getAccessToken());
-				credential.setAccessToken(null);
-				SharedPreferences.Editor editor2 = settings.edit();
-				editor2.remove(PREF_AUTH_TOKEN);
-				editor2.commit();
-				gotAccount();
-				return;
-			}
-		}
-		Log.e(TAG, e.getMessage(), e);
-	}
 
 	/**************************************************************************
 	 * Methods implementing OnClickListener interface                         *
