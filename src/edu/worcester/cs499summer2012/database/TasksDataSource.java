@@ -101,30 +101,34 @@ public class TasksDataSource {
 				DatabaseHandler.KEY_NOTES }, 
 				DatabaseHandler.KEY_ID + " = " + id,
 				null, null, null, null, null);
-		if (cursor != null)
-			cursor.moveToFirst();
-		Task task = new Task(
-				cursor.getInt(0), 
-				cursor.getString(1), 
-				cursor.getInt(2) > 0, 
-				cursor.getInt(3),
-				cursor.getInt(4),
-				cursor.getInt(5) > 0,
-				cursor.getInt(6) > 0,
-				cursor.getInt(7) > 0,
-				cursor.getInt(8) > 0,
-				cursor.getInt(9),
-				cursor.getInt(10), 
-				cursor.getLong(11), 
-				cursor.getLong(12), 
-				cursor.getLong(13), 
-				cursor.getLong(14),
-				cursor.getLong(15),
-				cursor.getString(16),
-				cursor.getString(17));
-		close();
-		cursor.close();
-		return task;
+		if (cursor.moveToFirst()) {
+			Task task = new Task(
+					cursor.getInt(0), 
+					cursor.getString(1), 
+					cursor.getInt(2) > 0, 
+					cursor.getInt(3),
+					cursor.getInt(4),
+					cursor.getInt(5) > 0,
+					cursor.getInt(6) > 0,
+					cursor.getInt(7) > 0,
+					cursor.getInt(8) > 0,
+					cursor.getInt(9),
+					cursor.getInt(10), 
+					cursor.getLong(11), 
+					cursor.getLong(12), 
+					cursor.getLong(13), 
+					cursor.getLong(14),
+					cursor.getLong(15),
+					cursor.getString(16),
+					cursor.getString(17));
+			close();
+			cursor.close();
+			return task;
+		} else {
+			close();
+			cursor.close();
+			return null;
+		}
 	}
 	
 	public ArrayList<Task> getTasksByCategory(Category c) {
