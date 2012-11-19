@@ -180,8 +180,16 @@ public class AddTaskActivity extends SherlockActivity implements
     	
     	// Get task final due date
     	long final_due_date_ms = 0;
-    	if (has_final_due_date.isChecked())
+    	if (has_final_due_date.isChecked()) {
     		final_due_date_ms = final_due_date_cal.getTimeInMillis();
+    		
+    		// Swap due date and final due date if due date is later (larger)
+        	if (due_date_ms > final_due_date_ms) {
+        		long temp = due_date_ms;
+        		due_date_ms = final_due_date_ms;
+        		final_due_date_ms = temp;
+        	}
+    	}
     	
     	// Get stop repeating date
     	long stop_repeating_date_ms = 0;
