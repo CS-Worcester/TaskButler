@@ -137,9 +137,9 @@ public class TaskAlarm {
     	Task task = db.getTask(id);
     	if(task.getDateDue() >= System.currentTimeMillis() && task.getFinalDateDue() <= System.currentTimeMillis())
     		return;
-    	
+    	long alarm = System.currentTimeMillis() + (1 * MINUTES);
     	AlarmManager am=(AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
-        am.set(AlarmManager.RTC_WAKEUP, 15 * MINUTES, getPendingIntent(context, id));
+        am.set(AlarmManager.RTC_WAKEUP, alarm, getPendingIntent(context, id));
     }
     
     //get a PendingIntent 
