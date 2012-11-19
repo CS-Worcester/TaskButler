@@ -19,28 +19,26 @@
 
 package edu.worcester.cs499summer2012.activity;
 
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.ArrayList;
 
-import android.accounts.Account;
-import android.accounts.AccountManager;
-import android.accounts.AccountManagerCallback;
-import android.accounts.AccountManagerFuture;
-import android.accounts.AuthenticatorException;
-import android.accounts.OperationCanceledException;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemLongClickListener;
+import android.widget.HorizontalScrollView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockListActivity;
@@ -50,19 +48,11 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.SubMenu;
 
-import com.google.api.client.extensions.android.http.AndroidHttp;
-import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
-import com.google.api.client.googleapis.extensions.android.accounts.GoogleAccountManager;
-import com.google.api.client.googleapis.json.GoogleJsonResponseException;
-import com.google.api.client.googleapis.services.GoogleKeyInitializer;
-import com.google.api.client.http.HttpTransport;
-import com.google.api.client.json.JsonFactory;
-import com.google.api.client.json.gson.GsonFactory;
-
 import edu.worcester.cs499summer2012.R;
 import edu.worcester.cs499summer2012.adapter.TaskListAdapter;
 import edu.worcester.cs499summer2012.database.TasksDataSource;
 import edu.worcester.cs499summer2012.service.TaskAlarm;
+import edu.worcester.cs499summer2012.task.Category;
 import edu.worcester.cs499summer2012.task.Task;
 
 /**
@@ -73,18 +63,20 @@ import edu.worcester.cs499summer2012.task.Task;
  * @author James Celona
  */
 public final class MainActivity extends SherlockListActivity implements 
-OnItemLongClickListener, ActionMode.Callback {
+OnItemLongClickListener, ActionMode.Callback, OnClickListener {
 
 	/**************************************************************************
 	 * Static fields and methods                                              *
 	 **************************************************************************/
 
 	public static final String PREF_SORT_TYPE = "sort_type";
+	public static final String DISPLAY_CATEGORY = "display_category";
 	public static final int ADD_TASK_REQUEST = 0;
 	public static final int VIEW_TASK_REQUEST = 1;
 	public static final int DELETE_MODE_SINGLE = 0;
 	public static final int DELETE_MODE_FINISHED = 1;
 	public static final int DELETE_MODE_ALL = 2;
+	public static final int DISPLAY_ALL_CATEGORIES = 1;
 
 	/**************************************************************************
 	 * Private fields                                                         *
@@ -97,34 +89,6 @@ OnItemLongClickListener, ActionMode.Callback {
 	private Object action_mode;
 	private int selected_task;
 
-	/**************************************************************************
-	 * Google Tasks Fields                                                    *
-	 **************************************************************************/
-
-	/** Logging level for HTTP requests/responses. */
-	private static final Level LOGGING_LEVEL = Level.OFF;
-	private static final String TAG = "MainActivity";
-
-	// This must be the exact string, and is a special for alias OAuth 2 scope
-	// "https://www.googleapis.com/auth/tasks"
-	private static final String AUTH_TOKEN_TYPE = "Manage your tasks";
-	private static final int MENU_ACCOUNTS = 0;
-	private static final int REQUEST_AUTHENTICATE = 2;
-
-	final HttpTransport transport = AndroidHttp.newCompatibleTransport();
-	final JsonFactory jsonFactory = new GsonFactory();
-
-	static final String PREF_ACCOUNT_NAME = "accountName";
-	static final String PREF_AUTH_TOKEN = "authToken";
-
-	GoogleAccountManager accountManager;
-	SharedPreferences settings;
-	String accountName;
-
-	GoogleCredential credential = new GoogleCredential();
-	com.google.api.services.tasks.Tasks service;
-
-	private boolean received401;
 	/**************************************************************************
 	 * Class methods                                                          *
 	 **************************************************************************/
@@ -147,8 +111,13 @@ OnItemLongClickListener, ActionMode.Callback {
 				int deleted_tasks;
 				switch (mode) {
 				case DELETE_MODE_SINGLE:
-					data_source.deleteTask(adapter.getItem(selected_task));
-					adapter.remove(adapter.getItem(selected_task));
+					Task task = adapter.getItem(selected_task);
+					data_source.deleteTask(task);
+					adapter.remove(task);
+					if (task.hasDateDue()) {
+						TaskAlarm alarm = new TaskAlarm();
+						alarm.cancelAlarm(getApplicationContext(), task.getID());
+					}
 					toast("Task deleted");
 					break;
 
@@ -166,6 +135,12 @@ OnItemLongClickListener, ActionMode.Callback {
 					break;
 
 				case DELETE_MODE_ALL:
+					ArrayList<Task> tasks = data_source.getAllTasks();
+					TaskAlarm alarm = new TaskAlarm();
+					for (Task t : tasks) {
+						if (t.hasDateDue())
+							alarm.cancelAlarm(getApplicationContext(), t.getID());
+					}
 					deleted_tasks = data_source.deleteAllTasks();
 					adapter.clear();
 					toast(deleted_tasks + " tasks deleted");
@@ -178,11 +153,56 @@ OnItemLongClickListener, ActionMode.Callback {
 				dialog.cancel();
 			}
 		});
-		AlertDialog alert = builder.create();		alert.show();
+		builder.create().show();
 	}
 
 	public static synchronized TaskListAdapter getAdapter(){
 		return adapter;
+	}
+	
+	private void createCategoryBar(int display_category) {
+		// Populate bottom category bar
+		ArrayList<Category> categories = data_source.getCategories();
+		
+		if (categories.size() == 1) {
+			findViewById(R.id.main_ruler).setVisibility(View.GONE);
+			((HorizontalScrollView) findViewById(R.id.main_category_bar_scroll)).setVisibility(View.GONE);
+		} else {
+			LinearLayout category_bar = (LinearLayout) findViewById(R.id.main_category_bar);
+			category_bar.removeAllViews();
+			LayoutInflater inflater = getLayoutInflater();
+			
+			for (Category category : categories) {
+				View view = inflater.inflate(R.layout.category_bar_item, null);
+				
+				TextView name = (TextView) view.findViewById(R.id.main_category_bar_item_name);
+				View color = view.findViewById(R.id.main_category_bar_item_color);
+				
+				color.setBackgroundColor(category.getColor());
+				
+				if (category.getID() == DISPLAY_ALL_CATEGORIES)
+					name.setText(R.string.text_main_all_categories);
+				else
+					name.setText(category.getName());
+				
+				Resources r = getResources();
+				
+				if (display_category == category.getID()) {
+					name.setBackgroundColor(r.getColor(android.R.color.background_light));
+					name.setTextColor(r.getColor(android.R.color.secondary_text_light));
+				} else {
+					name.setBackgroundColor(r.getColor(android.R.color.background_dark));
+					name.setTextColor(r.getColor(android.R.color.secondary_text_dark));
+				}
+				
+				view.setTag(category);
+				view.setOnClickListener(this);
+				
+				LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1);
+				params.setMargins(2, 2, 2, 2);
+				category_bar.addView(view, params);
+			}
+		}
 	}
 
 	/**************************************************************************
@@ -199,39 +219,41 @@ OnItemLongClickListener, ActionMode.Callback {
 		// Open the database
 		data_source = TasksDataSource.getInstance(getApplicationContext());
 
-		// Create an adapter for the task list
-		adapter = new TaskListAdapter(this, data_source.getAllTasks());
-		setListAdapter(adapter);
-
 		// Read preferences from file
 		prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		prefs_editor = prefs.edit();
+
+		// Set up a long item click listener
+		getListView().setOnItemLongClickListener(this);
+	}
+
+	@Override
+	public void onStart() {
+		super.onStart();
+		
+		// Create an adapter for the task list
+		int display_category = prefs.getInt(DISPLAY_CATEGORY, DISPLAY_ALL_CATEGORIES);
+		if (display_category == DISPLAY_ALL_CATEGORIES)
+			adapter = new TaskListAdapter(this, data_source.getAllTasks());
+		else
+			adapter = new TaskListAdapter(this, data_source.getTasksByCategory(data_source.getCategory(display_category)));
+		setListAdapter(adapter);
 
 		// Set sort type and sort the list
 		adapter.setSortType(prefs.getInt(PREF_SORT_TYPE, 
 				TaskListAdapter.AUTO_SORT));
 		adapter.sort();
-
-		// Set up a long item click listener
-		getListView().setOnItemLongClickListener(this);
-
-		// Get Google Tasks service and account
-		ClientCredentials.errorIfNotSpecified();
-		service = new com.google.api.services.tasks.Tasks.Builder(
-				transport, jsonFactory, credential).setApplicationName("Google-TasksAndroidSample/1.0")
-				.setJsonHttpRequestInitializer(new GoogleKeyInitializer(ClientCredentials.KEY)).build();
-		settings = getPreferences(MODE_PRIVATE);
-		accountName = settings.getString(PREF_ACCOUNT_NAME, null);
-		credential.setAccessToken(settings.getString(PREF_AUTH_TOKEN, null));
-		Logger.getLogger("com.google.api.client").setLevel(LOGGING_LEVEL);
-		accountManager = new GoogleAccountManager(this);
-		//gotAccount(); //uncomment if you want to check out the way tasks are accessed on google tasks
+		
+		createCategoryBar(display_category);
 	}
-
+	
 	@Override
 	public void onStop() {
 		// Save preferences to file
 		prefs_editor.commit();
+		
+		// Destroy the adapter, it will be recreated in onStart
+		adapter = null;
 
 		super.onStop();
 	}
@@ -242,9 +264,10 @@ OnItemLongClickListener, ActionMode.Callback {
 		inflater.inflate(R.menu.activity_main, menu);
 
 		//add switch account button if more than 2 accounts on the device
-		if (accountManager.getAccounts().length >= 2) {
+		// TODO: (Jon) Figure out why this isn't working for me
+		/*if (accountManager.getAccounts().length >= 2) {
 			menu.add(0, MENU_ACCOUNTS, 0, "Switch Account");
-		}
+		}*/
 		return true;
 	}
 
@@ -270,6 +293,7 @@ OnItemLongClickListener, ActionMode.Callback {
 		case R.id.menu_main_custom_sort:
 			adapter.setSortType(TaskListAdapter.CUSTOM_SORT);
 			prefs_editor.putInt(PREF_SORT_TYPE, TaskListAdapter.CUSTOM_SORT);
+			startActivity(new Intent(this, CustomSortActivity.class));
 			return true;
 
 		case R.id.menu_delete_finished:
@@ -280,10 +304,6 @@ OnItemLongClickListener, ActionMode.Callback {
 		case R.id.menu_delete_all:
 			deleteAlert("Are you sure you want to delete all tasks? This cannot be undone.",
 					DELETE_MODE_ALL);
-			return true;
-
-		case MENU_ACCOUNTS:
-			chooseAccount();
 			return true;	
 
 		case R.id.menu_main_settings:
@@ -322,15 +342,6 @@ OnItemLongClickListener, ActionMode.Callback {
 	@Override
 	public void onListItemClick(ListView list_view, View view, int position, 
 			long id) {
-		/*adapter.getItem(position).toggleIsCompleted();
-    	adapter.getItem(position).setDateModified(GregorianCalendar.getInstance().getTimeInMillis());
-
-    	// Update database
-    	data_source.updateTask(adapter.getItem(position));
-
-    	// Sort the list
-    	adapter.sort();*/
-
 		Intent intent = new Intent(this, ViewTaskActivity.class);
 		intent.putExtra(Task.EXTRA_TASK_ID, adapter.getItem(position).getID());
 		startActivityForResult(intent, VIEW_TASK_REQUEST);
@@ -345,11 +356,11 @@ OnItemLongClickListener, ActionMode.Callback {
 			if(result_code == RESULT_OK){
 				// Get the task from the db using the ID in the intent
 				task = data_source.getTask(intent.getIntExtra(Task.EXTRA_TASK_ID, 0));
-				adapter.add(task);
-				adapter.sort();
-				if (task.hasDateDue() && !task.isCompleted()) {
+
+				if (!task.isCompleted() && task.hasDateDue() &&
+						(task.getDateDue() >= System.currentTimeMillis())) {
 					TaskAlarm alarm = new TaskAlarm();
-					alarm.setOnetimeAlarm(this, task.getID());
+					alarm.setAlarm(this, task.getID());
 				}
 			}
 			break;
@@ -358,21 +369,12 @@ OnItemLongClickListener, ActionMode.Callback {
 			if(result_code == RESULT_OK){
 				// Get the task from the db using the ID in the intent
 				task = data_source.getTask(intent.getIntExtra(Task.EXTRA_TASK_ID, 0));
-				adapter.remove(task);	// Update the adapter
-				adapter.add(task);
-				adapter.sort();
-				if (task.hasDateDue() && !task.isCompleted()) {
+				
+				if (!task.isCompleted() && task.hasDateDue() &&
+						(task.getDateDue() >= System.currentTimeMillis())) {
 					TaskAlarm alarm = new TaskAlarm();
-					alarm.setOnetimeAlarm(this, task.getID());
+					alarm.setAlarm(this, task.getID());
 				}
-			}
-			break;
-
-		case REQUEST_AUTHENTICATE:
-			if (result_code == RESULT_OK) {
-				gotAccount();
-			} else {
-				chooseAccount();
 			}
 			break;
 		}
@@ -416,9 +418,9 @@ OnItemLongClickListener, ActionMode.Callback {
 		switch (item.getItemId()) {
 		
 		case R.id.menu_main_edit_task:
-			startActivityForResult(new Intent(this, EditTaskActivity.class), 
-        			ADD_TASK_REQUEST);
-			//toast("Coming soon!");
+			//startActivityForResult(new Intent(this, EditTaskActivity.class), 
+        		//	ADD_TASK_REQUEST);
+			toast("Coming soon!");
 			mode.finish();
 			return true;
 
@@ -438,106 +440,36 @@ OnItemLongClickListener, ActionMode.Callback {
 		action_mode = null;			
 	}
 
+
 	/**************************************************************************
-	 * Google Tasks methods implementation				                      *
-	 **************************************************************************/
-
-	@SuppressWarnings("deprecation")
-	void gotAccount() {
-		Account account = accountManager.getAccountByName(accountName);
-		if (account == null) {
-			chooseAccount();
-			return;
-		}
-		if (credential.getAccessToken() != null) {
-			onAuthToken();
-			return;
-		}
-		accountManager.getAccountManager()
-		.getAuthToken(account, AUTH_TOKEN_TYPE, true, new AccountManagerCallback<Bundle>() {
-
-			public void run(AccountManagerFuture<Bundle> future) {
-				try {
-					Bundle bundle = future.getResult();
-					if (bundle.containsKey(AccountManager.KEY_INTENT)) {
-						Intent intent = bundle.getParcelable(AccountManager.KEY_INTENT);
-						intent.setFlags(intent.getFlags() & ~Intent.FLAG_ACTIVITY_NEW_TASK);
-						startActivityForResult(intent, REQUEST_AUTHENTICATE);
-					} else if (bundle.containsKey(AccountManager.KEY_AUTHTOKEN)) {
-						setAuthToken(bundle.getString(AccountManager.KEY_AUTHTOKEN));
-						onAuthToken();
-					}
-				} catch (Exception e) {
-					Log.e(TAG, e.getMessage(), e);
-				}
-			}
-		}, null);
-	}
-
-	private void chooseAccount() {
-		accountManager.getAccountManager().getAuthTokenByFeatures(GoogleAccountManager.ACCOUNT_TYPE,
-				AUTH_TOKEN_TYPE,
-				null,
-				MainActivity.this,
-				null,
-				null,
-				new AccountManagerCallback<Bundle>() {
-
-			public void run(AccountManagerFuture<Bundle> future) {
-				Bundle bundle;
-				try {
-					bundle = future.getResult();
-					setAccountName(bundle.getString(AccountManager.KEY_ACCOUNT_NAME));
-					setAuthToken(bundle.getString(AccountManager.KEY_AUTHTOKEN));
-					onAuthToken();
-				} catch (OperationCanceledException e) {
-					// user canceled
-				} catch (AuthenticatorException e) {
-					Log.e(TAG, e.getMessage(), e);
-				} catch (IOException e) {
-					Log.e(TAG, e.getMessage(), e);
-				}
-			}
-		},
-		null);
-	}
-
-	void setAccountName(String accountName) {
-		SharedPreferences.Editor editor = settings.edit();
-		editor.putString(PREF_ACCOUNT_NAME, accountName);
-		editor.commit();
-		this.accountName = accountName;
-	}
-
-	void setAuthToken(String authToken) {
-		SharedPreferences.Editor editor = settings.edit();
-		editor.putString(PREF_AUTH_TOKEN, authToken);
-		editor.commit();
-		credential.setAccessToken(authToken);
-	}
-
-	void onAuthToken() {
-		new AsyncLoadTasks(this).execute();
-	}
-
-	void onRequestCompleted() {
-		received401 = false;
-	}
-
-	void handleGoogleException(IOException e) {
-		if (e instanceof GoogleJsonResponseException) {
-			GoogleJsonResponseException exception = (GoogleJsonResponseException) e;
-			if (exception.getStatusCode() == 401 && !received401) {
-				received401 = true;
-				accountManager.invalidateAuthToken(credential.getAccessToken());
-				credential.setAccessToken(null);
-				SharedPreferences.Editor editor2 = settings.edit();
-				editor2.remove(PREF_AUTH_TOKEN);
-				editor2.commit();
-				gotAccount();
-				return;
+	 * Methods implementing OnClickListener interface                         *
+	 **************************************************************************/  
+	
+	@Override
+	public void onClick(View v) {
+		Category category = (Category) v.getTag();
+		adapter.clear();
+		
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+			if (category.getID() != DISPLAY_ALL_CATEGORIES)
+				adapter.addAll(data_source.getTasksByCategory(category));
+			else
+				adapter.addAll(data_source.getAllTasks());
+		} else {
+			// addAll is not supported in under API 11
+			if (category.getID() != DISPLAY_ALL_CATEGORIES) {
+				for (Task task : data_source.getTasksByCategory(category))
+					adapter.add(task);
+			} else {
+				for (Task task : data_source.getAllTasks())
+					adapter.add(task);
 			}
 		}
-		Log.e(TAG, e.getMessage(), e);
+		
+		adapter.sort();
+		
+		createCategoryBar(category.getID());
+		
+		prefs_editor.putInt(DISPLAY_CATEGORY, category.getID());
 	}
 }

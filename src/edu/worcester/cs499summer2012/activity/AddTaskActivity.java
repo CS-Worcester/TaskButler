@@ -180,8 +180,16 @@ public class AddTaskActivity extends SherlockActivity implements
     	
     	// Get task final due date
     	long final_due_date_ms = 0;
-    	if (has_final_due_date.isChecked())
+    	if (has_final_due_date.isChecked()) {
     		final_due_date_ms = final_due_date_cal.getTimeInMillis();
+    		
+    		// Swap due date and final due date if due date is later (larger)
+        	if (due_date_ms > final_due_date_ms) {
+        		long temp = due_date_ms;
+        		due_date_ms = final_due_date_ms;
+        		final_due_date_ms = temp;
+        	}
+    	}
     	
     	// Get stop repeating date
     	long stop_repeating_date_ms = 0;
@@ -528,35 +536,43 @@ public class AddTaskActivity extends SherlockActivity implements
 			break;
 			
 		case CATEGORY_DIALOG:
-			if (category_name.getText().toString().equals("")) {
-				// No name, cancel dialog
-				Toast.makeText(this, "Category needs a name!", Toast.LENGTH_SHORT).show();
+			if (id == DialogInterface.BUTTON_POSITIVE) {
+				String name = category_name.getText().toString();
+				if (name.equals("")) {
+					// No name, cancel dialog
+					Toast.makeText(this, "Category needs a name!", Toast.LENGTH_SHORT).show();
+					category.setSelection(0);
+					dialog.cancel();
+				} else if (data_source.doesCategoryNameExist(name)) {
+					// Category name already exists, cancel dialog
+					Toast.makeText(this, "Category name already exists", Toast.LENGTH_SHORT).show();
+					category.setSelection(0);
+					dialog.cancel();
+				} else  {
+					AmbilWarnaDialog color_dialog = new AmbilWarnaDialog(this, Color.parseColor("#00FFFFFF"), new OnAmbilWarnaListener() {
+	
+						@Override
+						public void onCancel(AmbilWarnaDialog dialog) {
+							category.setSelection(0);
+						}
+	
+						@Override
+						public void onOk(AmbilWarnaDialog dialog, int color) {
+							Category new_category = new Category(category_name.getText().toString(), 
+									color, 
+									GregorianCalendar.getInstance().getTimeInMillis());
+							new_category.setID(data_source.getNextID(DatabaseHandler.TABLE_CATEGORIES));
+							data_source.addCategory(new_category);
+							category_adapter.insert(new_category, category_adapter.getCount() - 1);
+							category_adapter.notifyDataSetChanged();
+						}
+					});
+					color_dialog.show();
+				}
+			} else {
 				category.setSelection(0);
 				dialog.cancel();
-			} else if (id == DialogInterface.BUTTON_POSITIVE) {
-				AmbilWarnaDialog color_dialog = new AmbilWarnaDialog(this, Color.parseColor("#00FFFFFF"), new OnAmbilWarnaListener() {
-
-					@Override
-					public void onCancel(AmbilWarnaDialog dialog) {
-						category.setSelection(0);
-					}
-
-					@Override
-					public void onOk(AmbilWarnaDialog dialog, int color) {
-						Category new_category = new Category(category_name.getText().toString(), 
-								color, 
-								GregorianCalendar.getInstance().getTimeInMillis());
-						new_category.setID(data_source.getNextID(DatabaseHandler.TABLE_CATEGORIES));
-						data_source.addCategory(new_category);
-						category_adapter.insert(new_category, category_adapter.getCount() - 1);
-						category_adapter.notifyDataSetChanged();
-					}
-				});
-				color_dialog.show();
 			}
-			else
-				category.setSelection(0);
-				dialog.cancel();
 			break;
 		}
 	}

@@ -1,7 +1,7 @@
 /*
  * TaskDateDueComparator.java
  * 
- * Copyright 2012 Jonathan Hasenzahl, James Celona
+ * Copyright 2012 Jonathan Hasenzahl, James Celona, Dhimitraq Jorgji
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,9 +39,9 @@ public class TaskDateDueComparator implements Comparator<Task> {
 	 *         the same time
 	 */	
 	public int compare(Task lhs, Task rhs) {
-		if (lhs.getDateDue() == 0) {
+		if (!lhs.hasDateDue()) {
 			// Case 1: lhs has no due date
-			if (rhs.getDateDue() > 0) {
+			if (rhs.hasDateDue()) {
 				// Case 1a: rhs has a due date and is ordered first
 				return 1;
 			} else {
@@ -51,7 +51,7 @@ public class TaskDateDueComparator implements Comparator<Task> {
 		}
 		else {
 			// Case 2: lhs has a due date
-			if (rhs.getDateDue() == 0) {
+			if (!rhs.hasDateDue()) {
 				// Case 2a: rhs has no due date and is ordered second
 				return -1;
 			}

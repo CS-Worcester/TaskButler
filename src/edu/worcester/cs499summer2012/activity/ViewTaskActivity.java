@@ -92,6 +92,13 @@ public class ViewTaskActivity extends SherlockActivity implements OnClickListene
         // Get the task from the intent
         task = data_source.getTask(getIntent().getIntExtra(Task.EXTRA_TASK_ID, 0));
         
+        // Exit the task if it no longer exists (has been deleted)
+        if (task == null) {
+        	toast("This task has been deleted!");
+        	finish();
+        	return;
+        }
+        
         // Set name
         ((TextView) findViewById(R.id.text_view_task_name)).setText(task.getName());
         
@@ -140,7 +147,7 @@ public class ViewTaskActivity extends SherlockActivity implements OnClickListene
         
         // Set repetition
         if (task.isRepeating()) {
-        	((TextView) findViewById(R.id.text_repeat)).setText("Repeat every " + task.getRepeatInterval() + ' ' + Task.REPEAT_LABELS[task.getRepeatInterval()]);
+        	((TextView) findViewById(R.id.text_repeat)).setText("Repeat every " + task.getRepeatInterval() + ' ' + Task.REPEAT_LABELS[task.getRepeatType()]);
         	
         	if (task.hasStopRepeatingDate())
         		((TextView) findViewById(R.id.text_repeat_2)).setText(DateFormat.format("'until' MM/dd/yy 'at' h:mm AA", task.getStopRepeatingDateCal()));

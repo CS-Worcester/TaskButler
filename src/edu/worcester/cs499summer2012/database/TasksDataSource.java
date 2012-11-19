@@ -27,6 +27,7 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import edu.worcester.cs499summer2012.task.Category;
+import edu.worcester.cs499summer2012.task.Comparator;
 import edu.worcester.cs499summer2012.task.Task;
 
 /**
@@ -100,30 +101,76 @@ public class TasksDataSource {
 				DatabaseHandler.KEY_NOTES }, 
 				DatabaseHandler.KEY_ID + " = " + id,
 				null, null, null, null, null);
-		if (cursor != null)
-			cursor.moveToFirst();
-		Task task = new Task(
-				cursor.getInt(0), 
-				cursor.getString(1), 
-				cursor.getInt(2) > 0, 
-				cursor.getInt(3),
-				cursor.getInt(4),
-				cursor.getInt(5) > 0,
-				cursor.getInt(6) > 0,
-				cursor.getInt(7) > 0,
-				cursor.getInt(8) > 0,
-				cursor.getInt(9),
-				cursor.getInt(10), 
-				cursor.getLong(11), 
-				cursor.getLong(12), 
-				cursor.getLong(13), 
-				cursor.getLong(14),
-				cursor.getLong(15),
-				cursor.getString(16),
-				cursor.getString(17));
-		close();
+		if (cursor.moveToFirst()) {
+			Task task = new Task(
+					cursor.getInt(0), 
+					cursor.getString(1), 
+					cursor.getInt(2) > 0, 
+					cursor.getInt(3),
+					cursor.getInt(4),
+					cursor.getInt(5) > 0,
+					cursor.getInt(6) > 0,
+					cursor.getInt(7) > 0,
+					cursor.getInt(8) > 0,
+					cursor.getInt(9),
+					cursor.getInt(10), 
+					cursor.getLong(11), 
+					cursor.getLong(12), 
+					cursor.getLong(13), 
+					cursor.getLong(14),
+					cursor.getLong(15),
+					cursor.getString(16),
+					cursor.getString(17));
+			close();
+			cursor.close();
+			return task;
+		} else {
+			close();
+			cursor.close();
+			return null;
+		}
+	}
+	
+	public ArrayList<Task> getTasksByCategory(Category c) {
+		ArrayList<Task> taskList = new ArrayList<Task>();
+		
+		String selectQuery = "SELECT * FROM " + DatabaseHandler.TABLE_TASKS + 
+				" WHERE " + DatabaseHandler.KEY_CATEGORY + " = " + c.getID();
+		
+		open();
+		Cursor cursor = db.rawQuery(selectQuery, null);
+
+		if (cursor.moveToFirst()) {
+			do {
+				Task task = new Task(
+						cursor.getInt(0), 
+						cursor.getString(1), 
+						cursor.getInt(2) > 0, 
+						cursor.getInt(3),
+						cursor.getInt(4),
+						cursor.getInt(5) > 0,
+						cursor.getInt(6) > 0,
+						cursor.getInt(7) > 0,
+						cursor.getInt(8) > 0,
+						cursor.getInt(9),
+						cursor.getInt(10), 
+						cursor.getLong(11), 
+						cursor.getLong(12), 
+						cursor.getLong(13), 
+						cursor.getLong(14),
+						cursor.getLong(15),
+						cursor.getString(16),
+						cursor.getString(17));
+
+				// Adding task to list
+				taskList.add(task);
+			} while (cursor.moveToNext());
+		}
+
 		cursor.close();
-		return task;
+		close();
+		
+		return taskList;
 	}
 
 	public ArrayList<Task> getAllTasks() {
@@ -330,6 +377,8 @@ public class TasksDataSource {
 		// updating row
 		int i = db.update(DatabaseHandler.TABLE_CATEGORIES, values, 
 				DatabaseHandler.KEY_ID + " = " + c.getID(), null);
+		
+		close();
 		return i;
 	}
 
@@ -389,12 +438,61 @@ public class TasksDataSource {
 
 		return categories;
 	}
+	
+	public boolean doesCategoryNameExist(String name) {
+		// Select All Query
+		String selectQuery = "SELECT * FROM " + 
+				DatabaseHandler.TABLE_CATEGORIES + " WHERE " +
+				DatabaseHandler.KEY_NAME + " = '" + name + "'";
+		
+		boolean exists = false;
 
-	public ArrayList<CharSequence> getCategoryNames() {
-		ArrayList<CharSequence> names = new ArrayList<CharSequence>();
+		open();
+		Cursor cursor = db.rawQuery(selectQuery, null);
+
+		if (cursor.moveToFirst())
+			exists = true;
+
+		cursor.close();
+		close();
+
+		return exists;
+	}
+	
+	/************************************************************
+	 * Comparators   											*
+	 ************************************************************/
+	
+	public Comparator getComparator(int id) {
+		open();
+		Cursor cursor = db.query(DatabaseHandler.TABLE_COMPARATORS, new String[] {
+				DatabaseHandler.KEY_ID,
+				DatabaseHandler.KEY_NAME,
+				DatabaseHandler.KEY_ENABLED,
+				DatabaseHandler.KEY_ORDER}, 
+				DatabaseHandler.KEY_ID + " = " + id,
+				null, null, null, null);
+		if (cursor != null)
+			cursor.moveToFirst();
+		Comparator c = new Comparator(
+				cursor.getInt(0),
+				cursor.getString(1),
+				cursor.getInt(2) > 0,
+				cursor.getInt(3));
+		close();
+		cursor.close();
+		return c;
+	}
+	
+	/**
+	 * Creates an ArrayList of Comparators in the order specified by the comparators
+	 * @return an ArrayList of Comparators
+	 */
+	public ArrayList<Comparator> getComparators() {
+		Comparator[] comparators = new Comparator[Comparator.NUM_COMPARATORS];
 
 		// Select All Query
-		String selectQuery = "SELECT * FROM " + DatabaseHandler.TABLE_CATEGORIES;
+		String selectQuery = "SELECT * FROM " + DatabaseHandler.TABLE_COMPARATORS;
 
 		open();
 		Cursor cursor = db.rawQuery(selectQuery, null);
@@ -402,16 +500,42 @@ public class TasksDataSource {
 		// Loop through all rows and add to list
 		if (cursor.moveToFirst()) {
 			do {
-				// Add name to list
-				names.add(cursor.getString(1));
+				Comparator c = new Comparator(
+						cursor.getInt(0),
+						cursor.getString(1),
+						cursor.getInt(2) > 0,
+						cursor.getInt(3));
+				// Add comparactor to array
+				comparators[c.getOrder()] = c;
 			} while (cursor.moveToNext());
 		}
 
 		cursor.close();
 		close();
+		
+		// Copy array into ArrayList
+		ArrayList<Comparator> comparator_list = new ArrayList<Comparator>(Comparator.NUM_COMPARATORS);
+		for (int i = 0; i < Comparator.NUM_COMPARATORS; i++)
+			comparator_list.add(comparators[i]);
 
-		return names;
+		return comparator_list;
 	}
+	
+	public int updateComparator(Comparator c) {
+		open();
+		ContentValues values = new ContentValues();
+		values.put(DatabaseHandler.KEY_NAME, c.getName());
+		values.put(DatabaseHandler.KEY_ENABLED, c.isEnabled());
+		values.put(DatabaseHandler.KEY_ORDER, c.getOrder());
+
+		// Update row
+		int i = db.update(DatabaseHandler.TABLE_COMPARATORS, values, 
+				DatabaseHandler.KEY_ID + " = " + c.getId(), null);
+		
+		close();
+		return i;
+	}
+	
 	/************************************************************
 	 * 	Google Tasks											*
 	 ************************************************************/
