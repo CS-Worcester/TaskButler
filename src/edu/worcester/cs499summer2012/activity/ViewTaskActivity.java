@@ -140,7 +140,7 @@ public class ViewTaskActivity extends SherlockActivity implements OnClickListene
         
         // Set repetition
         if (task.isRepeating()) {
-        	((TextView) findViewById(R.id.text_repeat)).setText("Repeat every " + task.getRepeatInterval() + ' ' + Task.REPEAT_LABELS[task.getRepeatInterval()]);
+        	((TextView) findViewById(R.id.text_repeat)).setText("Repeat every " + task.getRepeatInterval() + ' ' + Task.REPEAT_LABELS[task.getRepeatType()]);
         	
         	if (task.hasStopRepeatingDate())
         		((TextView) findViewById(R.id.text_repeat_2)).setText(DateFormat.format("'until' MM/dd/yy 'at' h:mm AA", task.getStopRepeatingDateCal()));
