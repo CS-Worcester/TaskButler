@@ -137,7 +137,8 @@ public class TaskAlarm {
     	Task task = db.getTask(id);
     	if(task.getDateDue() >= System.currentTimeMillis() && task.getFinalDateDue() <= System.currentTimeMillis())
     		return;
-    	long alarm = System.currentTimeMillis() + (1 * MINUTES);
+    	long alarm = (task.getFinalDateDue() - task.getDateDue()) / 4; //fit 4 reminders in the time between alarms
+    	alarm += System.currentTimeMillis();
     	AlarmManager am=(AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
         am.set(AlarmManager.RTC_WAKEUP, alarm, getPendingIntent(context, id));
     }
