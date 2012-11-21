@@ -79,7 +79,7 @@ public class TaskAlarm {
     	TasksDataSource db = TasksDataSource.getInstance(context);
     	Task task = db.getTask(id);    	
     	Calendar cal = Calendar.getInstance();
-    	long months = DAYS * cal.getActualMaximum(Calendar.DAY_OF_MONTH);
+    	long months = DAYS * cal.getActualMaximum(Calendar.DAY_OF_MONTH); //TODO: fix and add the field in a loop
     	long years = DAYS * cal.getActualMaximum(Calendar.DAY_OF_YEAR);
     	
     	long newDateDue;
