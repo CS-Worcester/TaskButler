@@ -80,7 +80,7 @@ public class TaskAlarm {
 		long newDateDue;
 		switch(task.getRepeatType()){
 		case Task.MINUTES:
-			cal.roll(Calendar.MINUTE, task.getRepeatInterval());
+			cal.add(Calendar.MINUTE, task.getRepeatInterval());
 			newDateDue = cal.getTimeInMillis();
 			Log.d("MINUTES",""+newDateDue);
 			task.setDateDue(newDateDue);
@@ -88,7 +88,7 @@ public class TaskAlarm {
 			db.updateTask(task);
 			return task;
 		case Task.HOURS:
-			cal.roll(Calendar.HOUR, task.getRepeatInterval());
+			cal.add(Calendar.HOUR, task.getRepeatInterval());
 			newDateDue = cal.getTimeInMillis();
 			Log.d("HOURS",""+newDateDue);
 			task.setDateDue(newDateDue);
@@ -96,7 +96,7 @@ public class TaskAlarm {
 			db.updateTask(task);
 			return task;
 		case Task.DAYS:
-			cal.roll(Calendar.DAY_OF_YEAR, task.getRepeatInterval());
+			cal.add(Calendar.DAY_OF_YEAR, task.getRepeatInterval());
 			newDateDue = cal.getTimeInMillis();
 			Log.d("DAYS",""+newDateDue);
 			task.setDateDue(newDateDue);
@@ -104,7 +104,7 @@ public class TaskAlarm {
 			db.updateTask(task);
 			return task;
 		case Task.WEEKS:
-			cal.roll(Calendar.WEEK_OF_YEAR, task.getRepeatInterval());
+			cal.add(Calendar.WEEK_OF_YEAR, task.getRepeatInterval());
 			newDateDue = cal.getTimeInMillis();
 			Log.d("WEEKS",""+newDateDue);
 			task.setDateDue(newDateDue);
@@ -112,7 +112,7 @@ public class TaskAlarm {
 			db.updateTask(task);
 			return task;
 		case Task.MONTHS:
-			cal.roll(Calendar.MONTH, task.getRepeatInterval());
+			cal.add(Calendar.MONTH, task.getRepeatInterval());
 			newDateDue = cal.getTimeInMillis();
 			Log.d("MONTHS",""+newDateDue);
 			task.setDateDue(newDateDue);
@@ -120,7 +120,7 @@ public class TaskAlarm {
 			db.updateTask(task);
 			return task;
 		case Task.YEARS:
-			cal.roll(Calendar.YEAR, task.getRepeatInterval());
+			cal.add(Calendar.YEAR, task.getRepeatInterval());
 			newDateDue = cal.getTimeInMillis();
 			Log.d("YEARS",""+newDateDue);
 			task.setDateDue(newDateDue);
