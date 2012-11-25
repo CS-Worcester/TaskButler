@@ -40,8 +40,6 @@ public class TaskAlarm {
 	public static final int REPEATING_ALARM = 1;
 	public static final int PROCRASTINATOR_ALARM =2;
 
-	private final long MINUTES = 60000;
-
 	/**
 	 * Cancel alarm using the task id, PendingIntent is created using the Task id
 	 * @param context
