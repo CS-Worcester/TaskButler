@@ -35,92 +35,91 @@ import edu.worcester.cs499summer2012.task.Task;
  * @author Dhimitraq Jorgji
  */
 public class TaskAlarm {
-	
+
 	public static final String ALARM_EXTRA ="edu.worcester.cs499summer2012.TaskAlarm";
 	public static final int REPEATING_ALARM = 1;
 	public static final int PROCRASTINATOR_ALARM =2;
-	
-	private final long MINUTES = 60000;
-	private final long HOURS = MINUTES * 60;
-	private final long DAYS = HOURS * 24;
-	private final long WEEKS =  DAYS * 7;
 
 	/**
 	 * Cancel alarm using the task id, PendingIntent is created using the Task id
 	 * @param context
 	 * @param intent
 	 */
-    public void cancelAlarm(Context context, int id)
-    {
-    	PendingIntent pi = getPendingIntent(context, id);
-    	AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-    	alarmManager.cancel(pi);
-    	pi.cancel();
-    }
-    
-    /**
-     * Set a One Time Alarm using the taskID
-     * @param context
-     * @param id id of task to retrieve task from SQLite database
-     */
-    public void setAlarm(Context context, int id){
+	public void cancelAlarm(Context context, int id)
+	{
+		PendingIntent pi = getPendingIntent(context, id);
+		AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+		alarmManager.cancel(pi);
+		pi.cancel();
+	}
+
+	/**
+	 * Set a One Time Alarm using the taskID
+	 * @param context
+	 * @param id id of task to retrieve task from SQLite database
+	 */
+	public void setAlarm(Context context, int id){
 		TasksDataSource db = TasksDataSource.getInstance(context);
 		Task task = db.getTask(id);
-        AlarmManager am=(AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
-        am.set(AlarmManager.RTC_WAKEUP, task.getDateDue(), getPendingIntent(context, id));
-    }
-    
-    /**
-     * Sets DateDue field to the next repeat cycle, you still need to call setAlarm()
-     * @param context
-     * @param id
-     */
+		AlarmManager am=(AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
+		am.set(AlarmManager.RTC_WAKEUP, task.getDateDue(), getPendingIntent(context, id));
+	}
+
+	/**
+	 * Sets DateDue field to the next repeat cycle, you still need to call setAlarm()
+	 * @param context
+	 * @param id
+	 */
 	public Task setRepeatingAlarm(Context context, int id){
-    	TasksDataSource db = TasksDataSource.getInstance(context);
-    	Task task = db.getTask(id);    	
-    	Calendar cal = Calendar.getInstance();
-    	long months = DAYS * cal.getActualMaximum(Calendar.DAY_OF_MONTH);
-    	long years = DAYS * cal.getActualMaximum(Calendar.DAY_OF_YEAR);
-    	
-    	long newDateDue;
-    	switch(task.getRepeatType()){
+		TasksDataSource db = TasksDataSource.getInstance(context);
+		Task task = db.getTask(id);    	
+		Calendar cal = Calendar.getInstance();    	
+
+		long newDateDue;
+		switch(task.getRepeatType()){
 		case Task.MINUTES:
-			newDateDue = task.getDateDue() + MINUTES*task.getRepeatInterval();
+			cal.add(Calendar.MINUTE, task.getRepeatInterval());
+			newDateDue = cal.getTimeInMillis();
 			Log.d("MINUTES",""+newDateDue);
 			task.setDateDue(newDateDue);
 			task.setIsCompleted(false); //this allows user to mark task complete until next time
 			db.updateTask(task);
 			return task;
 		case Task.HOURS:
-			newDateDue = task.getDateDue() + HOURS*task.getRepeatInterval();
+			cal.add(Calendar.HOUR, task.getRepeatInterval());
+			newDateDue = cal.getTimeInMillis();
 			Log.d("HOURS",""+newDateDue);
 			task.setDateDue(newDateDue);
 			task.setIsCompleted(false); //this allows user to mark task complete until next time
 			db.updateTask(task);
 			return task;
 		case Task.DAYS:
-			newDateDue = task.getDateDue() + DAYS*task.getRepeatInterval();
+			cal.add(Calendar.DAY_OF_YEAR, task.getRepeatInterval());
+			newDateDue = cal.getTimeInMillis();
 			Log.d("DAYS",""+newDateDue);
 			task.setDateDue(newDateDue);
 			task.setIsCompleted(false); //this allows user to mark task complete until next time
 			db.updateTask(task);
 			return task;
 		case Task.WEEKS:
-			newDateDue = task.getDateDue() + WEEKS*task.getRepeatInterval();
+			cal.add(Calendar.WEEK_OF_YEAR, task.getRepeatInterval());
+			newDateDue = cal.getTimeInMillis();
 			Log.d("WEEKS",""+newDateDue);
 			task.setDateDue(newDateDue);
 			task.setIsCompleted(false); //this allows user to mark task complete until next time
 			db.updateTask(task);
 			return task;
 		case Task.MONTHS:
-			newDateDue = task.getDateDue() + months * task.getRepeatInterval();
+			cal.add(Calendar.MONTH, task.getRepeatInterval());
+			newDateDue = cal.getTimeInMillis();
 			Log.d("MONTHS",""+newDateDue);
 			task.setDateDue(newDateDue);
 			task.setIsCompleted(false); //this allows user to mark task complete until next time
 			db.updateTask(task);
 			return task;
 		case Task.YEARS:
-			newDateDue = task.getDateDue() + years *task.getRepeatInterval();
+			cal.add(Calendar.YEAR, task.getRepeatInterval());
+			newDateDue = cal.getTimeInMillis();
 			Log.d("YEARS",""+newDateDue);
 			task.setDateDue(newDateDue);
 			task.setIsCompleted(false); //this allows user to mark task complete until next time
@@ -129,23 +128,26 @@ public class TaskAlarm {
 		default:
 			return task;
 		}
+
+	}
+
+	public void setProcrastinatorAlarm(Context context, int id){
+		TasksDataSource db = TasksDataSource.getInstance(context);
+		Task task = db.getTask(id);
+		if(task.getDateDue() >= System.currentTimeMillis() && task.getFinalDateDue() <= System.currentTimeMillis())
+			return;
 		
-    }
-    
-    public void setProcrastinatorAlarm(Context context, int id){
-    	TasksDataSource db = TasksDataSource.getInstance(context);
-    	Task task = db.getTask(id);
-    	if(task.getDateDue() >= System.currentTimeMillis() && task.getFinalDateDue() <= System.currentTimeMillis())
-    		return;
-    	long alarm = System.currentTimeMillis() + (1 * MINUTES);
-    	AlarmManager am=(AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
-        am.set(AlarmManager.RTC_WAKEUP, alarm, getPendingIntent(context, id));
-    }
-    
-    //get a PendingIntent 
+		long alarm = (task.getFinalDateDue() - task.getDateDue()) / 4; //fit 4 reminders in the time between alarms
+		alarm += System.currentTimeMillis();
+
+		AlarmManager am=(AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
+		am.set(AlarmManager.RTC_WAKEUP, alarm, getPendingIntent(context, id));
+	}
+
+	//get a PendingIntent 
 	PendingIntent getPendingIntent(Context context, int id) {
 		Intent intent =  new Intent(context, OnAlarmReceiver.class)
-			.putExtra(Task.EXTRA_TASK_ID, id);
+		.putExtra(Task.EXTRA_TASK_ID, id);
 		return PendingIntent.getBroadcast(context, id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 	}
 }

@@ -24,19 +24,27 @@
 		android:layout_marginTop="4dp"
 		android:layout_marginBottom="2dp"
 		android:background="#33B5E5" />
-    
-    <ListView android:id="@android:id/list"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_above="@id/main_ruler" />
-    
-    <TextView android:id="@android:id/empty"
+
+  	<android.gesture.GestureOverlayView android:id="@+id/main_gesture_overlay"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentTop="true"
         android:layout_above="@id/main_ruler"
-        android:gravity="center"
-        android:text="@string/text_empty_list" />
+        android:eventsInterceptionEnabled="true"
+        android:gestureStrokeType="single"
+        android:gestureColor="#00000000"
+        android:uncertainGestureColor="#00000000">"
+  	
+	    <ListView android:id="@android:id/list"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content" />
+	    
+	    <TextView android:id="@android:id/empty"
+	        android:layout_width="match_parent"
+	        android:layout_height="match_parent"
+	        android:gravity="center"
+	        android:text="@string/text_empty_list" />
+    
+    </android.gesture.GestureOverlayView>
 
 </RelativeLayout>

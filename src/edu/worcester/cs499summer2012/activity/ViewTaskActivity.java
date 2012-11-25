@@ -22,6 +22,7 @@ package edu.worcester.cs499summer2012.activity;
 import java.util.GregorianCalendar;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.view.View;
@@ -134,9 +135,13 @@ public class ViewTaskActivity extends SherlockActivity implements OnClickListene
         }
         
         // Set due date
-        if (task.hasDateDue())
-        	((TextView) findViewById(R.id.text_date_due)).setText(DateFormat.format("MM/dd/yy 'at' h:mm AA", task.getDateDueCal()));
-        else
+        if (task.hasDateDue()) {
+        	TextView date_due = ((TextView) findViewById(R.id.text_date_due));
+        	date_due.setText(DateFormat.format("MM/dd/yy 'at' h:mm AA", task.getDateDueCal()));
+        	
+        	if (task.isPastDue())
+        		date_due.setTextColor(Color.RED);
+        } else
         	((TextView) findViewById(R.id.text_date_due)).setText(R.string.text_no_due_date);
         
         // Set final due date

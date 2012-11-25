@@ -268,6 +268,13 @@ public class Task implements Parcelable {
 
 		stopRepeatingDateCal.setTimeInMillis(stopRepeatingDate);
 	}
+	
+	public boolean isPastDue() {
+		if (!hasDateDue || isCompleted)
+			return false;
+		
+		return dateDue - System.currentTimeMillis() < 0;
+	}
 
 	/**************************************************************************
 	 * Overridden parent methods                                              *
