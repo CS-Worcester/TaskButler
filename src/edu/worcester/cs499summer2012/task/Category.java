@@ -47,16 +47,31 @@ public class Category {
 	public Category(Category c) {
 		this(c.id, c.name, c.color, c.updated);
 	}
+	
+	public Category(int id, String name, int color, long updated, String gID) {
+		this(id,name,color,updated);
+		this.gID = gID;
+
+	}
 
 	@Override
 	public String toString() {
 		return name;
 	}
-
-	public Category(int id, String name, int color, long updated, String gID) {
-		this(id,name,color,updated);
-		this.gID = gID;
-
+	
+	/**
+	 * Categories are equal if they have the same ID.
+	 */
+	@Override
+	public boolean equals(Object o) {
+		if (o == this)
+			return true;
+		if (o == null)
+			return false;
+		if (o.getClass() != this.getClass())
+			return false;
+		
+		return ((Category) o).id == this.id;
 	}
 
 	public int getID() {
