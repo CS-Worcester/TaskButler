@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.GregorianCalendar;
 
 import android.app.Activity;
+import android.graphics.Color;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -155,7 +156,7 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 		
 		// Set name
 		holder.name.setText(task.getName());
-		holder.name.setEnabled(!is_complete);
+		holder.name.setTextColor(is_complete ? Color.DKGRAY : Color.WHITE);
 		
 		// Set category
 		if (is_complete)
@@ -191,9 +192,12 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 		else {
 			holder.due_date.setVisibility(View.VISIBLE);
 			
-			if (task.hasDateDue())
+			if (task.hasDateDue()) {
 				holder.due_date.setText(DateFormat.format("'Due' MM/dd/yy h:mmAA", task.getDateDueCal()));
-			else
+				
+				if (task.isPastDue())
+	        		holder.due_date.setTextColor(Color.RED);
+			} else
 				holder.due_date.setText("");
 		}
 		
