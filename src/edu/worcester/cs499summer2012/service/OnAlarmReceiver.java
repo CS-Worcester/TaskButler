@@ -42,7 +42,7 @@ public class OnAlarmReceiver extends BroadcastReceiver {
 		NotificationHelper notification = new NotificationHelper();
 		Bundle bundle = intent.getExtras();
 		int id = bundle.getInt(Task.EXTRA_TASK_ID);
-		notification.sendBasicNotification(context, id); // send basic notification
+		notification.sendPersistentNotification(context, id); // send notification
 		
 		context.startService(new Intent(context, TaskButlerService.class)); //start TaskButlerService
 	}
