@@ -52,6 +52,8 @@ import edu.worcester.cs499summer2012.R;
 import edu.worcester.cs499summer2012.adapter.TaskListAdapter;
 import edu.worcester.cs499summer2012.database.TasksDataSource;
 import edu.worcester.cs499summer2012.service.TaskAlarm;
+import edu.worcester.cs499summer2012.service.TaskButlerService;
+import edu.worcester.cs499summer2012.service.WakefulIntentService;
 import edu.worcester.cs499summer2012.task.Category;
 import edu.worcester.cs499summer2012.task.Task;
 
@@ -225,6 +227,10 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener {
 
 		// Set up a long item click listener
 		getListView().setOnItemLongClickListener(this);
+		
+		//Start service to check for alarms
+		WakefulIntentService.acquireStaticLock(this);
+		this.startService(new Intent(this, TaskButlerService.class));
 	}
 
 	@Override
