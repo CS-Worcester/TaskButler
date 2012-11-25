@@ -27,8 +27,10 @@ import yuku.ambilwarna.AmbilWarnaDialog.OnAmbilWarnaListener;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -89,6 +91,9 @@ public class AddTaskActivity extends SherlockActivity implements
     
     // Database
     private TasksDataSource data_source;
+    
+    // Prefs
+    private SharedPreferences prefs;
     
     // Category spinner array adapter
     private ArrayAdapter<Category> category_adapter;
@@ -238,6 +243,7 @@ public class AddTaskActivity extends SherlockActivity implements
         setContentView(R.layout.activity_add_task);
         
         data_source = TasksDataSource.getInstance(this);
+        prefs = PreferenceManager.getDefaultSharedPreferences(this);
         
         // Initialize the fields that can be enabled/disabled or listened to
         has_due_date = (CheckBox) findViewById(R.id.checkbox_has_due_date);
@@ -310,6 +316,10 @@ public class AddTaskActivity extends SherlockActivity implements
         category_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         category.setAdapter(category_adapter);
         category.setOnItemSelectedListener(this);
+        
+        // Make the displayed category in MainActivity the default selection
+        int id = prefs.getInt(MainActivity.DISPLAY_CATEGORY, MainActivity.DISPLAY_ALL_CATEGORIES);
+        category.setSelection(category_adapter.getPosition(data_source.getCategory(id)));
         
         // Populate the repeat type spinner
         ArrayAdapter<CharSequence> repeat_type_adapter = 

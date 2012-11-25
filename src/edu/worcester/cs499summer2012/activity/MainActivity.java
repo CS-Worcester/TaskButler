@@ -519,7 +519,7 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 			return false;
 		
 		// Get selected category
-		Category current_category = data_source.getCategory(prefs.getInt(DISPLAY_CATEGORY, 1));
+		Category current_category = data_source.getCategory(prefs.getInt(DISPLAY_CATEGORY, DISPLAY_ALL_CATEGORIES));
 		
 		int current_index = categories.indexOf(current_category);
 		int new_index;
