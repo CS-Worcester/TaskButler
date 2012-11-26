@@ -188,7 +188,6 @@ public class ViewTaskActivity extends SherlockActivity implements OnClickListene
     public boolean onOptionsItemSelected(MenuItem item) {
     	switch (item.getItemId()) {
     	case android.R.id.home:
-    	case R.id.menu_view_task_back:
     		setResult(RESULT_CANCELED);
     		finish();
     		return true;
