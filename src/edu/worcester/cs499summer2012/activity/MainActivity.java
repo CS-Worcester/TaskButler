@@ -168,11 +168,11 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 	public static synchronized TaskListAdapter getAdapter(){
 		return adapter;
 	}
-	
+
 	private void createCategoryBar(int display_category) {
 		// Populate bottom category bar
 		ArrayList<Category> categories = data_source.getCategories();
-		
+
 		if (categories.size() == 1) {
 			findViewById(R.id.main_ruler).setVisibility(View.GONE);
 			((HorizontalScrollView) findViewById(R.id.main_category_bar_scroll)).setVisibility(View.GONE);
@@ -180,22 +180,22 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 			LinearLayout category_bar = (LinearLayout) findViewById(R.id.main_category_bar);
 			category_bar.removeAllViews();
 			LayoutInflater inflater = getLayoutInflater();
-			
+
 			for (Category category : categories) {
 				View view = inflater.inflate(R.layout.category_bar_item, null);
-				
+
 				TextView name = (TextView) view.findViewById(R.id.main_category_bar_item_name);
 				View color = view.findViewById(R.id.main_category_bar_item_color);
-				
+
 				color.setBackgroundColor(category.getColor());
-				
+
 				if (category.getID() == DISPLAY_ALL_CATEGORIES)
 					name.setText(R.string.text_main_all_categories);
 				else
 					name.setText(category.getName());
-				
+
 				Resources r = getResources();
-				
+
 				if (display_category == category.getID()) {
 					name.setBackgroundColor(r.getColor(android.R.color.background_light));
 					name.setTextColor(r.getColor(android.R.color.secondary_text_light));
@@ -203,10 +203,10 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 					name.setBackgroundColor(r.getColor(android.R.color.background_dark));
 					name.setTextColor(r.getColor(android.R.color.secondary_text_dark));
 				}
-				
+
 				view.setTag(category);
 				view.setOnClickListener(this);
-				
+
 				LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1);
 				params.setMargins(2, 2, 2, 2);
 				category_bar.addView(view, params);
@@ -236,10 +236,10 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 		gesture_detector = new GestureDetector(this, this);
 		GestureOverlayView overlay = (GestureOverlayView) findViewById(R.id.main_gesture_overlay);
 		overlay.setOnTouchListener(this);
-		
+
 		// Set an onItemLongClickListener to the list view
 		getListView().setOnItemLongClickListener(this);
-		
+
 		//Start service to check for alarms
 		WakefulIntentService.acquireStaticLock(this);
 		this.startService(new Intent(this, TaskButlerService.class));
@@ -248,7 +248,7 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 	@Override
 	public void onStart() {
 		super.onStart();
-		
+
 		// Create an adapter for the task list
 		int display_category = prefs.getInt(DISPLAY_CATEGORY, DISPLAY_ALL_CATEGORIES);
 		if (display_category == DISPLAY_ALL_CATEGORIES)
@@ -261,10 +261,10 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 		adapter.setSortType(prefs.getInt(PREF_SORT_TYPE, 
 				TaskListAdapter.AUTO_SORT));
 		adapter.sort();
-		
+
 		createCategoryBar(display_category);
 	}
-	
+
 	@Override
 	public void onStop() {
 		// Destroy the adapter, it will be recreated in onStart
@@ -363,24 +363,13 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 			Intent intent) {
 		Task task;
 		switch(request_code){
+		case EDIT_TASK_REQUEST:
+		case VIEW_TASK_REQUEST:
 		case ADD_TASK_REQUEST:
 			if(result_code == RESULT_OK){
 				// Get the task from the db using the ID in the intent
 				task = data_source.getTask(intent.getIntExtra(Task.EXTRA_TASK_ID, 0));
 
-				if (!task.isCompleted() && task.hasDateDue() &&
-						(task.getDateDue() >= System.currentTimeMillis())) {
-					TaskAlarm alarm = new TaskAlarm();
-					alarm.setAlarm(this, task.getID());
-				}
-			}
-			break;
-
-		case VIEW_TASK_REQUEST:
-			if(result_code == RESULT_OK){
-				// Get the task from the db using the ID in the intent
-				task = data_source.getTask(intent.getIntExtra(Task.EXTRA_TASK_ID, 0));
-				
 				if (!task.isCompleted() && task.hasDateDue() &&
 						(task.getDateDue() >= System.currentTimeMillis())) {
 					TaskAlarm alarm = new TaskAlarm();
@@ -428,11 +417,11 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 	public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.menu_main_edit_task:
-			
+
 			Intent intent = new Intent(this, EditTaskActivity.class);
 			intent.putExtra(Task.EXTRA_TASK_ID, adapter.getItem(selected_task).getID());
-			startActivity(intent);
-	
+			startActivityForResult(intent, EDIT_TASK_REQUEST);
+
 			mode.finish();
 			return true;
 
@@ -456,12 +445,12 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 	/**************************************************************************
 	 * Methods implementing OnClickListener interface                         *
 	 **************************************************************************/  
-	
+
 	@Override
 	public void onClick(View v) {
 		Category category = (Category) v.getTag();
 		adapter.clear();
-		
+
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
 			if (category.getID() != DISPLAY_ALL_CATEGORIES)
 				adapter.addAll(data_source.getTasksByCategory(category));
@@ -477,11 +466,11 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 					adapter.add(task);
 			}
 		}
-		
+
 		adapter.sort();
-		
+
 		createCategoryBar(category.getID());
-		
+
 		prefs_editor.putInt(DISPLAY_CATEGORY, category.getID());
 		prefs_editor.commit();
 	}
@@ -489,7 +478,7 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 	/**************************************************************************
 	 * Methods implementing OnGestureListener interface                       *
 	 **************************************************************************/
-	
+
 	@Override
 	public boolean onDown(MotionEvent e) {
 		// Not used
@@ -509,53 +498,53 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 	@Override
 	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
 			float velocityY) {
-		
+
 		// Get list of categories
 		ArrayList<Category> categories = data_source.getCategories();
-		
+
 		// Swiping won't work unless there are categories
 		if (categories.size() == 1)
 			return false;
-		
+
 		// Get selected category
 		Category current_category = data_source.getCategory(prefs.getInt(DISPLAY_CATEGORY, DISPLAY_ALL_CATEGORIES));
-		
+
 		int current_index = categories.indexOf(current_category);
 		int new_index;
-		
+
 		if (velocityX <= -1000) {
 			// Swipe left: increase index by 1
-			
+
 			// Check if we are at the end of the list
 			if (current_index == categories.size() - 1)
 				return false;
-			
+
 			new_index = current_index + 1;
 		} else if (velocityX >= 1000) {
 			// Swipe right: decrease index by 1
-			
+
 			// Check if we are at the beginning of the list
 			if (current_index == 0)
 				return false;
-			
+
 			new_index = current_index - 1;
 		} else
 			// A clear left or right swipe was not registered
 			return false;
-		
+
 		// Swiping has the same result as the user clicking on a category, so
 		// let's tag a view with the new category and send it over to onClick
 		View view = new View(this);
 		view.setTag(categories.get(new_index));
 		onClick(view);
-		
+
 		return true;
 	}
 
 	@Override
 	public void onLongPress(MotionEvent e) {
 		// Not used
-		
+
 	}
 
 	@Override
@@ -568,7 +557,7 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 	@Override
 	public void onShowPress(MotionEvent e) {
 		// Not used
-		
+
 	}
 
 	@Override
@@ -580,7 +569,7 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 	/**************************************************************************
 	 * Methods implementing OnTouchListener interface                         *
 	 **************************************************************************/
-	
+
 	@Override
 	public boolean onTouch(View v, MotionEvent event) {
 		gesture_detector.onTouchEvent(event);
