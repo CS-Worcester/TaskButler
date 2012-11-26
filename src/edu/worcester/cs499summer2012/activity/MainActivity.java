@@ -80,6 +80,7 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 	public static final String DISPLAY_CATEGORY = "display_category";
 	public static final int ADD_TASK_REQUEST = 0;
 	public static final int VIEW_TASK_REQUEST = 1;
+	public static final int EDIT_TASK_REQUEST = 2;
 	public static final int DELETE_MODE_SINGLE = 0;
 	public static final int DELETE_MODE_FINISHED = 1;
 	public static final int DELETE_MODE_ALL = 2;
@@ -276,12 +277,6 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getSupportMenuInflater();
 		inflater.inflate(R.menu.activity_main, menu);
-
-		//add switch account button if more than 2 accounts on the device
-		// TODO: (Jon) Figure out why this isn't working for me
-		/*if (accountManager.getAccounts().length >= 2) {
-			menu.add(0, MENU_ACCOUNTS, 0, "Switch Account");
-		}*/
 		return true;
 	}
 
@@ -433,7 +428,11 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 	public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.menu_main_edit_task:
-			toast("Coming soon!");
+			
+			Intent intent = new Intent(this, EditTaskActivity.class);
+			intent.putExtra(Task.EXTRA_TASK_ID, adapter.getItem(selected_task).getID());
+			startActivity(intent);
+	
 			mode.finish();
 			return true;
 

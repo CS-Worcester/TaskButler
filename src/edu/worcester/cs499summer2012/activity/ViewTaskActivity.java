@@ -69,42 +69,8 @@ public class ViewTaskActivity extends SherlockActivity implements OnClickListene
 	 * Class methods                                                          *
 	 **************************************************************************/
     
-	/**
-     * Displays a message in a Toast notification for a short duration.
-     */
-    private void toast(String message)
-    {
-    	Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-    }
-    
-	/**************************************************************************
-	 * Overridden parent methods                                              *
-	 **************************************************************************/
-    
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_view_task);
-        
-        // Allow Action bar icon to act as a button
-        ActionBar action_bar = getSupportActionBar();
-        action_bar.setHomeButtonEnabled(true);
-        action_bar.setDisplayHomeAsUpEnabled(true);
-        
-        // Get instance of the db
-        data_source = TasksDataSource.getInstance(this);
-        
-        // Get the task from the intent
-        task = data_source.getTask(getIntent().getIntExtra(Task.EXTRA_TASK_ID, 0));
-        
-        // Exit the task if it no longer exists (has been deleted)
-        if (task == null) {
-        	toast("This task has been deleted!");
-        	finish();
-        	return;
-        }
-        
-        // Set name
+	private void displayTask() {
+		// Set name
         ((TextView) findViewById(R.id.text_view_task_name)).setText(task.getName());
         
         // Set completion button
@@ -132,10 +98,15 @@ public class ViewTaskActivity extends SherlockActivity implements OnClickListene
         }
         
         // Set category (if category ID is not 1, i.e. no category)
+        ImageView iv_category_color = (ImageView) findViewById(R.id.image_category);
+        TextView tv_category_name = (TextView) findViewById(R.id.text_category);
         if (task.getCategory() != 1) {
         	Category category = data_source.getCategory(task.getCategory());
-        	((ImageView) findViewById(R.id.image_category)).setBackgroundColor(category.getColor());
-        	((TextView) findViewById(R.id.text_category)).setText(category.getName());
+        	iv_category_color.setBackgroundColor(category.getColor());
+        	tv_category_name.setText(category.getName());
+        } else {
+        	iv_category_color.setBackgroundColor(Color.TRANSPARENT);
+        	tv_category_name.setText("");
         }
         
         // Set due date
@@ -175,6 +146,45 @@ public class ViewTaskActivity extends SherlockActivity implements OnClickListene
         
         // Set date modified
         ((TextView) findViewById(R.id.text_date_modified)).setText(DateFormat.format("MM/dd/yy 'at' h:mm AA", task.getDateModifiedCal()));
+	}
+	
+	/**
+     * Displays a message in a Toast notification for a short duration.
+     */
+    private void toast(String message)
+    {
+    	Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    }
+    
+	/**************************************************************************
+	 * Overridden parent methods                                              *
+	 **************************************************************************/
+    
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_view_task);
+        
+        // Allow Action bar icon to act as a button
+        ActionBar action_bar = getSupportActionBar();
+        action_bar.setHomeButtonEnabled(true);
+        action_bar.setDisplayHomeAsUpEnabled(true);
+        
+        // Get instance of the db
+        data_source = TasksDataSource.getInstance(this);
+        
+        // Get the task from the intent
+        task = data_source.getTask(getIntent().getIntExtra(Task.EXTRA_TASK_ID, 0));
+        
+        // Exit the task if it no longer exists (has been deleted)
+        if (task == null) {
+        	toast("This task has been deleted!");
+        	finish();
+        	return;
+        }
+        
+        // Display the task
+        displayTask();
     }
     
     @Override
@@ -193,8 +203,10 @@ public class ViewTaskActivity extends SherlockActivity implements OnClickListene
     		return true;
     		
     	case R.id.menu_view_task_edit:
-    		// TODO: Implement this
-    		return super.onOptionsItemSelected(item);
+    		Intent intent = new Intent(this, EditTaskActivity.class);
+			intent.putExtra(Task.EXTRA_TASK_ID, task.getID());
+			startActivityForResult(intent, MainActivity.EDIT_TASK_REQUEST);
+    		return true;
     		
     	case R.id.menu_view_task_delete:
     		AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -256,4 +268,11 @@ public class ViewTaskActivity extends SherlockActivity implements OnClickListene
 		}
 	}
 	
+	@Override
+	public void onActivityResult(int request_code, int result_code, Intent intent) {		
+		if (request_code == MainActivity.EDIT_TASK_REQUEST && result_code == MainActivity.RESULT_OK) {
+			task = data_source.getTask(intent.getIntExtra(Task.EXTRA_TASK_ID, 0));
+			displayTask();
+		}
+	}
 }
