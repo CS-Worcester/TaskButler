@@ -1,14 +1,6 @@
 *******************************************************************************
-* TASK BUTLER 0.1 - A task organization app                                   *
+* TASK BUTLER - A task organization app for Android                           *
 *******************************************************************************
-
-**********
-* Notice *
-**********
-
-This app is in its very early stages of development. Much of its functionality
-has yet to be implemented and there are bound to be bugs. If you would like to 
-try our app, we recommend that you run it in an AVD (Android virtual device).
 
 ***************
 * Description *
@@ -24,17 +16,25 @@ organized and never miss an obligation or deadline again with Task Butler!
 Task Butler is being developed as part of CS 499 Summer 2012 at Worcester State
 University.
 
-*********************************************
-* Building from source - required libraries *
-*********************************************
+*******************************************************
+* Building from source - required 3rd party libraries *
+*******************************************************
 
 ActionBarSherlock - http://actionbarsherlock.com/
+    This software is Copyright Jake Wharton and is distributed under the Apache 
+    2.0 License.
 
-***********
-* License *
-***********
+AndroidColorPicker - http://code.google.com/p/android-color-picker/
+    This software is Copyright yukuku@gmail.com and is distributed under the 
+    Apache 2.0 License.
 
-Copyright 2012 Jonathan Hasenzahl, James Celona
+
+
+***********************
+* Copyright & license *
+***********************
+
+Copyright 2012 Jonathan Hasenzahl, James Celona, Dhimitraq Jorgji
  
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

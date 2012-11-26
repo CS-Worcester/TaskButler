@@ -25,6 +25,7 @@ import edu.worcester.cs499summer2012.database.TasksDataSource;
 import edu.worcester.cs499summer2012.task.Task;
 
 import android.app.Notification;
+import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -51,10 +52,34 @@ public class NotificationHelper{
 		NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
 			.setContentText(task.getName())
 			.setContentTitle("Task Butler")
-			.setSmallIcon(R.drawable.ic_notification)
+			.setSmallIcon(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB ? 
+					R.drawable.ic_notification : R.drawable.ic_notification_deprecated)
 			.setAutoCancel(true)
 			.setContentIntent(getPendingIntent(context, id))
 			.setWhen(System.currentTimeMillis())
+			.setDefaults(Notification.DEFAULT_ALL);
+		Notification notification = builder.getNotification();
+		NotificationManager notificationManager = getNotificationManager(context);
+		notificationManager.notify(task.getID(), notification);
+	}
+	/**
+	 * Basic Text Notification with Ongoing flag enabled for Task Butler, using NotificationCompat
+	 * @param context 
+	 * @param id id of task, call task.getID() and pass it to this parameter
+	 */
+	public void sendPersistentNotification(Context context, int id) {
+		TasksDataSource db = TasksDataSource.getInstance(context);
+		Task task = db.getTask(id);
+
+		NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
+			.setContentText(task.getName())
+			.setContentTitle("Task Butler")
+			.setSmallIcon(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB ? 
+					R.drawable.ic_notification : R.drawable.ic_notification_deprecated)
+			.setAutoCancel(true)
+			.setContentIntent(getPendingIntent(context, id))
+			.setWhen(System.currentTimeMillis())
+			.setOngoing(true)
 			.setDefaults(Notification.DEFAULT_ALL);
 		Notification notification = builder.getNotification();
 		NotificationManager notificationManager = getNotificationManager(context);

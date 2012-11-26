@@ -22,6 +22,8 @@ package edu.worcester.cs499summer2012.database;
 
 import java.util.GregorianCalendar;
 
+import edu.worcester.cs499summer2012.task.Comparator;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
@@ -36,7 +38,7 @@ import android.graphics.Color;
 public class DatabaseHandler extends SQLiteOpenHelper {
 
 	// Database Version
-	private static final int DATABASE_VERSION = 6;
+	private static final int DATABASE_VERSION = 7;
 
 
 	// Database Name
@@ -45,9 +47,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	// Table names
 	public static final String TABLE_TASKS = "tasks";
 	public static final String TABLE_CATEGORIES = "categories";
+	public static final String TABLE_COMPARATORS = "comparators";
 
 	// Column names
-	public static final String KEY_ID = "id";
+	public static final String KEY_ID = "id";										 // INTEGER PRIMARY KEY
 	public static final String KEY_NAME = "name"; 									 // TEXT
 	public static final String KEY_COMPLETION = "completion"; 						 // INTEGER, indirectly boolean
 	public static final String KEY_PRIORITY = "priority"; 							 // INTEGER
@@ -65,8 +68,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	public static final String KEY_STOP_REPEATING_DATE = "stopRepeatingDate"; 		 // DATETIME
 	public static final String KEY_NOTES = "notes"; 								 // TEXT, can be null
 	public static final String KEY_COLOR = "color"; 								 // INTEGER, used in category table
-	public static final String KEY_UPDATED = "updated";
-	public static final String KEY_G_ID = "gID";
+	public static final String KEY_UPDATED = "updated";								 // DATETIME
+	public static final String KEY_G_ID = "gID";									 // STRING
+	public static final String KEY_ENABLED = "enabled";								 // INTEGER, indirectly boolean, used in comparators table
+	public static final String KEY_ORDER = "list_order";									 // INTEGER, used in comparators table
 
 
 	public DatabaseHandler(Context context) {
@@ -102,10 +107,17 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				+ KEY_COLOR + " INTEGER,"
 				+ KEY_UPDATED + " DATETIME,"
 				+ KEY_G_ID + " TEXT)";
+		
+		String create_comparators_table = "CREATE TABLE " + TABLE_COMPARATORS + "(" 
+				+ KEY_ID + " INTEGER PRIMARY KEY,"
+				+ KEY_NAME + " TEXT,"
+				+ KEY_ENABLED + " INTEGER,"
+				+ KEY_ORDER + " INTEGER)";
 
 
 		db.execSQL(create_tasks_table);
 		db.execSQL(create_categories_table);
+		db.execSQL(create_comparators_table);
 
 		// Create first entry of categories table
 		ContentValues values = new ContentValues();
@@ -113,8 +125,57 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		values.put(KEY_NAME, "No category");
 		values.put(KEY_COLOR, Color.parseColor("#00FFFFFF"));
 		values.put(KEY_UPDATED, GregorianCalendar.getInstance().getTimeInMillis());
-
 		db.insert(TABLE_CATEGORIES, null, values);
+		
+		// Create all entries of comparators table
+		values = new ContentValues();
+		values.put(KEY_ID, Comparator.NAME);
+		values.put(KEY_NAME, "Task name");
+		values.put(KEY_ENABLED, 0);
+		values.put(KEY_ORDER, 0);
+		db.insert(TABLE_COMPARATORS, null, values);
+		values = new ContentValues();
+		values.put(KEY_ID, Comparator.COMPLETION);
+		values.put(KEY_NAME, "Completion status");
+		values.put(KEY_ENABLED, 0);
+		values.put(KEY_ORDER, 1);
+		db.insert(TABLE_COMPARATORS, null, values);
+		values = new ContentValues();
+		values.put(KEY_ID, Comparator.PRIORITY);
+		values.put(KEY_NAME, "Priority");
+		values.put(KEY_ENABLED, 0);
+		values.put(KEY_ORDER, 2);
+		db.insert(TABLE_COMPARATORS, null, values);
+		values = new ContentValues();
+		values.put(KEY_ID, Comparator.CATEGORY);
+		values.put(KEY_NAME, "Category");
+		values.put(KEY_ENABLED, 0);
+		values.put(KEY_ORDER, 3);
+		db.insert(TABLE_COMPARATORS, null, values);
+		values = new ContentValues();
+		values.put(KEY_ID, Comparator.DATE_DUE);
+		values.put(KEY_NAME, "Due date");
+		values.put(KEY_ENABLED, 0);
+		values.put(KEY_ORDER, 4);
+		db.insert(TABLE_COMPARATORS, null, values);
+		values = new ContentValues();
+		values.put(KEY_ID, Comparator.FINAL_DATE_DUE);
+		values.put(KEY_NAME, "Alarm date");
+		values.put(KEY_ENABLED, 0);
+		values.put(KEY_ORDER, 5);
+		db.insert(TABLE_COMPARATORS, null, values);
+		values = new ContentValues();
+		values.put(KEY_ID, Comparator.DATE_CREATED);
+		values.put(KEY_NAME, "Date created");
+		values.put(KEY_ENABLED, 0);
+		values.put(KEY_ORDER, 6);
+		db.insert(TABLE_COMPARATORS, null, values);
+		values = new ContentValues();
+		values.put(KEY_ID, Comparator.DATE_MODIFIED);
+		values.put(KEY_NAME, "Date modified");
+		values.put(KEY_ENABLED, 0);
+		values.put(KEY_ORDER, 7);
+		db.insert(TABLE_COMPARATORS, null, values);
 	}
 
 	// Upgrading database
@@ -124,6 +185,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		//TODO:change to copy over old database 
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_TASKS);
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_CATEGORIES);
+		db.execSQL("DROP TABLE IF EXISTS " + TABLE_COMPARATORS);
 
 		// Create tables again
 		onCreate(db);

@@ -21,7 +21,10 @@ package edu.worcester.cs499summer2012.activity;
 
 import java.util.GregorianCalendar;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.view.View;
@@ -39,6 +42,7 @@ import com.actionbarsherlock.view.MenuItem;
 
 import edu.worcester.cs499summer2012.R;
 import edu.worcester.cs499summer2012.database.TasksDataSource;
+import edu.worcester.cs499summer2012.service.TaskAlarm;
 import edu.worcester.cs499summer2012.task.Category;
 import edu.worcester.cs499summer2012.task.Task;
 
@@ -46,7 +50,8 @@ import edu.worcester.cs499summer2012.task.Task;
  * Activity for adding a new task.
  * @author Jonathan Hasenzahl
  */
-public class ViewTaskActivity extends SherlockActivity implements OnClickListener {
+public class ViewTaskActivity extends SherlockActivity implements OnClickListener, 
+		DialogInterface.OnClickListener {
 
 	/**************************************************************************
 	 * Static fields and methods                                              *
@@ -64,6 +69,85 @@ public class ViewTaskActivity extends SherlockActivity implements OnClickListene
 	 * Class methods                                                          *
 	 **************************************************************************/
     
+	private void displayTask() {
+		// Set name
+        ((TextView) findViewById(R.id.text_view_task_name)).setText(task.getName());
+        
+        // Set completion button
+        Button button = (Button) findViewById(R.id.button_complete_task);
+        if (!task.isCompleted())
+        	button.setText(R.string.button_not_completed);
+        else
+        	button.setText(R.string.button_completed);
+        button.setOnClickListener(this);
+        
+        // Set priority
+        ((TextView) findViewById(R.id.text_priority)).setText(Task.LABELS[task.getPriority()]);
+        
+        // Set priority icon
+        switch (task.getPriority()) {
+        case Task.URGENT:
+        	((ImageView) findViewById(R.id.image_priority)).setImageResource(R.drawable.ic_urgent);
+        	break;
+        case Task.NORMAL:
+        	((ImageView) findViewById(R.id.image_priority)).setImageResource(R.drawable.ic_normal);
+        	break;
+        case Task.TRIVIAL:
+        	((ImageView) findViewById(R.id.image_priority)).setImageResource(R.drawable.ic_trivial);
+        	break;
+        }
+        
+        // Set category (if category ID is not 1, i.e. no category)
+        ImageView iv_category_color = (ImageView) findViewById(R.id.image_category);
+        TextView tv_category_name = (TextView) findViewById(R.id.text_category);
+        if (task.getCategory() != 1) {
+        	Category category = data_source.getCategory(task.getCategory());
+        	iv_category_color.setBackgroundColor(category.getColor());
+        	tv_category_name.setText(category.getName());
+        } else {
+        	iv_category_color.setBackgroundColor(Color.TRANSPARENT);
+        	tv_category_name.setText("");
+        }
+        
+        // Set due date
+        if (task.hasDateDue()) {
+        	TextView date_due = ((TextView) findViewById(R.id.text_date_due));
+        	date_due.setText(DateFormat.format("MM/dd/yy 'at' h:mm AA", task.getDateDueCal()));
+        	
+        	if (task.isPastDue())
+        		date_due.setTextColor(Color.RED);
+        } else
+        	((TextView) findViewById(R.id.text_date_due)).setText(R.string.text_no_due_date);
+        
+        // Set final due date
+        if (task.hasFinalDateDue())
+        	((TextView) findViewById(R.id.text_alarm)).setText(DateFormat.format("MM/dd/yy 'at' h:mm AA", task.getFinalDateDueCal()));
+        else
+        	((TextView) findViewById(R.id.text_alarm)).setText(R.string.text_no_final_due_date);
+        
+        // Set repetition
+        if (task.isRepeating()) {
+        	((TextView) findViewById(R.id.text_repeat)).setText("Repeat every " + task.getRepeatInterval() + ' ' + Task.REPEAT_LABELS[task.getRepeatType()]);
+        	
+        	if (task.hasStopRepeatingDate())
+        		((TextView) findViewById(R.id.text_repeat_2)).setText(DateFormat.format("'until' MM/dd/yy 'at' h:mm AA", task.getStopRepeatingDateCal()));
+        	else
+        		((TextView) findViewById(R.id.text_repeat_2)).setText(R.string.text_no_stop_repeating_date);
+        } else {
+        	((TextView) findViewById(R.id.text_repeat)).setText(R.string.text_no_repetition);
+        	((TextView) findViewById(R.id.text_repeat_2)).setVisibility(View.GONE);
+        }
+        
+        // Set notes
+        ((TextView) findViewById(R.id.text_notes)).setText(task.getNotes());
+        
+        // Set date created
+        ((TextView) findViewById(R.id.text_date_created)).setText(DateFormat.format("MM/dd/yy 'at' h:mm AA", task.getDateCreatedCal()));
+        
+        // Set date modified
+        ((TextView) findViewById(R.id.text_date_modified)).setText(DateFormat.format("MM/dd/yy 'at' h:mm AA", task.getDateModifiedCal()));
+	}
+	
 	/**
      * Displays a message in a Toast notification for a short duration.
      */
@@ -92,73 +176,15 @@ public class ViewTaskActivity extends SherlockActivity implements OnClickListene
         // Get the task from the intent
         task = data_source.getTask(getIntent().getIntExtra(Task.EXTRA_TASK_ID, 0));
         
-        // Set name
-        ((TextView) findViewById(R.id.text_view_task_name)).setText(task.getName());
-        
-        // Set completion button
-        Button button = (Button) findViewById(R.id.button_complete_task);
-        if (!task.isCompleted())
-        	button.setText(R.string.button_not_completed);
-        else
-        	button.setText(R.string.button_completed);
-        button.setOnClickListener(this);
-        
-        // Set priority
-        ((TextView) findViewById(R.id.text_priority)).setText(Task.LABELS[task.getPriority()]);
-        
-        // Set priority icon
-        switch (task.getPriority()) {
-        case Task.URGENT:
-        	((ImageView) findViewById(R.id.image_priority)).setImageResource(R.drawable.ic_urgent);
-        	break;
-        case Task.NORMAL:
-        	((ImageView) findViewById(R.id.image_priority)).setImageResource(R.drawable.ic_normal);
-        	break;
-        case Task.TRIVIAL:
-        	((ImageView) findViewById(R.id.image_priority)).setImageResource(R.drawable.ic_trivial);
-        	break;
+        // Exit the task if it no longer exists (has been deleted)
+        if (task == null) {
+        	toast("This task has been deleted!");
+        	finish();
+        	return;
         }
         
-        // Set category (if category ID is not 1, i.e. no category)
-        if (task.getCategory() != 1) {
-        	Category category = data_source.getCategory(task.getCategory());
-        	((ImageView) findViewById(R.id.image_category)).setBackgroundColor(category.getColor());
-        	((TextView) findViewById(R.id.text_category)).setText(category.getName());
-        }
-        
-        // Set due date
-        if (task.hasDateDue())
-        	((TextView) findViewById(R.id.text_date_due)).setText(DateFormat.format("MM/dd/yy 'at' h:mm AA", task.getDateDueCal()));
-        else
-        	((TextView) findViewById(R.id.text_date_due)).setText(R.string.text_no_due_date);
-        
-        // Set final due date
-        if (task.hasFinalDateDue())
-        	((TextView) findViewById(R.id.text_alarm)).setText(DateFormat.format("MM/dd/yy 'at' h:mm AA", task.getFinalDateDueCal()));
-        else
-        	((TextView) findViewById(R.id.text_alarm)).setText(R.string.text_no_final_due_date);
-        
-        // Set repetition
-        if (task.isRepeating()) {
-        	((TextView) findViewById(R.id.text_repeat)).setText("Repeat every " + task.getRepeatInterval() + ' ' + Task.REPEAT_LABELS[task.getRepeatInterval()]);
-        	
-        	if (task.hasStopRepeatingDate())
-        		((TextView) findViewById(R.id.text_repeat_2)).setText(DateFormat.format("'until' MM/dd/yy 'at' h:mm AA", task.getStopRepeatingDateCal()));
-        	else
-        		((TextView) findViewById(R.id.text_repeat_2)).setText(R.string.text_no_stop_repeating_date);
-        } else {
-        	((TextView) findViewById(R.id.text_repeat)).setText(R.string.text_no_repetition);
-        	((TextView) findViewById(R.id.text_repeat_2)).setVisibility(View.GONE);
-        }
-        
-        // Set notes
-        ((TextView) findViewById(R.id.text_notes)).setText(task.getNotes());
-        
-        // Set date created
-        ((TextView) findViewById(R.id.text_date_created)).setText(DateFormat.format("MM/dd/yy 'at' h:mm AA", task.getDateCreatedCal()));
-        
-        // Set date modified
-        ((TextView) findViewById(R.id.text_date_modified)).setText(DateFormat.format("MM/dd/yy 'at' h:mm AA", task.getDateModifiedCal()));
+        // Display the task
+        displayTask();
     }
     
     @Override
@@ -172,14 +198,24 @@ public class ViewTaskActivity extends SherlockActivity implements OnClickListene
     public boolean onOptionsItemSelected(MenuItem item) {
     	switch (item.getItemId()) {
     	case android.R.id.home:
-    	case R.id.menu_view_task_back:
     		setResult(RESULT_CANCELED);
     		finish();
     		return true;
     		
     	case R.id.menu_view_task_edit:
+    		Intent intent = new Intent(this, EditTaskActivity.class);
+			intent.putExtra(Task.EXTRA_TASK_ID, task.getID());
+			startActivityForResult(intent, MainActivity.EDIT_TASK_REQUEST);
+    		return true;
     		
     	case R.id.menu_view_task_delete:
+    		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+    		builder.setMessage("Are you sure you want to delete this task?");
+    		builder.setCancelable(true);
+    		builder.setPositiveButton("Yes", this);
+    		builder.setNegativeButton("No", this);
+    		builder.create().show();
+    		return true;
     		
     	default:
     		return super.onOptionsItemSelected(item);
@@ -208,5 +244,35 @@ public class ViewTaskActivity extends SherlockActivity implements OnClickListene
 		setResult(RESULT_OK, intent);
 		finish();
 	}
+
+	/**************************************************************************
+	 * Methods implementing DialogInterface.OnClickListener interface         *
+	 **************************************************************************/
+
+	@Override
+	public void onClick(DialogInterface dialog, int which) {
+		switch (which) {
+		case DialogInterface.BUTTON_POSITIVE:
+			data_source.deleteTask(task);
+			if (task.hasDateDue()) {
+				TaskAlarm alarm = new TaskAlarm();
+				alarm.cancelAlarm(getApplicationContext(), task.getID());
+			}
+			toast("Task deleted");
+			finish();
+			break;
+			
+		case DialogInterface.BUTTON_NEGATIVE:
+			dialog.cancel();
+			break;
+		}
+	}
 	
+	@Override
+	public void onActivityResult(int request_code, int result_code, Intent intent) {		
+		if (request_code == MainActivity.EDIT_TASK_REQUEST && result_code == MainActivity.RESULT_OK) {
+			task = data_source.getTask(intent.getIntExtra(Task.EXTRA_TASK_ID, 0));
+			displayTask();
+		}
+	}
 }

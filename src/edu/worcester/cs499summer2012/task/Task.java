@@ -268,6 +268,13 @@ public class Task implements Parcelable {
 
 		stopRepeatingDateCal.setTimeInMillis(stopRepeatingDate);
 	}
+	
+	public boolean isPastDue() {
+		if (!hasDateDue || isCompleted)
+			return false;
+		
+		return dateDue - System.currentTimeMillis() < 0;
+	}
 
 	/**************************************************************************
 	 * Overridden parent methods                                              *
@@ -460,7 +467,7 @@ public class Task implements Parcelable {
 	}
 
 	public void setRepeatType(int repeatType) {
-		if (repeatType >= 0 && repeatType <= 5){
+		if (repeatType >= 0 && repeatType <= 5) {
 			this.isRepeating = true;
 			this.repeatType = repeatType;
 		}
