@@ -197,6 +197,8 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 				
 				if (task.isPastDue())
 	        		holder.due_date.setTextColor(Color.RED);
+				else
+					holder.due_date.setTextColor(Color.LTGRAY);
 			} else
 				holder.due_date.setText("");
 		}

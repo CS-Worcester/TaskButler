@@ -296,7 +296,7 @@ public class TasksDataSource {
 
 		// updating row
 		int i = db.update(DatabaseHandler.TABLE_TASKS, values, 
-				DatabaseHandler.KEY_ID + " = " + task.getID(), null);
+				DatabaseHandler.KEY_ID + " = ?", new String[] { String.valueOf(task.getID()) });
 		close();
 		return i;		
 	}
