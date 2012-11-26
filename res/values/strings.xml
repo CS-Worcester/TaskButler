@@ -7,6 +7,7 @@
     <!-- Activity titles -->
     <string name="title_activity_main">Task Butler</string>
     <string name="title_activity_add_task">Create New Task</string>
+    <string name="title_activity_edit_task">Edit Task</string>
     <string name="title_activity_view_task">View Task</string>
     <string name="title_activity_settings">Settings</string>
     <string name="title_activity_custom_sort">Customize Task Sorting</string>
