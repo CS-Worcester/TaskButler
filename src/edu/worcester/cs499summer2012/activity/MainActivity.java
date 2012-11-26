@@ -366,24 +366,13 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 			Intent intent) {
 		Task task;
 		switch(request_code){
+		case EDIT_TASK_REQUEST:
+		case VIEW_TASK_REQUEST:
 		case ADD_TASK_REQUEST:
 			if(result_code == RESULT_OK){
 				// Get the task from the db using the ID in the intent
 				task = data_source.getTask(intent.getIntExtra(Task.EXTRA_TASK_ID, 0));
 
-				if (!task.isCompleted() && task.hasDateDue() &&
-						(task.getDateDue() >= System.currentTimeMillis())) {
-					TaskAlarm alarm = new TaskAlarm();
-					alarm.setAlarm(this, task.getID());
-				}
-			}
-			break;
-
-		case VIEW_TASK_REQUEST:
-			if(result_code == RESULT_OK){
-				// Get the task from the db using the ID in the intent
-				task = data_source.getTask(intent.getIntExtra(Task.EXTRA_TASK_ID, 0));
-				
 				if (!task.isCompleted() && task.hasDateDue() &&
 						(task.getDateDue() >= System.currentTimeMillis())) {
 					TaskAlarm alarm = new TaskAlarm();
@@ -434,7 +423,7 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 			
 			Intent intent = new Intent(this, EditTaskActivity.class);
 			intent.putExtra(Task.EXTRA_TASK_ID, adapter.getItem(selected_task).getID());
-			startActivity(intent);
+			startActivityForResult(intent, EDIT_TASK_REQUEST);
 	
 			mode.finish();
 			return true;
