@@ -21,7 +21,10 @@ package edu.worcester.cs499summer2012.activity;
 
 import java.util.GregorianCalendar;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.view.View;
@@ -39,6 +42,7 @@ import com.actionbarsherlock.view.MenuItem;
 
 import edu.worcester.cs499summer2012.R;
 import edu.worcester.cs499summer2012.database.TasksDataSource;
+import edu.worcester.cs499summer2012.service.TaskAlarm;
 import edu.worcester.cs499summer2012.task.Category;
 import edu.worcester.cs499summer2012.task.Task;
 
@@ -46,7 +50,8 @@ import edu.worcester.cs499summer2012.task.Task;
  * Activity for adding a new task.
  * @author Jonathan Hasenzahl
  */
-public class ViewTaskActivity extends SherlockActivity implements OnClickListener {
+public class ViewTaskActivity extends SherlockActivity implements OnClickListener, 
+		DialogInterface.OnClickListener {
 
 	/**************************************************************************
 	 * Static fields and methods                                              *
@@ -134,9 +139,13 @@ public class ViewTaskActivity extends SherlockActivity implements OnClickListene
         }
         
         // Set due date
-        if (task.hasDateDue())
-        	((TextView) findViewById(R.id.text_date_due)).setText(DateFormat.format("MM/dd/yy 'at' h:mm AA", task.getDateDueCal()));
-        else
+        if (task.hasDateDue()) {
+        	TextView date_due = ((TextView) findViewById(R.id.text_date_due));
+        	date_due.setText(DateFormat.format("MM/dd/yy 'at' h:mm AA", task.getDateDueCal()));
+        	
+        	if (task.isPastDue())
+        		date_due.setTextColor(Color.RED);
+        } else
         	((TextView) findViewById(R.id.text_date_due)).setText(R.string.text_no_due_date);
         
         // Set final due date
@@ -185,8 +194,17 @@ public class ViewTaskActivity extends SherlockActivity implements OnClickListene
     		return true;
     		
     	case R.id.menu_view_task_edit:
+    		// TODO: Implement this
+    		return super.onOptionsItemSelected(item);
     		
     	case R.id.menu_view_task_delete:
+    		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+    		builder.setMessage("Are you sure you want to delete this task?");
+    		builder.setCancelable(true);
+    		builder.setPositiveButton("Yes", this);
+    		builder.setNegativeButton("No", this);
+    		builder.create().show();
+    		return true;
     		
     	default:
     		return super.onOptionsItemSelected(item);
@@ -214,6 +232,29 @@ public class ViewTaskActivity extends SherlockActivity implements OnClickListene
 		intent.putExtra(Task.EXTRA_TASK_ID, task.getID());
 		setResult(RESULT_OK, intent);
 		finish();
+	}
+
+	/**************************************************************************
+	 * Methods implementing DialogInterface.OnClickListener interface         *
+	 **************************************************************************/
+
+	@Override
+	public void onClick(DialogInterface dialog, int which) {
+		switch (which) {
+		case DialogInterface.BUTTON_POSITIVE:
+			data_source.deleteTask(task);
+			if (task.hasDateDue()) {
+				TaskAlarm alarm = new TaskAlarm();
+				alarm.cancelAlarm(getApplicationContext(), task.getID());
+			}
+			toast("Task deleted");
+			finish();
+			break;
+			
+		case DialogInterface.BUTTON_NEGATIVE:
+			dialog.cancel();
+			break;
+		}
 	}
 	
 }

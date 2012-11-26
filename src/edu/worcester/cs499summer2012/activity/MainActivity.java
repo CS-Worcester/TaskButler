@@ -26,13 +26,18 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.gesture.GestureOverlayView;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.view.GestureDetector;
+import android.view.GestureDetector.OnGestureListener;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnTouchListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.HorizontalScrollView;
@@ -65,7 +70,7 @@ import edu.worcester.cs499summer2012.task.Task;
  * @author James Celona
  */
 public final class MainActivity extends SherlockListActivity implements 
-OnItemLongClickListener, ActionMode.Callback, OnClickListener {
+OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener, OnTouchListener {
 
 	/**************************************************************************
 	 * Static fields and methods                                              *
@@ -88,6 +93,7 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener {
 	private SharedPreferences prefs;
 	private SharedPreferences.Editor prefs_editor;
 	private static TaskListAdapter adapter;
+	private GestureDetector gesture_detector;
 	private Object action_mode;
 	private int selected_task;
 
@@ -225,7 +231,12 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener {
 		prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		prefs_editor = prefs.edit();
 
-		// Set up a long item click listener
+		// Initialize gesture detector and set an onTouchListener to the gesture overlay
+		gesture_detector = new GestureDetector(this, this);
+		GestureOverlayView overlay = (GestureOverlayView) findViewById(R.id.main_gesture_overlay);
+		overlay.setOnTouchListener(this);
+		
+		// Set an onItemLongClickListener to the list view
 		getListView().setOnItemLongClickListener(this);
 		
 		//Start service to check for alarms
@@ -255,9 +266,6 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener {
 	
 	@Override
 	public void onStop() {
-		// Save preferences to file
-		prefs_editor.commit();
-		
 		// Destroy the adapter, it will be recreated in onStart
 		adapter = null;
 
@@ -293,12 +301,14 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener {
 		case R.id.menu_main_auto_sort:
 			adapter.setSortType(TaskListAdapter.AUTO_SORT);
 			prefs_editor.putInt(PREF_SORT_TYPE, TaskListAdapter.AUTO_SORT);
+			prefs_editor.commit();
 			adapter.sort();
 			return true;
 
 		case R.id.menu_main_custom_sort:
 			adapter.setSortType(TaskListAdapter.CUSTOM_SORT);
 			prefs_editor.putInt(PREF_SORT_TYPE, TaskListAdapter.CUSTOM_SORT);
+			prefs_editor.commit();
 			startActivity(new Intent(this, CustomSortActivity.class));
 			return true;
 
@@ -474,5 +484,107 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener {
 		createCategoryBar(category.getID());
 		
 		prefs_editor.putInt(DISPLAY_CATEGORY, category.getID());
+		prefs_editor.commit();
+	}
+
+	/**************************************************************************
+	 * Methods implementing OnGestureListener interface                       *
+	 **************************************************************************/
+	
+	@Override
+	public boolean onDown(MotionEvent e) {
+		// Not used
+		return false;
+	}
+
+	/**
+	 * This method is called when the user flings/swipes the list view. Swiping
+	 * right or left will change the display category, if there are defined
+	 * categories.
+	 * @param e1 Not used
+	 * @param e2 Not used
+	 * @param velocityX The velocity (pixels per second) of the swipe along the X-axis.
+	 * @param velocityY Not used
+	 * @return true if the user swiped left or right, false otherwise
+	 */
+	@Override
+	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
+			float velocityY) {
+		
+		// Get list of categories
+		ArrayList<Category> categories = data_source.getCategories();
+		
+		// Swiping won't work unless there are categories
+		if (categories.size() == 1)
+			return false;
+		
+		// Get selected category
+		Category current_category = data_source.getCategory(prefs.getInt(DISPLAY_CATEGORY, DISPLAY_ALL_CATEGORIES));
+		
+		int current_index = categories.indexOf(current_category);
+		int new_index;
+		
+		if (velocityX <= -1000) {
+			// Swipe left: increase index by 1
+			
+			// Check if we are at the end of the list
+			if (current_index == categories.size() - 1)
+				return false;
+			
+			new_index = current_index + 1;
+		} else if (velocityX >= 1000) {
+			// Swipe right: decrease index by 1
+			
+			// Check if we are at the beginning of the list
+			if (current_index == 0)
+				return false;
+			
+			new_index = current_index - 1;
+		} else
+			// A clear left or right swipe was not registered
+			return false;
+		
+		// Swiping has the same result as the user clicking on a category, so
+		// let's tag a view with the new category and send it over to onClick
+		View view = new View(this);
+		view.setTag(categories.get(new_index));
+		onClick(view);
+		
+		return true;
+	}
+
+	@Override
+	public void onLongPress(MotionEvent e) {
+		// Not used
+		
+	}
+
+	@Override
+	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
+			float distanceY) {
+		// Not used
+		return false;
+	}
+
+	@Override
+	public void onShowPress(MotionEvent e) {
+		// Not used
+		
+	}
+
+	@Override
+	public boolean onSingleTapUp(MotionEvent e) {
+		// Not used
+		return false;
+	}
+
+	/**************************************************************************
+	 * Methods implementing OnTouchListener interface                         *
+	 **************************************************************************/
+	
+	@Override
+	public boolean onTouch(View v, MotionEvent event) {
+		gesture_detector.onTouchEvent(event);
+		return true;
 	}
 }

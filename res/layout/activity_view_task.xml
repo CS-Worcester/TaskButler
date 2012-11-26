@@ -19,9 +19,10 @@
 	        android:layout_alignParentTop="true"
 	        android:layout_marginTop="4dp"
 	        android:layout_marginBottom="4dp"
-	        android:textSize="28dp"
+	        android:textSize="28sp"
 	        android:textStyle="bold"
-	        android:minHeight="40dp" />"
+	        android:minHeight="40dp"
+	        android:textColor="#FFFFFF" />
 	    	    
 	    <Button
    	        android:id="@+id/button_complete_task"
@@ -30,7 +31,7 @@
 	        android:layout_below="@id/text_view_task_name"
 	        android:layout_marginTop="4dp"
 	        android:layout_marginBottom="4dp"
-	        android:textSize="24dp" />
+	        android:textSize="24sp" />
 	    
 	    <ImageView
 	        android:id="@+id/image_priority"
@@ -54,7 +55,7 @@
 	        android:layout_marginBottom="4dp"
 	        android:layout_marginLeft="4dp"
 	        android:layout_marginRight="16dp"
-	        android:textSize="20dp"
+	        android:textSize="20sp"
 	        android:gravity="center_vertical" />
 	    
 	    <ImageView
@@ -78,7 +79,7 @@
 	        android:layout_marginTop="4dp"
 	        android:layout_marginBottom="4dp"
 	        android:layout_marginLeft="4dp"
-	        android:textSize="20dp"
+	        android:textSize="20sp"
 	        android:gravity="center_vertical" />  
 	    
 	    <ImageView
@@ -102,7 +103,7 @@
 	        android:layout_marginTop="4dp"
 	        android:layout_marginBottom="4dp"
 	        android:layout_marginLeft="4dp"
-	        android:textSize="20dp"
+	        android:textSize="20sp"
 	        android:gravity="center_vertical" />
 	    
 	    <ImageView
@@ -126,7 +127,7 @@
 	        android:layout_marginTop="4dp"
 	        android:layout_marginBottom="4dp"
 	        android:layout_marginLeft="4dp"
-	        android:textSize="20dp"
+	        android:textSize="20sp"
 	        android:gravity="center_vertical" />
 	    
 	    <ImageView
@@ -150,7 +151,7 @@
 	        android:layout_marginTop="4dp"
 	        android:layout_marginBottom="4dp"
 	        android:layout_marginLeft="4dp"
-	        android:textSize="20dp"
+	        android:textSize="20sp"
 	        android:gravity="center_vertical" />
 	    
 	    <TextView
@@ -161,7 +162,7 @@
 	        android:layout_alignLeft="@id/text_repeat"
 	        android:layout_marginTop="4dp"
 	        android:layout_marginBottom="4dp"
-	        android:textSize="20dp"
+	        android:textSize="20sp"
 	        android:gravity="center_vertical" />
 	    
 	    <ImageView
@@ -185,7 +186,7 @@
 	        android:layout_marginTop="4dp"
 	        android:layout_marginBottom="4dp"
 	        android:layout_marginLeft="4dp"
-	        android:textSize="18dp"
+	        android:textSize="18sp"
 	        android:minHeight="40dp"
 	        android:gravity="top|left" />
 	    
@@ -210,7 +211,7 @@
 	        android:layout_marginTop="4dp"
 	        android:layout_marginBottom="4dp"
 	        android:layout_marginRight="4dp"
-	        android:textSize="18dp"
+	        android:textSize="18sp"
 	        android:text="@string/text_date_created_label"
 	        android:gravity="center_vertical" />
 	    
@@ -223,7 +224,7 @@
 	        android:layout_marginTop="4dp"
 	        android:layout_marginBottom="4dp"
 	        android:layout_marginRight="4dp"
-	        android:textSize="18dp"
+	        android:textSize="18sp"
 	        android:text="@string/text_date_modified_label"
 	        android:gravity="center_vertical" />
 	    
@@ -235,7 +236,7 @@
 	        android:layout_toRightOf="@id/text_date_modified_label"
 	        android:layout_marginTop="4dp"
 	        android:layout_marginBottom="4dp"
-	        android:textSize="18dp"
+	        android:textSize="18sp"
 	        android:gravity="center_vertical" />
 	    
 	    <TextView
@@ -246,7 +247,7 @@
 	        android:layout_alignLeft="@id/text_date_created"
 	        android:layout_marginTop="4dp"
 	        android:layout_marginBottom="4dp"
-	        android:textSize="18dp"
+	        android:textSize="18sp"
 	        android:gravity="center_vertical" />
 	    
 	</RelativeLayout>
