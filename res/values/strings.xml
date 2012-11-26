@@ -61,7 +61,7 @@
     
     <!-- CheckBox items -->
     <string name="checkbox_hide_completed">Hide completed tasks</string>
-    <string name="checkbox_auto_delete">Delete completed tasks automatically</string>
+    <string name="checkbox_auto_delete">Auto-delete completed tasks</string>
     <string name="checkbox_already_completed">Already completed</string>
     <string name="checkbox_has_due_date">Due date</string>
     <string name="checkbox_has_final_due_date">Procrastination alarm</string>

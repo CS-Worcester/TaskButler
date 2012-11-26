@@ -2,10 +2,6 @@
 * TASK BUTLER - A task organization app for Android                           *
 *******************************************************************************
 
-***************
-* Description *
-***************
-
 Task Butler is a task organization app for Android 2.2+. Using Task Butler, you
 can create tasks for your everyday life such as paying bills or picking up the
 dry-cleaning. Tasks can be customized by importance, due date, category, and
@@ -48,3 +44,5 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+App and notification icons by Camille Hennessy - http://milliebotdesigns.com/

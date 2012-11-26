@@ -79,6 +79,9 @@
         <activity
             android:name=".activity.SettingsActivity"
             android:label="@string/title_activity_settings" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="edu.worcester.cs499summer2012.MainActivity" />
         </activity>
     </application>
 </manifest>
