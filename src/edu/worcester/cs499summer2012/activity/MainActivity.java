@@ -78,6 +78,7 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 
 	public static final String PREF_SORT_TYPE = "sort_type";
 	public static final String DISPLAY_CATEGORY = "display_category";
+	public static final String HIDE_COMPLETED = "hide_completed";
 	public static final int ADD_TASK_REQUEST = 0;
 	public static final int VIEW_TASK_REQUEST = 1;
 	public static final int EDIT_TASK_REQUEST = 2;
@@ -144,7 +145,7 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 					break;
 
 				case DELETE_MODE_ALL:
-					ArrayList<Task> tasks = data_source.getAllTasks();
+					ArrayList<Task> tasks = data_source.getTasks(true, null);
 					TaskAlarm alarm = new TaskAlarm();
 					for (Task t : tasks) {
 						if (t.hasDateDue())
@@ -249,12 +250,14 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 	public void onStart() {
 		super.onStart();
 		
+		boolean hide_completed = prefs.getBoolean(HIDE_COMPLETED, false);
+		
 		// Create an adapter for the task list
 		int display_category = prefs.getInt(DISPLAY_CATEGORY, DISPLAY_ALL_CATEGORIES);
 		if (display_category == DISPLAY_ALL_CATEGORIES)
-			adapter = new TaskListAdapter(this, data_source.getAllTasks());
+			adapter = new TaskListAdapter(this, data_source.getTasks(!hide_completed, null));
 		else
-			adapter = new TaskListAdapter(this, data_source.getTasksByCategory(data_source.getCategory(display_category)));
+			adapter = new TaskListAdapter(this, data_source.getTasks(!hide_completed, data_source.getCategory(display_category)));
 		setListAdapter(adapter);
 
 		// Set sort type and sort the list
@@ -462,18 +465,20 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 		Category category = (Category) v.getTag();
 		adapter.clear();
 		
+		boolean hide_completed = prefs.getBoolean(HIDE_COMPLETED, false);
+		
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
 			if (category.getID() != DISPLAY_ALL_CATEGORIES)
-				adapter.addAll(data_source.getTasksByCategory(category));
+				adapter.addAll(data_source.getTasks(!hide_completed, category));
 			else
-				adapter.addAll(data_source.getAllTasks());
+				adapter.addAll(data_source.getTasks(!hide_completed, null));
 		} else {
 			// addAll is not supported in under API 11
 			if (category.getID() != DISPLAY_ALL_CATEGORIES) {
-				for (Task task : data_source.getTasksByCategory(category))
+				for (Task task : data_source.getTasks(!hide_completed, category))
 					adapter.add(task);
 			} else {
-				for (Task task : data_source.getAllTasks())
+				for (Task task : data_source.getTasks(!hide_completed, null))
 					adapter.add(task);
 			}
 		}
