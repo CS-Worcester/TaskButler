@@ -21,14 +21,14 @@ package edu.worcester.cs499summer2012.adapter;
 
 import java.util.ArrayList;
 
-import edu.worcester.cs499summer2012.R;
-import edu.worcester.cs499summer2012.task.Category;
 import android.app.Activity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
+import edu.worcester.cs499summer2012.R;
+import edu.worcester.cs499summer2012.task.Category;
 
 public class CategoryListAdapter extends ArrayAdapter<Category> {
 
