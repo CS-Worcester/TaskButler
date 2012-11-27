@@ -178,6 +178,7 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 			findViewById(R.id.main_ruler).setVisibility(View.GONE);
 			((HorizontalScrollView) findViewById(R.id.main_category_bar_scroll)).setVisibility(View.GONE);
 		} else {
+			((HorizontalScrollView) findViewById(R.id.main_category_bar_scroll)).setVisibility(View.VISIBLE);
 			LinearLayout category_bar = (LinearLayout) findViewById(R.id.main_category_bar);
 			category_bar.removeAllViews();
 			LayoutInflater inflater = getLayoutInflater();
