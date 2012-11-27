@@ -25,8 +25,8 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.gesture.GestureOverlayView;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -195,14 +195,12 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 				else
 					name.setText(category.getName());
 
-				Resources r = getResources();
-
 				if (display_category == category.getID()) {
-					name.setBackgroundColor(r.getColor(android.R.color.background_light));
-					name.setTextColor(r.getColor(android.R.color.secondary_text_light));
+					name.setBackgroundColor(Color.LTGRAY);
+					name.setTextColor(Color.BLACK);
 				} else {
-					name.setBackgroundColor(r.getColor(android.R.color.background_dark));
-					name.setTextColor(r.getColor(android.R.color.secondary_text_dark));
+					name.setBackgroundColor(Color.BLACK);
+					name.setTextColor(Color.LTGRAY);
 				}
 
 				view.setTag(category);
