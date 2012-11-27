@@ -22,6 +22,7 @@ package edu.worcester.cs499summer2012.database;
 
 import java.util.GregorianCalendar;
 
+import edu.worcester.cs499summer2012.task.Category;
 import edu.worcester.cs499summer2012.task.Comparator;
 
 import android.content.ContentValues;
@@ -121,7 +122,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 		// Create first entry of categories table
 		ContentValues values = new ContentValues();
-		values.put(KEY_ID, 1);
+		values.put(KEY_ID, Category.NO_CATEGORY);
 		values.put(KEY_NAME, "No category");
 		values.put(KEY_COLOR, Color.parseColor("#00FFFFFF"));
 		values.put(KEY_UPDATED, GregorianCalendar.getInstance().getTimeInMillis());
