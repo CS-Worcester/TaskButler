@@ -24,6 +24,7 @@ import android.graphics.Color;
 public class Category {
 
 	public static final int NEW_CATEGORY = 0;
+	public static final int NO_CATEGORY = 1;
 
 	private int id;
 	private String name;
