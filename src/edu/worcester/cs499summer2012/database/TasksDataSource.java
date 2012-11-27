@@ -130,16 +130,17 @@ public class TasksDataSource {
 			return null;
 		}
 	}
-	
-	public ArrayList<Task> getTasksByCategory(Category c) {
+
+	public ArrayList<Task> getAllTasks() {
 		ArrayList<Task> taskList = new ArrayList<Task>();
-		
-		String selectQuery = "SELECT * FROM " + DatabaseHandler.TABLE_TASKS + 
-				" WHERE " + DatabaseHandler.KEY_CATEGORY + " = " + c.getID();
-		
+
+		// Select All Query
+		String selectQuery = "SELECT * FROM " + DatabaseHandler.TABLE_TASKS;
+
 		open();
 		Cursor cursor = db.rawQuery(selectQuery, null);
 
+		// looping through all rows and adding to list
 		if (cursor.moveToFirst()) {
 			do {
 				Task task = new Task(
@@ -169,15 +170,37 @@ public class TasksDataSource {
 
 		cursor.close();
 		close();
-		
+		// return task list
 		return taskList;
 	}
-
-	public ArrayList<Task> getAllTasks() {
+	
+	/**
+	 * Gets a list of Tasks from the database.
+	 * @param all_tasks True will return all tasks, false will return only
+	 *                  unfinished tasks.
+	 * @param category Only get tasks of this category. If null, get all tasks.
+	 * @return an ArrayList of tasks
+	 */
+	public ArrayList<Task> getTasks(boolean all_tasks, Category category) {
 		ArrayList<Task> taskList = new ArrayList<Task>();
 
+		StringBuilder builder = new StringBuilder();
+		builder.append("SELECT * FROM " + DatabaseHandler.TABLE_TASKS);
+		
+		if (!all_tasks)
+			builder.append(" WHERE " + DatabaseHandler.KEY_COMPLETION + " = 0");
+		
+		if (category != null) {
+			if (all_tasks)
+				builder.append(" WHERE ");
+			else
+				builder.append(" AND ");
+			
+			builder.append(DatabaseHandler.KEY_CATEGORY + " = " + category.getID());
+		}
+		
 		// Select All Query
-		String selectQuery = "SELECT * FROM " + DatabaseHandler.TABLE_TASKS;
+		String selectQuery = builder.toString();
 
 		open();
 		Cursor cursor = db.rawQuery(selectQuery, null);
@@ -296,7 +319,7 @@ public class TasksDataSource {
 
 		// updating row
 		int i = db.update(DatabaseHandler.TABLE_TASKS, values, 
-				DatabaseHandler.KEY_ID + " = " + task.getID(), null);
+				DatabaseHandler.KEY_ID + " = ?", new String[] { String.valueOf(task.getID()) });
 		close();
 		return i;		
 	}

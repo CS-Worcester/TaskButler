@@ -23,7 +23,9 @@ import java.util.ArrayList;
 import java.util.GregorianCalendar;
 
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.preference.PreferenceManager;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,6 +36,7 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 import edu.worcester.cs499summer2012.R;
+import edu.worcester.cs499summer2012.activity.MainActivity;
 import edu.worcester.cs499summer2012.comparator.TaskAutoComparator;
 import edu.worcester.cs499summer2012.comparator.TaskCategoryComparator;
 import edu.worcester.cs499summer2012.comparator.TaskCompletionComparator;
@@ -78,6 +81,7 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 	private final Activity activity;
 	private final ArrayList<Task> tasks;
 	private TasksDataSource data_source;
+	private SharedPreferences prefs;
 	private int sort_type;
 	
 	/**************************************************************************
@@ -95,6 +99,7 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 		this.activity = activity;
 		this.tasks = tasks;
 		data_source = TasksDataSource.getInstance(this.activity);
+		prefs = PreferenceManager.getDefaultSharedPreferences(this.activity);
 		setNotifyOnChange(true);
 	}
 	
@@ -132,6 +137,10 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 					
 					// Update DB
 					data_source.updateTask(task);
+					
+					// If "hide completed tasks" option, then remove the task from the adapter
+					if (prefs.getBoolean(MainActivity.HIDE_COMPLETED, false))
+							tasks.remove(task);
 					
 					sort();
 				}
@@ -197,6 +206,8 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 				
 				if (task.isPastDue())
 	        		holder.due_date.setTextColor(Color.RED);
+				else
+					holder.due_date.setTextColor(Color.LTGRAY);
 			} else
 				holder.due_date.setText("");
 		}
