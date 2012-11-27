@@ -467,7 +467,7 @@ public class Task implements Parcelable {
 	}
 
 	public void setRepeatType(int repeatType) {
-		if (repeatType >= 0 && repeatType <= 5){
+		if (repeatType >= 0 && repeatType <= 5) {
 			this.isRepeating = true;
 			this.repeatType = repeatType;
 		}
