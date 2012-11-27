@@ -10,6 +10,7 @@
     <string name="title_activity_edit_task">Edit Task</string>
     <string name="title_activity_view_task">View Task</string>
     <string name="title_activity_settings">Settings</string>
+    <string name="title_activity_edit_categories">Manage categories</string>
     <string name="title_activity_custom_sort">Customize Task Sorting</string>
     
     <!-- Menu items -->
@@ -31,6 +32,7 @@
 
     <!-- TextView items -->
     <string name="text_empty_list">No tasks found.\nClick the button above to create a task!</string>
+    <string name="text_no_categories">No categories found.\nClick the button above to create a category!</string>
     <string name="text_task_name">Name</string>
     <string name="text_task_priority">Priority</string>
     <string name="text_task_category">Category</string>
@@ -61,7 +63,7 @@
     
     <!-- CheckBox items -->
     <string name="checkbox_hide_completed">Hide completed tasks</string>
-    <string name="checkbox_auto_delete">Delete completed tasks automatically</string>
+    <string name="checkbox_auto_delete">Auto-delete completed tasks</string>
     <string name="checkbox_already_completed">Already completed</string>
     <string name="checkbox_has_due_date">Due date</string>
     <string name="checkbox_has_final_due_date">Procrastination alarm</string>
@@ -86,7 +88,7 @@
     <string name="image_down">Down</string>
     
     <!-- Dialog items -->
-    <string name="dialog_about">Task Butler 1.0\n\nCopyright 2012 Jonathan Hasenzahl, James Celona, Dhimitraq Jorgji.\n\nTask Butler is distributed under the GNU General Public License.</string>
+    <string name="dialog_about">Task Butler\n\nCopyright 2012 Jonathan Hasenzahl, James Celona, Dhimitraq Jorgji.\n\nTask Butler is distributed under the GNU General Public License.</string>
 	
 	<!-- Spinner items -->
 	<string-array name="spinner_repeat_types">

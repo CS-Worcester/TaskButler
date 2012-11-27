@@ -1,4 +1,5 @@
 /* 
+
  * EditTaskActivity.java
  * 
  * Copyright 2012 Jonathan Hasenzahl, James Celona, Dhimitraq Jorgji
@@ -83,7 +84,6 @@ public class EditTaskActivity extends BaseTaskActivity {
         // Set due date
         if (task.hasDateDue()) {
         	due_date_cal = task.getDateDueCal();
-        	prevent_initial_due_date_popup = true;
         	has_due_date.setChecked(true);
         } else {
         	due_date_cal = GregorianCalendar.getInstance();
@@ -95,7 +95,6 @@ public class EditTaskActivity extends BaseTaskActivity {
         // Set final due date
         if (task.hasFinalDateDue()) {
         	final_due_date_cal = task.getFinalDateDueCal();
-        	prevent_initial_final_due_date_popup = true;
         	has_final_due_date.setChecked(true);
         } else {
         	final_due_date_cal = (Calendar) due_date_cal.clone();
@@ -113,7 +112,6 @@ public class EditTaskActivity extends BaseTaskActivity {
         // Set stop repeating date
         if (task.hasStopRepeatingDate()) {
         	stop_repeating_date_cal = task.getStopRepeatingDateCal();
-        	prevent_initial_stop_repeating_date_popup = true;
         	stop_repeating.setChecked(true);
         } else {
         	stop_repeating_date_cal = (Calendar) due_date_cal.clone();

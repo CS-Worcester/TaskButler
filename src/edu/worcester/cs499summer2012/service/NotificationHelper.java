@@ -21,7 +21,6 @@ package edu.worcester.cs499summer2012.service;
 
 import edu.worcester.cs499summer2012.R;
 import edu.worcester.cs499summer2012.activity.ViewTaskActivity;
-import edu.worcester.cs499summer2012.database.TasksDataSource;
 import edu.worcester.cs499summer2012.task.Task;
 
 import android.app.Notification;
@@ -45,17 +44,14 @@ public class NotificationHelper{
 	 * @param context 
 	 * @param id id of task, call task.getID() and pass it to this parameter
 	 */
-	public void sendBasicNotification(Context context, int id) {
-		TasksDataSource db = TasksDataSource.getInstance(context);
-		Task task = db.getTask(id);
-
+	public void sendBasicNotification(Context context, Task task) {
 		NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
 			.setContentText(task.getName())
 			.setContentTitle("Task Butler")
 			.setSmallIcon(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB ? 
 					R.drawable.ic_notification : R.drawable.ic_notification_deprecated)
 			.setAutoCancel(true)
-			.setContentIntent(getPendingIntent(context, id))
+			.setContentIntent(getPendingIntent(context, task.getID()))
 			.setWhen(System.currentTimeMillis())
 			.setDefaults(Notification.DEFAULT_ALL);
 		Notification notification = builder.getNotification();
@@ -67,17 +63,14 @@ public class NotificationHelper{
 	 * @param context 
 	 * @param id id of task, call task.getID() and pass it to this parameter
 	 */
-	public void sendPersistentNotification(Context context, int id) {
-		TasksDataSource db = TasksDataSource.getInstance(context);
-		Task task = db.getTask(id);
-
+	public void sendPersistentNotification(Context context, Task task) {
 		NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
 			.setContentText(task.getName())
 			.setContentTitle("Task Butler")
 			.setSmallIcon(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB ? 
 					R.drawable.ic_notification : R.drawable.ic_notification_deprecated)
 			.setAutoCancel(true)
-			.setContentIntent(getPendingIntent(context, id))
+			.setContentIntent(getPendingIntent(context,task.getID()))
 			.setWhen(System.currentTimeMillis())
 			.setOngoing(true)
 			.setDefaults(Notification.DEFAULT_ALL);
