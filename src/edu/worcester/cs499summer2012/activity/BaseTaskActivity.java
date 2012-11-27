@@ -59,6 +59,7 @@ import edu.worcester.cs499summer2012.R;
 import edu.worcester.cs499summer2012.database.DatabaseHandler;
 import edu.worcester.cs499summer2012.database.TasksDataSource;
 import edu.worcester.cs499summer2012.task.Category;
+import edu.worcester.cs499summer2012.task.Task;
 
 public abstract class BaseTaskActivity extends SherlockActivity implements 
 	OnCheckedChangeListener, OnClickListener, DialogInterface.OnClickListener,
@@ -71,9 +72,14 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
 	public final static String DEFAULT_INTERVAL = "1";
 	public final static int DATETIME_DIALOG = 0;
 	public final static int CATEGORY_DIALOG = 1;
-	public final static int SECOND_MS = 1000;
-	public final static int MINUTE_MS = SECOND_MS * 60;
-	public final static int HOUR_MS = MINUTE_MS * 60;
+	public final static long SECOND_MS = 1000;
+	public final static long MINUTE_MS = SECOND_MS * 60;
+	public final static long HOUR_MS = MINUTE_MS * 60;
+	public final static long DAY_MS = HOUR_MS * 24;
+	public final static long WEEK_MS = DAY_MS * 7;
+	public final static long MONTH_MS = DAY_MS * 30;
+	public final static long YEAR_MS = DAY_MS * 365;
+	public final static long[] REPEAT_TYPES_MS = { MINUTE_MS, HOUR_MS, DAY_MS, WEEK_MS, MONTH_MS, YEAR_MS };
     
     /**************************************************************************
      * Private fields                                                         *
@@ -116,12 +122,6 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
     protected Calendar stop_repeating_date_cal;
     protected int selected_calendar;
     protected int selected_dialog;
-    
-    // Flags to prevent date-time picker dialogs popping up immediately on
-    // entering EditTaskActivity
-    protected boolean prevent_initial_due_date_popup = false;
-    protected boolean prevent_initial_final_due_date_popup = false;
-    protected boolean prevent_initial_stop_repeating_date_popup = false;
     
     protected String repeat_interval_string = DEFAULT_INTERVAL;
     
@@ -197,6 +197,7 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
         				android.R.layout.simple_spinner_item);
         repeat_type_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         repeat_type.setAdapter(repeat_type_adapter);
+        repeat_type.setSelection(Task.DAYS);
         
         // Hide certain due date items to start
         edit_due_date.setVisibility(View.GONE);
@@ -258,12 +259,6 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
 						due_date_cal));
 				has_final_due_date.setVisibility(View.VISIBLE);
 				has_repetition.setVisibility(View.VISIBLE);
-				
-				// Pop up date-time dialog as if user had clicked edit button
-				if (prevent_initial_due_date_popup)
-					prevent_initial_due_date_popup = false;
-				else
-					onClick(edit_due_date);
 			} else {
 				// Hide edit button, textview, and other checkboxes
 				edit_due_date.setVisibility(View.GONE);
@@ -286,13 +281,6 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
 				final_due_date.setVisibility(View.VISIBLE);
 				final_due_date.setText(DateFormat.format("'Alarm:' MM/dd/yy 'at' h:mm AA", 
 						final_due_date_cal));
-				
-				// Pop up date-time dialog as if user had clicked edit button
-				// Pop up date-time dialog as if user had clicked edit button
-				if (prevent_initial_final_due_date_popup)
-					prevent_initial_final_due_date_popup = false;
-				else
-					onClick(edit_final_due_date);
 			} else {
 				// Hide edit button and textview
 				edit_final_due_date.setVisibility(View.GONE);
@@ -328,12 +316,6 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
 				stop_repeating_date.setVisibility(View.VISIBLE);
 				stop_repeating_date.setText(DateFormat.format("'Ends:' MM/dd/yy 'at' h:mm AA", 
 						stop_repeating_date_cal));
-				
-				// Pop up date-time dialog as if user had clicked edit button
-				if (prevent_initial_stop_repeating_date_popup)
-					prevent_initial_stop_repeating_date_popup = false;
-				else
-					onClick(edit_stop_repeating_date);
 			} else {
 				// Hide edit button and textview
 				edit_stop_repeating_date.setVisibility(View.GONE);
@@ -404,6 +386,7 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
 			if (id == DialogInterface.BUTTON_POSITIVE) {
 				switch (selected_calendar) {
 				case R.id.button_edit_due_date:
+					// User modified the due date. There are no restrictions on this action.
 					due_date_cal.set(Calendar.YEAR, date_picker.getYear());
 					due_date_cal.set(Calendar.MONTH, date_picker.getMonth());
 					due_date_cal.set(Calendar.DAY_OF_MONTH, date_picker.getDayOfMonth());
@@ -412,26 +395,138 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
 					due_date.setText(DateFormat.format("'Due:' MM/dd/yy 'at' h:mm AA", 
 							due_date_cal));
 					
-					if (due_date_cal.getTimeInMillis() > final_due_date_cal.getTimeInMillis())
+					// Check to ensure final due date > due date
+					if (due_date_cal.getTimeInMillis() > final_due_date_cal.getTimeInMillis()) {
 						final_due_date_cal.setTimeInMillis(due_date_cal.getTimeInMillis() + HOUR_MS);
+						
+						// Update the view and notify user, if final due date is active
+						if (has_final_due_date.isChecked()) {
+							final_due_date.setText(DateFormat.format("'Alarm:' MM/dd/yy 'at' h:mm AA", final_due_date_cal));
+							toast("Procrastination alarm has been modified to be compatible with your new selection");
+						}
+					}
+					
+					// Check to ensure repeat period > final due date - due date
+					if (has_final_due_date.isChecked()) {
+						long original_repeat_interval = Long.parseLong(repeat_interval.getText().toString());
+						long repeat_period =  original_repeat_interval * REPEAT_TYPES_MS[repeat_type.getSelectedItemPosition()];
+						long time_between_due_dates = final_due_date_cal.getTimeInMillis() - due_date_cal.getTimeInMillis();
+						if (time_between_due_dates > repeat_period) {
+							int new_repeat_type = repeat_type.getSelectedItemPosition();
+							long new_repeat_interval = time_between_due_dates / REPEAT_TYPES_MS[new_repeat_type] + 1;
+							
+							while (new_repeat_interval > 30 && new_repeat_type < REPEAT_TYPES_MS.length - 1) {
+								new_repeat_type += 1;
+								new_repeat_interval = time_between_due_dates / REPEAT_TYPES_MS[new_repeat_type] + 1;
+							}
+							
+							repeat_interval.setText(String.valueOf(new_repeat_interval));
+							repeat_type.setSelection(new_repeat_type);
+							
+							// Notify user, if is repeating is active
+							if (has_repetition.isChecked())
+								toast("Repeat interval has been modified to be compatible with your new selection");
+						}
+					}
+					
+					// Check to ensure stop repeating date > due_date (and final due date)
+					if (has_final_due_date.isChecked()) {
+						if (final_due_date_cal.getTimeInMillis() > stop_repeating_date_cal.getTimeInMillis()) {
+							final_due_date_cal.setTimeInMillis(final_due_date_cal.getTimeInMillis() + HOUR_MS);
+							
+							// Update the view and notify user, if stop repeating date is active
+							if (stop_repeating.isChecked()) {
+								stop_repeating_date.setText(DateFormat.format("'Ends:' MM/dd/yy 'at' h:mm AA", stop_repeating_date_cal));
+								toast("Stop repeating date has been modified to be compatible with your new selection");
+							}
+						}
+					} else if (due_date_cal.getTimeInMillis() > stop_repeating_date_cal.getTimeInMillis()) {
+						stop_repeating_date_cal.setTimeInMillis(due_date_cal.getTimeInMillis() + HOUR_MS);
+						
+						// Update the view and notify user, if stop repeating date is active
+						if (stop_repeating.isChecked()) {
+							stop_repeating_date.setText(DateFormat.format("'Ends:' MM/dd/yy 'at' h:mm AA", stop_repeating_date_cal));
+							toast("Stop repeating date has been modified to be compatible with your new selection");
+						}
+					}
+					
 					break;
 					
 				case R.id.button_edit_final_due_date:
-					final_due_date_cal.set(Calendar.YEAR, date_picker.getYear());
-					final_due_date_cal.set(Calendar.MONTH, date_picker.getMonth());
-					final_due_date_cal.set(Calendar.DAY_OF_MONTH, date_picker.getDayOfMonth());
-					final_due_date_cal.set(Calendar.HOUR_OF_DAY, time_picker.getCurrentHour());
-					final_due_date_cal.set(Calendar.MINUTE, time_picker.getCurrentMinute());
-					final_due_date.setText(DateFormat.format("'Alarm:' MM/dd/yy 'at' h:mm AA", 
-							final_due_date_cal));
+					// User modified the final due date. It cannot be earlier than due date.
+					Calendar new_final_due_date_cal = (Calendar) final_due_date_cal.clone();
+					new_final_due_date_cal.set(Calendar.YEAR, date_picker.getYear());
+					new_final_due_date_cal.set(Calendar.MONTH, date_picker.getMonth());
+					new_final_due_date_cal.set(Calendar.DAY_OF_MONTH, date_picker.getDayOfMonth());
+					new_final_due_date_cal.set(Calendar.HOUR_OF_DAY, time_picker.getCurrentHour());
+					new_final_due_date_cal.set(Calendar.MINUTE, time_picker.getCurrentMinute());
+					
+					// Check to ensure final due date > due date
+					if (due_date_cal.getTimeInMillis() > new_final_due_date_cal.getTimeInMillis()) {
+						// Notify user of  bad selection
+						toast("Procrastination alarm cannot occur before due date");
+						return;
+					}
+					
+					final_due_date_cal = new_final_due_date_cal;
+					final_due_date.setText(DateFormat.format("'Alarm:' MM/dd/yy 'at' h:mm AA", final_due_date_cal));
+					
+					// Check to ensure repeat period > final due date - due date
+					long original_repeat_interval = Long.parseLong(repeat_interval.getText().toString());
+					long repeat_period =  original_repeat_interval * REPEAT_TYPES_MS[repeat_type.getSelectedItemPosition()];
+					long time_between_due_dates = final_due_date_cal.getTimeInMillis() - due_date_cal.getTimeInMillis();
+					if (time_between_due_dates > repeat_period) {
+						int new_repeat_type = repeat_type.getSelectedItemPosition();
+						long new_repeat_interval = time_between_due_dates / REPEAT_TYPES_MS[new_repeat_type] + 1;
+						
+						while (new_repeat_interval > 30 && new_repeat_type < REPEAT_TYPES_MS.length - 1) {
+							new_repeat_type += 1;
+							new_repeat_interval = time_between_due_dates / REPEAT_TYPES_MS[new_repeat_type] + 1;
+						}
+						
+						repeat_interval.setText(String.valueOf(new_repeat_interval));
+						repeat_type.setSelection(new_repeat_type);
+						
+						// Notify user, if is repeating is active
+						if (has_repetition.isChecked())
+							toast("Repeat interval has been modified to be compatible with your new selection");
+					}
+					
+					// Check to ensure stop repeating date > final due date
+					if (final_due_date_cal.getTimeInMillis() > stop_repeating_date_cal.getTimeInMillis()) {
+						stop_repeating_date_cal.setTimeInMillis(final_due_date_cal.getTimeInMillis() + HOUR_MS);
+						
+						// Update the view and notify user, if stop repeating date is active
+						if (stop_repeating.isChecked()) {
+							stop_repeating_date.setText(DateFormat.format("'Ends:' MM/dd/yy 'at' h:mm AA", stop_repeating_date_cal));
+							toast("Stop repeating date has been modified to be compatible with your new selection");
+						}
+					}
 					break;
 				
 				case R.id.button_edit_stop_repeating_date:
-					stop_repeating_date_cal.set(Calendar.YEAR, date_picker.getYear());
-					stop_repeating_date_cal.set(Calendar.MONTH, date_picker.getMonth());
-					stop_repeating_date_cal.set(Calendar.DAY_OF_MONTH, date_picker.getDayOfMonth());
-					stop_repeating_date_cal.set(Calendar.HOUR_OF_DAY, time_picker.getCurrentHour());
-					stop_repeating_date_cal.set(Calendar.MINUTE, time_picker.getCurrentMinute());
+					// User modified the stop repeating date. It cannot be earlier than due date (and final due date).
+					Calendar new_stop_repeating_date_cal = (Calendar) stop_repeating_date_cal.clone();
+					new_stop_repeating_date_cal.set(Calendar.YEAR, date_picker.getYear());
+					new_stop_repeating_date_cal.set(Calendar.MONTH, date_picker.getMonth());
+					new_stop_repeating_date_cal.set(Calendar.DAY_OF_MONTH, date_picker.getDayOfMonth());
+					new_stop_repeating_date_cal.set(Calendar.HOUR_OF_DAY, time_picker.getCurrentHour());
+					new_stop_repeating_date_cal.set(Calendar.MINUTE, time_picker.getCurrentMinute());
+					
+					// Check to ensure stop repeating date > due_date (and final due date)
+					if (has_final_due_date.isChecked()) {
+						if (final_due_date_cal.getTimeInMillis() > new_stop_repeating_date_cal.getTimeInMillis()) {
+							// Notify user of  bad selection
+							toast("Stop repeating date cannot occur before procrastination alarm");
+							return;
+						}
+					} else if (due_date_cal.getTimeInMillis() > new_stop_repeating_date_cal.getTimeInMillis()) {
+						// Notify user of  bad selection
+						toast("Stop repeating date cannot occur before due date");
+						return;
+					}
+					
+					stop_repeating_date_cal = new_stop_repeating_date_cal;
 					stop_repeating_date.setText(DateFormat.format("'Ends:' MM/dd/yy 'at' h:mm AA", 
 							stop_repeating_date_cal));
 					break;

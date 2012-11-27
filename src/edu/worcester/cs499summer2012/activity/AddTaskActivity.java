@@ -57,8 +57,8 @@ public class AddTaskActivity extends BaseTaskActivity {
         final_due_date_cal = (Calendar) due_date_cal.clone();
         final_due_date_cal.add(Calendar.HOUR, 1);
         
-        stop_repeating_date_cal = (Calendar) due_date_cal.clone();
-        stop_repeating_date_cal.add(Calendar.HOUR, 3);
+        stop_repeating_date_cal = (Calendar) final_due_date_cal.clone();
+        stop_repeating_date_cal.add(Calendar.DAY_OF_MONTH, 1);
         
         // Make the displayed category in MainActivity the default selection
         int id = prefs.getInt(MainActivity.DISPLAY_CATEGORY, MainActivity.DISPLAY_ALL_CATEGORIES);
