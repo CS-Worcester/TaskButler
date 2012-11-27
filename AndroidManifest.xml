@@ -83,5 +83,13 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="edu.worcester.cs499summer2012.MainActivity" />
         </activity>
+        
+        <activity
+            android:name=".activity.EditCategoriesActivity"
+            android:label="@string/title_activity_edit_categories" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="edu.worcester.cs499summer2012.SettingsActivity" />
+        </activity>
     </application>
 </manifest>

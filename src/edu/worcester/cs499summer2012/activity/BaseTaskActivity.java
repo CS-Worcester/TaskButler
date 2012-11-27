@@ -454,7 +454,7 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
 					category.setSelection(0);
 					dialog.cancel();
 				} else  {
-					AmbilWarnaDialog color_dialog = new AmbilWarnaDialog(this, Color.parseColor("#00FFFFFF"), new OnAmbilWarnaListener() {
+					AmbilWarnaDialog color_dialog = new AmbilWarnaDialog(this, Color.RED, new OnAmbilWarnaListener() {
 	
 						@Override
 						public void onCancel(AmbilWarnaDialog dialog) {
