@@ -188,6 +188,7 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 
 				TextView name = (TextView) view.findViewById(R.id.main_category_bar_item_name);
 				View color = view.findViewById(R.id.main_category_bar_item_color);
+				View selected = view.findViewById(R.id.main_category_bar_item_selection);
 
 				color.setBackgroundColor(category.getColor());
 
@@ -197,10 +198,10 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 					name.setText(category.getName());
 
 				if (display_category == category.getID()) {
-					name.setBackgroundColor(Color.LTGRAY);
-					name.setTextColor(Color.BLACK);
+					selected.setBackgroundColor(Color.LTGRAY);
+					name.setTextColor(Color.WHITE);
 				} else {
-					name.setBackgroundColor(Color.BLACK);
+					selected.setBackgroundColor(Color.TRANSPARENT);
 					name.setTextColor(Color.LTGRAY);
 				}
 

@@ -19,7 +19,7 @@
     <!-- Category View (solid color) -->
     <View 
         android:id="@+id/view_row_category"
-        android:layout_width="16dp"
+        android:layout_width="8dp"
         android:layout_height="60dp"
         android:layout_alignParentRight="true"
         android:layout_marginLeft="4dp" />
