@@ -493,6 +493,27 @@ public class TasksDataSource {
 		return category;
 	}
 	
+	public boolean categoryHasTasks(Category c) {
+		// Select All Query
+		String selectQuery = "SELECT * FROM " + 
+				DatabaseHandler.TABLE_TASKS + " WHERE " +
+				DatabaseHandler.KEY_CATEGORY + " = " + c.getID();
+		
+		boolean exists = false;
+		
+		open();
+		Cursor cursor = db.rawQuery(selectQuery, null);
+
+		if (cursor.moveToFirst()) {
+			exists = true;
+		}
+
+		cursor.close();
+		close();
+
+		return exists;
+	}
+	
 	/************************************************************
 	 * Comparators   											*
 	 ************************************************************/
