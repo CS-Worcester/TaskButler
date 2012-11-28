@@ -53,7 +53,6 @@ public class TaskButlerService extends WakefulIntentService{
 				} else {
 					while(task.getDateDue() <= System.currentTimeMillis())
 						task = alarm.setRepeatingAlarm(this, task.getID());
-						//TODO: maybe set a different flag for when a task is permanently complete
 				}
 			}
 			
