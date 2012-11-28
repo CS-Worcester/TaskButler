@@ -1,25 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/main_category_bar_item"
-    android:layout_width="0dp"
-    android:layout_height="match_parent"
-    android:layout_weight="1"
-    android:minWidth="96dp"
-    android:orientation="vertical">
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:minWidth="96dp">
     
     <View android:id="@+id/main_category_bar_item_color"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="2" />
+        android:layout_height="8dp"
+        android:layout_alignParentTop="true" />
+    
+    <View android:id="@+id/main_category_bar_item_selection"
+        android:layout_width="match_parent"
+        android:layout_height="8dp"
+        android:layout_alignParentBottom="true" />
     
     <TextView
 	    android:id="@+id/main_category_bar_item_name"
 	    android:layout_width="match_parent"
-	    android:layout_height="0dp"
-	    android:layout_weight="3"
-	    android:singleLine="true"
-	    android:minWidth="96dp"
+	    android:layout_height="36dp"
+	    android:layout_below="@id/main_category_bar_item_color"
+	    android:layout_above="@id/main_category_bar_item_selection"
 	    android:gravity="center"
+	    android:textSize="16sp"
 	    android:padding="4dp" />
     
-</LinearLayout>
+</RelativeLayout>

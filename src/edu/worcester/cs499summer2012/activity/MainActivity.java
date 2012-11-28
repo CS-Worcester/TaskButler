@@ -178,6 +178,7 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 			findViewById(R.id.main_ruler).setVisibility(View.GONE);
 			((HorizontalScrollView) findViewById(R.id.main_category_bar_scroll)).setVisibility(View.GONE);
 		} else {
+			((HorizontalScrollView) findViewById(R.id.main_category_bar_scroll)).setVisibility(View.VISIBLE);
 			LinearLayout category_bar = (LinearLayout) findViewById(R.id.main_category_bar);
 			category_bar.removeAllViews();
 			LayoutInflater inflater = getLayoutInflater();
@@ -187,6 +188,7 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 
 				TextView name = (TextView) view.findViewById(R.id.main_category_bar_item_name);
 				View color = view.findViewById(R.id.main_category_bar_item_color);
+				View selected = view.findViewById(R.id.main_category_bar_item_selection);
 
 				color.setBackgroundColor(category.getColor());
 
@@ -196,10 +198,10 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 					name.setText(category.getName());
 
 				if (display_category == category.getID()) {
-					name.setBackgroundColor(Color.LTGRAY);
-					name.setTextColor(Color.BLACK);
+					selected.setBackgroundColor(Color.LTGRAY);
+					name.setTextColor(Color.WHITE);
 				} else {
-					name.setBackgroundColor(Color.BLACK);
+					selected.setBackgroundColor(Color.TRANSPARENT);
 					name.setTextColor(Color.LTGRAY);
 				}
 

@@ -47,7 +47,7 @@ public class NotificationHelper{
 	public void sendBasicNotification(Context context, Task task) {
 		NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
 			.setContentText(task.getName())
-			.setContentTitle("Task Butler")
+			.setContentTitle(context.getText(R.string.app_name))
 			.setSmallIcon(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB ? 
 					R.drawable.ic_notification : R.drawable.ic_notification_deprecated)
 			.setAutoCancel(true)
@@ -66,7 +66,7 @@ public class NotificationHelper{
 	public void sendPersistentNotification(Context context, Task task) {
 		NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
 			.setContentText(task.getName())
-			.setContentTitle("Task Butler")
+			.setContentTitle(context.getText(R.string.app_name))
 			.setSmallIcon(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB ? 
 					R.drawable.ic_notification : R.drawable.ic_notification_deprecated)
 			.setAutoCancel(true)
