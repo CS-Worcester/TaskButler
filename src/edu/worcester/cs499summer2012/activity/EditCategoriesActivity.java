@@ -73,7 +73,9 @@ public class EditCategoriesActivity extends SherlockListActivity implements Acti
 		data_source = TasksDataSource.getInstance(this);
 		
 		// Create an adapter for the category list
-		adapter = new CategoryListAdapter(this, data_source.getCategories());
+		ArrayList<Category> categories = data_source.getCategories();
+		categories.remove(0);
+		adapter = new CategoryListAdapter(this, R.layout.row_category, categories);
 		setListAdapter(adapter);
 		
 		// Allow Action bar icon to act as a button

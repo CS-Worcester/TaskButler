@@ -61,6 +61,7 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 
 import edu.worcester.cs499summer2012.R;
+import edu.worcester.cs499summer2012.adapter.CategoryListAdapter;
 import edu.worcester.cs499summer2012.database.DatabaseHandler;
 import edu.worcester.cs499summer2012.database.TasksDataSource;
 import edu.worcester.cs499summer2012.task.Category;
@@ -92,7 +93,7 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
     protected SharedPreferences prefs;
     
     // Category spinner array adapter
-    protected ArrayAdapter<Category> category_adapter;
+    protected CategoryListAdapter category_adapter;
     
     // UI elements
     protected CheckBox cb_due_date;
@@ -171,11 +172,9 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
         action_bar.setDisplayHomeAsUpEnabled(true);
         
         // Populate the category spinner
-        category_adapter = new ArrayAdapter<Category>(this, 
-        				android.R.layout.simple_spinner_item, 
-        				data_source.getCategories());
-        category_adapter.add(new Category(0, "New category...", 0, Category.NEW_CATEGORY));
-        category_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        category_adapter = new CategoryListAdapter(this, R.layout.row_category_small, data_source.getCategories());
+        category_adapter.add(new Category(0, "New category...", Color.TRANSPARENT, Category.NEW_CATEGORY));
+        //category_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         s_category.setAdapter(category_adapter);
         s_category.setOnItemSelectedListener(this);
         
