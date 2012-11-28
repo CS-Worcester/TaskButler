@@ -88,7 +88,7 @@
     <string name="image_down">Down</string>
     
     <!-- Dialog items -->
-    <string name="dialog_about">Task Butler 1.0\n\nCopyright 2012 Jonathan Hasenzahl, James Celona, Dhimitraq Jorgji.\n\nTask Butler is distributed under the GNU General Public License.</string>
+    <string name="dialog_about">Task Butler\n\nCopyright 2012 Jonathan Hasenzahl, James Celona, Dhimitraq Jorgji.\n\nTask Butler is distributed under the GNU General Public License.</string>
 	
 	<!-- Spinner items -->
 	<string-array name="spinner_repeat_types">
