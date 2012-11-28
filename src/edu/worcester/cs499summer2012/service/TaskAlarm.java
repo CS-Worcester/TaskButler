@@ -132,14 +132,8 @@ public class TaskAlarm {
 	}
 
 	public void setProcrastinatorAlarm(Context context, int id){
-		TasksDataSource db = TasksDataSource.getInstance(context);
-		Task task = db.getTask(id);
-		if(task.getDateDue() >= System.currentTimeMillis() && task.getFinalDateDue() <= System.currentTimeMillis())
-			return;
-		
-		long alarm = (task.getFinalDateDue() - task.getDateDue()) / 4; //fit 4 reminders in the time between alarms
-		alarm += System.currentTimeMillis();
-
+		long alarm;
+		alarm = System.currentTimeMillis() + (60000*10); //add 10 minutes
 		AlarmManager am=(AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
 		am.set(AlarmManager.RTC_WAKEUP, alarm, getPendingIntent(context, id));
 	}
