@@ -22,7 +22,7 @@
 	        android:layout_marginTop="4dp"
 	        android:layout_marginBottom="4dp"
 	        android:text="@string/text_task_name"
-	        android:textSize="20dp" />
+	        android:textSize="20sp" />
 	
 	    <EditText
 	        android:id="@+id/edit_add_task_name"
@@ -32,7 +32,7 @@
      	    android:layout_marginTop="4dp"
 	        android:layout_marginBottom="4dp"
 	        android:hint="@string/edit_task_name"
-	        android:textSize="18dp"
+	        android:textSize="18sp"
 	        android:inputType="textCapSentences|textAutoCorrect" />
 	    
 	    <CheckBox
@@ -44,7 +44,7 @@
 	        android:layout_marginTop="4dp"
 	        android:layout_marginBottom="4dp"
 	        android:text="@string/checkbox_already_completed"
-	        android:textSize="16dp"
+	        android:textSize="16sp"
 	        android:checked="false" />
 	    
 	    <View
@@ -66,7 +66,7 @@
 	        android:layout_marginTop="4dp"
 	        android:layout_marginBottom="4dp"
 	        android:text="@string/text_task_priority"
-	        android:textSize="20dp" />
+	        android:textSize="20sp" />
 	
 	    <RadioGroup
 	        android:id="@+id/radiogroup_add_task_priority"
@@ -75,7 +75,7 @@
 	        android:layout_below="@id/text_add_task_priority"
 	        android:layout_marginTop="4dp"
 	        android:layout_marginBottom="4dp"
-	        android:textSize="16dp"
+	        android:textSize="16sp"
 	        android:orientation="horizontal" >
 	        
 	        <RadioButton
@@ -122,7 +122,7 @@
 	        android:layout_marginTop="4dp"
 			android:layout_marginBottom="4dp"
 	        android:text="@string/text_task_category"
-	        android:textSize="20dp" />
+	        android:textSize="20sp" />
 	    
 	    <Spinner
 	        android:id="@+id/spinner_add_task_category"
@@ -131,7 +131,7 @@
 	        android:layout_below="@id/text_add_task_category"
 	        android:layout_marginTop="4dp"
 			android:layout_marginBottom="4dp"
-			android:textSize="18dp" />
+			android:textSize="18sp" />
 	    
 	    <View
 	        android:id="@+id/ruler_3"
@@ -152,7 +152,7 @@
 	        android:layout_marginTop="4dp"
 			android:layout_marginBottom="4dp"
 	        android:text="@string/text_task_due"
-	        android:textSize="20dp" />
+	        android:textSize="20sp" />
    	    
    	    <CheckBox
 	        android:id="@+id/checkbox_has_due_date"
@@ -163,7 +163,7 @@
 	        android:layout_marginTop="4dp"
 	        android:layout_marginBottom="4dp"
 	        android:text="@string/checkbox_has_due_date"
-	        android:textSize="16dp"
+	        android:textSize="16sp"
 	        android:checked="false" />
    	    
    	    <Button
@@ -175,7 +175,7 @@
 	        android:layout_marginTop="4dp"
 	        android:layout_marginBottom="4dp"
 	        android:text="@string/button_edit_date"
-	        android:textSize="16dp" />  
+	        android:textSize="16sp" />  
    	    
    	    <TextView 
    	        android:id="@+id/text_add_task_due_date"
@@ -184,7 +184,7 @@
    	        android:layout_below="@id/checkbox_has_due_date"
 	        android:layout_marginTop="4dp"
 	        android:layout_marginBottom="4dp"
-	        android:textSize="18dp"
+	        android:textSize="18sp"
 	        android:gravity="center_vertical" />
    	    
    	    <CheckBox
@@ -196,7 +196,7 @@
 	        android:layout_marginTop="4dp"
 	        android:layout_marginBottom="4dp"
 	        android:text="@string/checkbox_has_final_due_date"
-	        android:textSize="16dp"
+	        android:textSize="16sp"
 	        android:checked="false" />
    	    
    	    <Button
@@ -208,7 +208,7 @@
 	        android:layout_marginTop="4dp"
 	        android:layout_marginBottom="4dp"
 	        android:text="@string/button_edit_date"
-	        android:textSize="16dp" />
+	        android:textSize="16sp" />
    	        
    	    <TextView 
    	        android:id="@+id/text_add_task_final_due_date"
@@ -217,7 +217,7 @@
    	        android:layout_below="@id/checkbox_has_final_due_date"
 	        android:layout_marginTop="4dp"
 	        android:layout_marginBottom="4dp"
-	        android:textSize="18dp"
+	        android:textSize="18sp"
 	        android:gravity="center_vertical" />
    	    
  	    <CheckBox
@@ -229,7 +229,7 @@
 	        android:layout_marginTop="4dp"
 	        android:layout_marginBottom="4dp"
 	        android:text="@string/checkbox_has_repetition"
-	        android:textSize="16dp"
+	        android:textSize="16sp"
 	        android:checked="false" />
  	    
  	    <TextView 
@@ -241,7 +241,7 @@
 	        android:layout_marginBottom="4dp"
 	        android:layout_marginRight="4dp"
 	        android:text="@string/text_task_repeats"
-	        android:textSize="18dp"
+	        android:textSize="18sp"
 	        android:gravity="center_vertical" />
    	    
  	    <EditText 
@@ -254,7 +254,7 @@
 	        android:layout_marginLeft="4dp"
 	        android:layout_marginRight="4dp"
 	        android:layout_toRightOf="@id/text_add_task_repeats"
-	        android:textSize="18dp"
+	        android:textSize="18sp"
 	        android:gravity="center_vertical"
 	        android:inputType="number"
 	        android:maxLength="3" />
@@ -268,7 +268,7 @@
 	        android:layout_marginBottom="4dp"
 	        android:layout_marginLeft="4dp"
 			android:layout_toRightOf="@id/edit_add_task_repeat_interval"
-	        android:textSize="18dp"
+	        android:textSize="18sp"
 	        android:gravity="center_vertical" />
 
 	    <CheckBox
@@ -280,7 +280,7 @@
 	        android:layout_marginTop="4dp"
 	        android:layout_marginBottom="4dp"
 	        android:text="@string/checkbox_stop_repeating"
-	        android:textSize="16dp"
+	        android:textSize="16sp"
 	        android:checked="false" />
    	    
    	    <Button
@@ -292,7 +292,7 @@
 	        android:layout_marginTop="4dp"
 	        android:layout_marginBottom="4dp"
 	        android:text="@string/button_edit_date"
-	        android:textSize="16dp" />
+	        android:textSize="16sp" />
    	        
    	    
    	    <TextView 
@@ -302,7 +302,7 @@
    	        android:layout_below="@id/checkbox_stop_repeating"
 	        android:layout_marginTop="4dp"
 	        android:layout_marginBottom="4dp"
-	        android:textSize="18dp"
+	        android:textSize="18sp"
 	        android:gravity="center_vertical" />
    	    
    	    <View
@@ -324,7 +324,7 @@
 	        android:layout_marginTop="4dp"
 			android:layout_marginBottom="4dp"
 	        android:text="@string/text_task_notes"
-	        android:textSize="20dp" />    	    
+	        android:textSize="20sp" />    	    
 	    
 	    <EditText
 	        android:id="@+id/edit_add_task_notes"
@@ -337,7 +337,7 @@
 	        android:inputType="textCapSentences|textMultiLine|textAutoCorrect"
 	        android:gravity="top|left"
 	        android:minHeight="40dp"
-	        android:textSize="18dp" />
+	        android:textSize="18sp" />
 	
 	</RelativeLayout>
 

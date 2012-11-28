@@ -62,7 +62,7 @@ public class AddTaskActivity extends BaseTaskActivity {
         
         // Make the displayed category in MainActivity the default selection
         int id = prefs.getInt(MainActivity.DISPLAY_CATEGORY, MainActivity.DISPLAY_ALL_CATEGORIES);
-        category.setSelection(category_adapter.getPosition(data_source.getCategory(id)));
+        s_category.setSelection(category_adapter.getPosition(data_source.getCategory(id)));
 	}
 
 	protected boolean addTask() {
@@ -98,11 +98,11 @@ public class AddTaskActivity extends BaseTaskActivity {
     	}
     	
     	// Get task category
-    	int categoryID = ((Category) category.getSelectedItem()).getID();
+    	int categoryID = ((Category) s_category.getSelectedItem()).getID();
     	
     	// Get repeat interval
     	int interval = 1;
-    	String interval_string = repeat_interval.getText().toString();
+    	String interval_string = et_repeat_interval.getText().toString();
     	if (!interval_string.equals("")) {
     		interval =  Integer.parseInt(interval_string);
     		if (interval == 0)
@@ -111,17 +111,17 @@ public class AddTaskActivity extends BaseTaskActivity {
     	
     	// Get task due date
     	long due_date_ms = 0;
-    	if (has_due_date.isChecked())
+    	if (cb_due_date.isChecked())
     		due_date_ms = due_date_cal.getTimeInMillis();
     	
     	// Get task final due date
     	long final_due_date_ms = 0;
-    	if (has_final_due_date.isChecked())
+    	if (cb_final_due_date.isChecked())
     		final_due_date_ms = final_due_date_cal.getTimeInMillis();
     	
     	// Get stop repeating date
     	long stop_repeating_date_ms = 0;
-    	if (stop_repeating.isChecked())
+    	if (cb_stop_repeating_date.isChecked())
     		stop_repeating_date_ms = stop_repeating_date_cal.getTimeInMillis();
     	
     	// Get task notes
@@ -133,11 +133,11 @@ public class AddTaskActivity extends BaseTaskActivity {
     			is_completed.isChecked(), 
     			priority, 
     			categoryID,
-    			has_due_date.isChecked(),
-    			has_final_due_date.isChecked(),
-    			has_repetition.isChecked(),
-    			stop_repeating.isChecked(),
-    			repeat_type.getSelectedItemPosition(),
+    			cb_due_date.isChecked(),
+    			cb_final_due_date.isChecked(),
+    			cb_repeating.isChecked(),
+    			cb_stop_repeating_date.isChecked(),
+    			s_repeat_type.getSelectedItemPosition(),
     			interval,
     			GregorianCalendar.getInstance().getTimeInMillis(), 
     			due_date_ms, 
