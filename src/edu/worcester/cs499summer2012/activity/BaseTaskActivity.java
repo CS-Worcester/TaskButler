@@ -62,9 +62,11 @@ import com.actionbarsherlock.view.MenuItem;
 
 import edu.worcester.cs499summer2012.R;
 import edu.worcester.cs499summer2012.adapter.CategoryListAdapter;
+import edu.worcester.cs499summer2012.adapter.PriorityListAdapter;
 import edu.worcester.cs499summer2012.database.DatabaseHandler;
 import edu.worcester.cs499summer2012.database.TasksDataSource;
 import edu.worcester.cs499summer2012.task.Category;
+import edu.worcester.cs499summer2012.task.Task;
 
 public abstract class BaseTaskActivity extends SherlockActivity implements 
 	OnCheckedChangeListener, OnClickListener, DialogInterface.OnClickListener,
@@ -94,6 +96,9 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
     
     // Category spinner array adapter
     protected CategoryListAdapter category_adapter;
+    
+    // Priority spinner array adapter
+    protected PriorityListAdapter priority_adapter;
     
     // UI elements
     protected CheckBox cb_due_date;
@@ -174,23 +179,16 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
         // Populate the category spinner
         category_adapter = new CategoryListAdapter(this, R.layout.row_category_small, data_source.getCategories());
         category_adapter.add(new Category(0, "New category...", Color.TRANSPARENT, Category.NEW_CATEGORY));
-        //category_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         s_category.setAdapter(category_adapter);
         s_category.setOnItemSelectedListener(this);
         
         // Populate the priority spinner
-        ArrayAdapter<CharSequence> priority_adapter = 
-        		ArrayAdapter.createFromResource(this, 
-        				R.array.spinner_priorities, 
-        				android.R.layout.simple_spinner_item);
+        priority_adapter = new PriorityListAdapter(this, R.layout.row_priority_small, Task.LABELS);
         priority_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         s_priority.setAdapter(priority_adapter);
         
         // Populate the repeat type spinner
-        ArrayAdapter<CharSequence> repeat_type_adapter = 
-        		ArrayAdapter.createFromResource(this, 
-        				R.array.spinner_repeat_types, 
-        				android.R.layout.simple_spinner_item);
+        ArrayAdapter<CharSequence> repeat_type_adapter = new ArrayAdapter<CharSequence>(this, android.R.layout.simple_spinner_item, Task.REPEAT_LABELS);
         repeat_type_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         s_repeat_type.setAdapter(repeat_type_adapter);
         
