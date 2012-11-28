@@ -24,11 +24,17 @@ import java.util.GregorianCalendar;
 
 import yuku.ambilwarna.AmbilWarnaDialog;
 import yuku.ambilwarna.AmbilWarnaDialog.OnAmbilWarnaListener;
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
+import android.app.DatePickerDialog.OnDateSetListener;
+import android.app.TimePickerDialog;
+import android.app.TimePickerDialog.OnTimeSetListener;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.format.DateFormat;
@@ -36,17 +42,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
-import android.widget.AdapterView.OnItemSelectedListener;
-import android.widget.CompoundButton.OnCheckedChangeListener;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockActivity;
@@ -61,24 +67,16 @@ import edu.worcester.cs499summer2012.task.Category;
 
 public abstract class BaseTaskActivity extends SherlockActivity implements 
 	OnCheckedChangeListener, OnClickListener, DialogInterface.OnClickListener,
-	OnItemSelectedListener {
+	OnItemSelectedListener, OnDateSetListener, OnTimeSetListener {
 	
 	/**************************************************************************
 	 * Static fields and methods                                              *
 	 **************************************************************************/
 
-	public final static String DEFAULT_INTERVAL = "1";
-	public final static int DATETIME_DIALOG = 0;
-	public final static int CATEGORY_DIALOG = 1;
-	public final static long SECOND_MS = 1000;
-	public final static long MINUTE_MS = SECOND_MS * 60;
-	public final static long HOUR_MS = MINUTE_MS * 60;
-	public final static long DAY_MS = HOUR_MS * 24;
-	public final static long WEEK_MS = DAY_MS * 7;
-	public final static long MONTH_MS = DAY_MS * 30;
-	public final static long YEAR_MS = DAY_MS * 365;
-	public final static long[] REPEAT_TYPES_MS = { MINUTE_MS, HOUR_MS, DAY_MS, WEEK_MS, MONTH_MS, YEAR_MS };
-	public final static String PREVENT_DUE_DATE = "prevent_due_date";
+	private final static String DEFAULT_INTERVAL = "1";
+	private final static String PREVENT_DUE_DATE = "prevent_due_date";
+	private final static int NO_DIALOG = 0;
+	private final static int CATEGORY_DIALOG = 1;
     
     /**************************************************************************
      * Private fields                                                         *
@@ -106,8 +104,9 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
     protected Spinner s_category;
     protected Spinner s_priority;
     protected Spinner s_repeat_type;
-    protected DatePicker date_picker;
-    protected TimePicker time_picker;
+    protected DatePickerDialog date_dialog;
+    protected TimePickerDialog time_dialog;
+    protected AlertDialog category_dialog;
     protected EditText et_category;
     protected TextView tv_at;
     
@@ -207,11 +206,19 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
         // Check bundle for prevent popup flag
         if (savedInstanceState != null)
         	prevent_initial_due_date_popup = savedInstanceState.getBoolean(PREVENT_DUE_DATE);
+        
+        
     }
     
     @Override
     protected void onSaveInstanceState(Bundle outState) {
     	outState.putBoolean(PREVENT_DUE_DATE, cb_due_date.isChecked() ? true : false);
+    	
+    	if (category_dialog.isShowing()) {
+    		s_category.setSelection(0);
+			category_dialog.cancel();
+    	}
+    	
     	super.onSaveInstanceState(outState);
     }
     
@@ -302,30 +309,54 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
 	 * Methods implementing OnClickListener interface                         *
 	 **************************************************************************/
 	
+	@SuppressLint("NewApi")
 	@Override
 	public void onClick(View v) {	
-		LayoutInflater li = LayoutInflater.from(this);
-		View picker_view = li.inflate(R.layout.date_time_picker, null);
-		
-		date_picker = (DatePicker) picker_view.findViewById(R.id.dialog_date_picker);
-        time_picker = (TimePicker) picker_view.findViewById(R.id.dialog_time_picker);
-		
-		if (v.getId() == R.id.text_add_task_due_date) {
-			date_picker.updateDate(due_date_cal.get(Calendar.YEAR), 
-					due_date_cal.get(Calendar.MONTH), 
-					due_date_cal.get(Calendar.DAY_OF_MONTH));
-			time_picker.setCurrentHour(due_date_cal.get(Calendar.HOUR_OF_DAY));
-			time_picker.setCurrentMinute(due_date_cal.get(Calendar.MINUTE));
-			
-			selected_dialog = DATETIME_DIALOG;
-			AlertDialog.Builder picker_dialog = new AlertDialog.Builder(this);
-			picker_dialog.setView(picker_view)
-			             .setTitle("Set date and time")
-			             .setCancelable(true)
-			             .setPositiveButton("Accept", this)
-			             .setNegativeButton("Cancel", this);
-			picker_dialog.show();
-		}
+        switch (v.getId()) {
+        case R.id.text_add_task_due_date:
+        	// Initialize picker dialog
+    		date_dialog = new DatePickerDialog(this, this, 
+    				due_date_cal.get(Calendar.YEAR), 
+    				due_date_cal.get(Calendar.MONTH), 
+    				due_date_cal.get(Calendar.DAY_OF_MONTH)) {
+    			
+    			@Override
+    			public Bundle onSaveInstanceState() {
+    				if (date_dialog.isShowing())
+    					date_dialog.cancel();
+    				return super.onSaveInstanceState();
+    			}
+    			
+    		};
+    		
+    		// Show calendar view (only available for API 11+)
+    		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+    			DatePicker date_picker = date_dialog.getDatePicker();
+    			date_picker.setCalendarViewShown(true);
+    			date_picker.setSpinnersShown(false);
+    		}
+    		
+    		date_dialog.show();
+        	break;
+        	
+        case R.id.text_add_task_due_time:
+        	// Initialize picker dialog
+    		time_dialog = new TimePickerDialog(this, this, 
+    				due_date_cal.get(Calendar.HOUR), 
+    				due_date_cal.get(Calendar.MINUTE), false) {
+    			
+    			@Override
+    			public Bundle onSaveInstanceState() {
+    				if (time_dialog.isShowing())
+    					time_dialog.cancel();
+    				return super.onSaveInstanceState();
+    			}
+    			
+    		};
+    		
+    		time_dialog.show();
+        	break;
+        }
 	}
 
 	/**************************************************************************
@@ -334,25 +365,8 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
 	
 	@Override
 	public void onClick(DialogInterface dialog, int id) {
-		switch (selected_dialog)
-		{
-		case DATETIME_DIALOG:
-			if (id == DialogInterface.BUTTON_POSITIVE) {
-				// User modified the due date
-				due_date_cal.set(Calendar.YEAR, date_picker.getYear());
-				due_date_cal.set(Calendar.MONTH, date_picker.getMonth());
-				due_date_cal.set(Calendar.DAY_OF_MONTH, date_picker.getDayOfMonth());
-				due_date_cal.set(Calendar.HOUR_OF_DAY, time_picker.getCurrentHour());
-				due_date_cal.set(Calendar.MINUTE, time_picker.getCurrentMinute());
-				tv_due_date.setText(DateFormat.format("MM/dd/yy", due_date_cal));
-				tv_due_time.setText(DateFormat.format("h:mm AA", due_date_cal));
-				
-				dialog.dismiss();
-			} else
-				dialog.cancel();
-			break;
-			
-		case CATEGORY_DIALOG:
+		if (selected_dialog == CATEGORY_DIALOG) {
+			selected_dialog = NO_DIALOG;
 			if (id == DialogInterface.BUTTON_POSITIVE) {
 				String name = et_category.getText().toString();
 				if (name.equals("")) {
@@ -390,7 +404,6 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
 				s_category.setSelection(0);
 				dialog.cancel();
 			}
-			break;
 		}
 	}
 	
@@ -413,12 +426,34 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
 			new_category_builder.setTitle("Enter category name");
 			new_category_builder.setPositiveButton("Next", this);
 			new_category_builder.setNegativeButton("Cancel", this);
-			new_category_builder.create().show();
+			category_dialog = new_category_builder.create();
+			category_dialog.show();
 		}
 	}
 
 	@Override
 	public void onNothingSelected(AdapterView<?> parent) {
 		// Do nothing
+	}
+	
+	/**************************************************************************
+	 * Methods implementing OnDateSetListener interface                       *
+	 **************************************************************************/
+	
+	@Override
+	public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+		due_date_cal.set(year, monthOfYear, dayOfMonth);
+		tv_due_date.setText(DateFormat.format("MM/dd/yy", due_date_cal));
+	}
+	
+	/**************************************************************************
+	 * Methods implementing OnTimeSetListener interface                       *
+	 **************************************************************************/
+	
+	@Override
+	public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+		due_date_cal.set(Calendar.HOUR_OF_DAY, hourOfDay);
+		due_date_cal.set(Calendar.MINUTE, minute);
+		tv_due_time.setText(DateFormat.format("h:mm AA", due_date_cal));
 	}
 }
