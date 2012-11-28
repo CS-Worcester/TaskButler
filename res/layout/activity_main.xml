@@ -5,14 +5,14 @@
     android:layout_height="match_parent" >
     
     <HorizontalScrollView android:id="@+id/main_category_bar_scroll"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="48dp"
         android:layout_alignParentBottom="true">
     
 	    <LinearLayout android:id="@+id/main_category_bar"
 	        android:orientation="horizontal"
 	        android:layout_width="wrap_content"
-	        android:layout_height="match_parent" />
+	        android:layout_height="wrap_content" />
 	
 	</HorizontalScrollView>
 	
@@ -33,7 +33,7 @@
         android:eventsInterceptionEnabled="true"
         android:gestureStrokeType="single"
         android:gestureColor="#00000000"
-        android:uncertainGestureColor="#00000000">"
+        android:uncertainGestureColor="#00000000">
   	
 	    <ListView android:id="@android:id/list"
 	        android:layout_width="match_parent"

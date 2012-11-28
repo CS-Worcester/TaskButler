@@ -25,9 +25,7 @@ import java.util.GregorianCalendar;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.RadioGroup;
 import android.widget.Toast;
 import edu.worcester.cs499summer2012.R;
 import edu.worcester.cs499summer2012.task.Category;
@@ -38,8 +36,6 @@ public class EditTaskActivity extends BaseTaskActivity {
 	private Task task;
 	
 	private EditText et_name;
-	private CheckBox cb_completed;
-	private RadioGroup rg_priority;
 	private EditText et_notes;
 	
 	@Override
@@ -58,33 +54,17 @@ public class EditTaskActivity extends BaseTaskActivity {
         et_name = (EditText) findViewById(R.id.edit_add_task_name);
         et_name.setText(task.getName());
         
-        // Set is completed
-        cb_completed = (CheckBox) findViewById(R.id.checkbox_already_completed);
-        cb_completed.setChecked(task.isCompleted());
-        
         // Set priority
-        rg_priority = (RadioGroup) findViewById(R.id.radiogroup_add_task_priority);
-        switch (task.getPriority()) {
-        case Task.URGENT:
-        	rg_priority.check(R.id.radio_add_task_urgent);
-        	break;
-        	
-        case Task.NORMAL:
-        	rg_priority.check(R.id.radio_add_task_normal);
-        	break;
-        	
-        case Task.TRIVIAL:
-        	rg_priority.check(R.id.radio_add_task_trivial);
-        	break;
-        }
+        s_priority.setSelection(task.getPriority());
         
         // Set category
-        category.setSelection(category_adapter.getPosition(data_source.getCategory(task.getCategory())));
+        s_category.setSelection(category_adapter.getPosition(data_source.getCategory(task.getCategory())));
 		
         // Set due date
         if (task.hasDateDue()) {
         	due_date_cal = task.getDateDueCal();
-        	has_due_date.setChecked(true);
+        	prevent_initial_due_date_popup = true;
+        	cb_due_date.setChecked(true);
         } else {
         	due_date_cal = GregorianCalendar.getInstance();
             due_date_cal.add(Calendar.HOUR, 1);
@@ -93,29 +73,15 @@ public class EditTaskActivity extends BaseTaskActivity {
         }
         
         // Set final due date
-        if (task.hasFinalDateDue()) {
-        	final_due_date_cal = task.getFinalDateDueCal();
-        	has_final_due_date.setChecked(true);
-        } else {
-        	final_due_date_cal = (Calendar) due_date_cal.clone();
-            final_due_date_cal.add(Calendar.HOUR, 1);
-        }
+        if (task.hasFinalDateDue())
+        	cb_final_due_date.setChecked(true);
         
         // Set repeating
         if (task.isRepeating()) {
-        	has_repetition.setChecked(true);
+        	cb_repeating.setChecked(true);
         	repeat_interval_string = String.valueOf(task.getRepeatInterval());
-        	repeat_interval.setText(repeat_interval_string);
-        	repeat_type.setSelection(task.getRepeatType());
-        }
-        
-        // Set stop repeating date
-        if (task.hasStopRepeatingDate()) {
-        	stop_repeating_date_cal = task.getStopRepeatingDateCal();
-        	stop_repeating.setChecked(true);
-        } else {
-        	stop_repeating_date_cal = (Calendar) due_date_cal.clone();
-            stop_repeating_date_cal.add(Calendar.HOUR, 3);
+        	et_repeat_interval.setText(repeat_interval_string);
+        	s_repeat_type.setSelection(task.getRepeatType());
         }
           
         // Set notes
@@ -136,48 +102,33 @@ public class EditTaskActivity extends BaseTaskActivity {
     	}
     	task.setName(name);
     	
-    	// 3. Is completed
-    	task.setIsCompleted(cb_completed.isChecked());
+    	// 3. Is completed (not modified)
     	
     	// 4. Task priority
-    	int priority;
-    	switch (rg_priority.getCheckedRadioButtonId()) {
-    	case R.id.radio_add_task_urgent:
-    		priority = Task.URGENT;
-    		break;
-    	case R.id.radio_add_task_trivial:
-    		priority = Task.TRIVIAL;
-    		break;
-    	case R.id.radio_add_task_normal:
-    	default:
-    		priority = Task.NORMAL;
-    		break;    		
-    	}
-    	task.setPriority(priority);
+    	task.setPriority(s_priority.getSelectedItemPosition());
     	
     	// 5. Task category
-    	task.setCategory(((Category) category.getSelectedItem()).getID());
+    	task.setCategory(((Category) s_category.getSelectedItem()).getID());
     	
     	// 6. Has date due
-    	task.setHasDateDue(has_due_date.isChecked());
+    	task.setHasDateDue(cb_due_date.isChecked());
     	
     	// 7. Has final date due
-    	task.setHasFinalDateDue(has_final_due_date.isChecked());
+    	task.setHasFinalDateDue(cb_final_due_date.isChecked());
     	
     	// 8. Is repeating
-		task.setIsRepeating(has_repetition.isChecked());
+		task.setIsRepeating(cb_repeating.isChecked());
 		
-		// 9. Has stop repeating date
-		task.setHasStopRepeatingDate(stop_repeating.isChecked());
+		// 9. Has stop repeating date (not modified)
     	
     	// 10. Repeat type
 		// 11. Repeat interval
 		if (task.isRepeating())	{
-			task.setRepeatType(repeat_type.getSelectedItemPosition());
+			task.setRepeatType(s_repeat_type.getSelectedItemPosition());
 
 	    	
 	    	int interval = 1;
-	    	String interval_string = repeat_interval.getText().toString();
+	    	String interval_string = et_repeat_interval.getText().toString();
 	    	if (!interval_string.equals("")) {
 	    		interval =  Integer.parseInt(interval_string);
 	    		if (interval == 0)
@@ -196,13 +147,9 @@ public class EditTaskActivity extends BaseTaskActivity {
     	if (task.hasDateDue())
     		task.setDateDue(due_date_cal.getTimeInMillis());
     	
-    	// 15. Task final due date
-    	if (task.hasFinalDateDue())
-    		task.setFinalDateDue(final_due_date_cal.getTimeInMillis());
+    	// 15. Task final due date (not modified)
     	
-    	// 16. Stop repeating date
-    	if (task.hasStopRepeatingDate())
-    		task.setStopRepeatingDate(stop_repeating_date_cal.getTimeInMillis());
+    	// 16. Stop repeating date (not modified)
     	
     	// 17. Task notes
     	task.setNotes(et_notes.getText().toString());

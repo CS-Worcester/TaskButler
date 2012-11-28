@@ -9,171 +9,33 @@
 	<RelativeLayout
 	    android:layout_width="match_parent"
 	    android:layout_height="wrap_content"
-	    android:paddingLeft="8dp"
-	    android:paddingRight="8dp" >
+	    android:padding="4dp">
 	    
 	    <TextView
 	        android:id="@+id/text_view_task_name"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
 	        android:layout_alignParentTop="true"
-	        android:layout_marginTop="4dp"
-	        android:layout_marginBottom="4dp"
-	        android:textSize="28sp"
-	        android:textStyle="bold"
-	        android:minHeight="40dp"
+	        android:layout_margin="4dp"
+	        android:textSize="24sp"
 	        android:textColor="#FFFFFF" />
 	    	    
-	    <Button
-   	        android:id="@+id/button_complete_task"
-   	        android:layout_width="match_parent"
-	        android:layout_height="60dp"
+		<CheckBox 
+		    android:id="@+id/checkbox_complete_task"
+		    android:layout_width="wrap_content"
+	        android:layout_height="40dp"
 	        android:layout_below="@id/text_view_task_name"
-	        android:layout_marginTop="4dp"
-	        android:layout_marginBottom="4dp"
-	        android:textSize="24sp" />
-	    
-	    <ImageView
-	        android:id="@+id/image_priority"
-	        android:layout_width="28dp"
-	        android:layout_height="28dp"
-	        android:layout_below="@id/button_complete_task"
-	        android:layout_alignParentLeft="true"
-	        android:layout_marginTop="4dp"
-	        android:layout_marginBottom="4dp"
-	        android:layout_marginRight="4dp"
-	        android:src="@drawable/ic_normal"
-	        android:contentDescription="@string/image_priority" />
-	    
-	    <TextView
-	        android:id="@+id/text_priority"
-	        android:layout_width="wrap_content"
-	        android:layout_height="28dp"
-	        android:layout_below="@id/button_complete_task"
-	        android:layout_toRightOf="@id/image_priority"
-	        android:layout_marginTop="4dp"
-	        android:layout_marginBottom="4dp"
-	        android:layout_marginLeft="4dp"
-	        android:layout_marginRight="16dp"
-	        android:textSize="20sp"
-	        android:gravity="center_vertical" />
-	    
-	    <ImageView
-	        android:id="@+id/image_category"
-	        android:layout_width="28dp"
-	        android:layout_height="28dp"
-	        android:layout_below="@id/button_complete_task"
-	        android:layout_toRightOf="@id/text_priority"
-	        android:layout_marginTop="4dp"
-	        android:layout_marginBottom="4dp"
-	        android:layout_marginLeft="16dp"
-	        android:layout_marginRight="4dp"
-	        android:contentDescription="@string/text_task_category" />
-	    
-	    <TextView
-	        android:id="@+id/text_category"
-	        android:layout_width="wrap_content"
-	        android:layout_height="28dp"
-	        android:layout_below="@id/button_complete_task"
-	        android:layout_toRightOf="@id/image_category"
-	        android:layout_marginTop="4dp"
-	        android:layout_marginBottom="4dp"
-	        android:layout_marginLeft="4dp"
-	        android:textSize="20sp"
-	        android:gravity="center_vertical" />  
-	    
-	    <ImageView
-	        android:id="@+id/image_date"
-	        android:layout_width="28dp"
-	        android:layout_height="28dp"
-	        android:layout_below="@id/image_priority"
-	        android:layout_alignParentLeft="true"
-	        android:layout_marginTop="4dp"
-	        android:layout_marginBottom="4dp"
-	        android:layout_marginRight="4dp"
-	        android:src="@drawable/ic_date"
-	        android:contentDescription="@string/image_date" />
-	    
-	    <TextView
-	        android:id="@+id/text_date_due"
-	        android:layout_width="wrap_content"
-	        android:layout_height="28dp"
-	        android:layout_below="@id/image_priority"
-	        android:layout_toRightOf="@id/image_date"
-	        android:layout_marginTop="4dp"
-	        android:layout_marginBottom="4dp"
-	        android:layout_marginLeft="4dp"
-	        android:textSize="20sp"
-	        android:gravity="center_vertical" />
-	    
-	    <ImageView
-	        android:id="@+id/image_alarm"
-	        android:layout_width="28dp"
-	        android:layout_height="28dp"
-	        android:layout_below="@id/image_date"
-	        android:layout_alignParentLeft="true"
-	        android:layout_marginTop="4dp"
-	        android:layout_marginBottom="4dp"
-	        android:layout_marginRight="4dp"
-	        android:src="@drawable/ic_alarm"
-	        android:contentDescription="@string/image_alarm" />
-	    
-	    <TextView
-	        android:id="@+id/text_alarm"
-	        android:layout_width="wrap_content"
-	        android:layout_height="28dp"
-	        android:layout_below="@id/image_date"
-	        android:layout_toRightOf="@id/image_alarm"
-	        android:layout_marginTop="4dp"
-	        android:layout_marginBottom="4dp"
-	        android:layout_marginLeft="4dp"
-	        android:textSize="20sp"
-	        android:gravity="center_vertical" />
-	    
-	    <ImageView
-	        android:id="@+id/image_repeat"
-	        android:layout_width="28dp"
-	        android:layout_height="28dp"
-	        android:layout_below="@id/image_alarm"
-	        android:layout_alignParentLeft="true"
-	        android:layout_marginTop="4dp"
-	        android:layout_marginBottom="4dp"
-	        android:layout_marginRight="4dp"
-	        android:src="@drawable/ic_repeat"
-	        android:contentDescription="@string/image_repeat" />
-	    
-	    <TextView
-	        android:id="@+id/text_repeat"
-	        android:layout_width="wrap_content"
-	        android:layout_height="28dp"
-	        android:layout_below="@id/image_alarm"
-	        android:layout_toRightOf="@id/image_repeat"
-	        android:layout_marginTop="4dp"
-	        android:layout_marginBottom="4dp"
-	        android:layout_marginLeft="4dp"
-	        android:textSize="20sp"
-	        android:gravity="center_vertical" />
-	    
-	    <TextView
-	        android:id="@+id/text_repeat_2"
-	        android:layout_width="wrap_content"
-	        android:layout_height="28dp"
-	        android:layout_below="@id/text_repeat"
-	        android:layout_alignLeft="@id/text_repeat"
-	        android:layout_marginTop="4dp"
-	        android:layout_marginBottom="4dp"
-	        android:textSize="20sp"
-	        android:gravity="center_vertical" />
+	        android:layout_margin="4dp"
+	        android:textSize="16sp"
+		    android:text="@string/checkbox_complete"/>
 	    
 	    <ImageView
 	        android:id="@+id/image_notes"
-	        android:layout_width="28dp"
-	        android:layout_height="28dp"
-	        android:layout_below="@id/text_repeat_2"
+	        android:layout_width="20dp"
+	        android:layout_height="20dp"
+	        android:layout_below="@id/checkbox_complete_task"
 	        android:layout_alignParentLeft="true"
-	        android:layout_marginTop="4dp"
-	        android:layout_marginBottom="4dp"
-	        android:layout_marginRight="4dp"
+	        android:layout_margin="4dp"
 	        android:src="@drawable/ic_notes"
 	        android:contentDescription="@string/image_notes" />
 	    
@@ -181,73 +43,102 @@
 	        android:id="@+id/text_notes"
 	        android:layout_width="match_parent"
 	        android:layout_height="wrap_content"
-	        android:layout_below="@id/text_repeat_2"
+	        android:layout_below="@id/checkbox_complete_task"
 	        android:layout_toRightOf="@id/image_notes"
-	        android:layout_marginTop="4dp"
-	        android:layout_marginBottom="4dp"
-	        android:layout_marginLeft="4dp"
-	        android:textSize="18sp"
+	        android:layout_margin="4dp"
+	        android:textSize="16sp"
 	        android:minHeight="40dp"
 	        android:gravity="top|left" />
 	    
-	    <ImageView
-	        android:id="@+id/image_about"
-	        android:layout_width="28dp"
-	        android:layout_height="28dp"
+	    <View
+	        android:id="@+id/view_category"
+	        android:layout_width="20dp"
+	        android:layout_height="20dp"
 	        android:layout_below="@id/text_notes"
 	        android:layout_alignParentLeft="true"
-	        android:layout_marginTop="4dp"
-	        android:layout_marginBottom="4dp"
-	        android:layout_marginRight="4dp"
-	        android:src="@drawable/ic_about"
-	        android:contentDescription="@string/image_about" />
+	        android:layout_margin="4dp"
+	        android:background="#ffffff"/>
 	    
 	    <TextView
-	        android:id="@+id/text_date_created_label"
-	        android:layout_width="wrap_content"
-	        android:layout_height="28dp"
+	        android:id="@+id/text_category"
+	        android:layout_width="match_parent"
+	        android:layout_height="20dp"
 	        android:layout_below="@id/text_notes"
-	        android:layout_toRightOf="@id/image_about"
-	        android:layout_marginTop="4dp"
-	        android:layout_marginBottom="4dp"
-	        android:layout_marginRight="4dp"
-	        android:textSize="18sp"
-	        android:text="@string/text_date_created_label"
+	        android:layout_toRightOf="@id/view_category"
+	        android:layout_margin="4dp"
+	        android:textSize="14sp"
+	        android:ellipsize="end"
+	        android:maxLines="1"
 	        android:gravity="center_vertical" />
 	    
-	    <TextView
-	        android:id="@+id/text_date_modified_label"
-	        android:layout_width="wrap_content"
-	        android:layout_height="28dp"
-	        android:layout_below="@id/text_date_created_label"
-	        android:layout_alignLeft="@id/text_date_created_label"
-	        android:layout_marginTop="4dp"
-	        android:layout_marginBottom="4dp"
-	        android:layout_marginRight="4dp"
-	        android:textSize="18sp"
-	        android:text="@string/text_date_modified_label"
-	        android:gravity="center_vertical" />
+	    <ImageView
+	        android:id="@+id/image_priority"
+	        android:layout_width="20dp"
+	        android:layout_height="20dp"
+	        android:layout_below="@id/view_category"
+	        android:layout_alignParentLeft="true"
+	        android:layout_margin="4dp"
+	        android:src="@drawable/ic_normal"
+	        android:contentDescription="@string/image_priority" />
 	    
 	    <TextView
-	        android:id="@+id/text_date_created"
+	        android:id="@+id/text_priority"
 	        android:layout_width="wrap_content"
-	        android:layout_height="28dp"
-	        android:layout_below="@id/text_notes"
-	        android:layout_toRightOf="@id/text_date_modified_label"
-	        android:layout_marginTop="4dp"
-	        android:layout_marginBottom="4dp"
-	        android:textSize="18sp"
+	        android:layout_height="20dp"
+	        android:layout_below="@id/view_category"
+	        android:layout_toRightOf="@id/image_priority"
+	        android:layout_margin="4dp"
+	        android:textSize="14sp"
 	        android:gravity="center_vertical" />
 	    
+	    <ImageView
+	        android:id="@+id/image_date"
+	        android:layout_width="20dp"
+	        android:layout_height="20dp"
+	        android:layout_below="@id/image_priority"
+	        android:layout_alignParentLeft="true"
+	        android:layout_margin="4dp"
+	        android:src="@drawable/ic_date"
+	        android:contentDescription="@string/image_date" />
+	    
 	    <TextView
-	        android:id="@+id/text_date_modified"
+	        android:id="@+id/text_date_due"
 	        android:layout_width="wrap_content"
-	        android:layout_height="28dp"
-	        android:layout_below="@id/text_date_created"
-	        android:layout_alignLeft="@id/text_date_created"
-	        android:layout_marginTop="4dp"
-	        android:layout_marginBottom="4dp"
-	        android:textSize="18sp"
+	        android:layout_height="20dp"
+	        android:layout_below="@id/image_priority"
+	        android:layout_toRightOf="@id/image_date"
+	        android:layout_margin="4dp"
+	        android:textSize="14sp"
+	        android:gravity="center_vertical" />
+	    
+	    <ImageView
+	        android:id="@+id/image_alarm"
+	        android:layout_width="20dp"
+	        android:layout_height="20dp"
+	        android:layout_below="@id/image_priority"
+	        android:layout_toRightOf="@id/text_date_due"
+	        android:layout_margin="4dp"
+	        android:src="@drawable/ic_alarm"
+	        android:contentDescription="@string/image_alarm" />
+	    
+	    <ImageView
+	        android:id="@+id/image_repeat"
+	        android:layout_width="20dp"
+	        android:layout_height="20dp"
+	        android:layout_below="@id/image_date"
+	        android:layout_alignParentLeft="true"
+	        android:layout_margin="4dp"
+	        android:src="@drawable/ic_repeat"
+	        android:contentDescription="@string/image_repeat" />
+	    
+	    <TextView
+	        android:id="@+id/text_repeat"
+	        android:layout_width="wrap_content"
+	        android:layout_height="20dp"
+	        android:layout_below="@id/image_date"
+	        android:layout_toRightOf="@id/image_repeat"
+	        android:layout_margin="4dp"
+	        android:textSize="14sp"
 	        android:gravity="center_vertical" />
 	    
 	</RelativeLayout>
