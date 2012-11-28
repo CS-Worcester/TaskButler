@@ -57,7 +57,7 @@ public class TaskButlerService extends WakefulIntentService{
 			}
 			
 			//set procrastinator alarm if the task has a finalDateDue
-			if(task.hasFinalDateDue() && !task.isCompleted())
+			if(task.hasFinalDateDue() && !task.isCompleted() && task.getDateDue() <= System.currentTimeMillis())
 				alarm.setProcrastinatorAlarm(this, task.getID());
 
 			if(!task.isCompleted() && (task.getDateDue() >= System.currentTimeMillis())){
