@@ -30,7 +30,6 @@ import edu.worcester.cs499summer2012.task.Task;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.EditText;
-import android.widget.RadioGroup;
 import android.widget.Toast;
 
 /**
@@ -44,20 +43,17 @@ public class AddTaskActivity extends BaseTaskActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-        // Initialize calendars: 
-		//     Due date defaults to +1 hour
-		//     Final due date defaults to +2 hours
-		//     Stop repeating date defaults to +4 hours
+        // Initialize calendars: Due date defaults to +1 hour
         due_date_cal = GregorianCalendar.getInstance();
         due_date_cal.add(Calendar.HOUR, 1);
         due_date_cal.set(Calendar.SECOND, 0);
         due_date_cal.set(Calendar.MILLISECOND, 0);
         
-        final_due_date_cal = (Calendar) due_date_cal.clone();
-        final_due_date_cal.add(Calendar.HOUR, 1);
+        // Initialize priority spinner
+        s_priority.setSelection(Task.NORMAL);
         
-        stop_repeating_date_cal = (Calendar) final_due_date_cal.clone();
-        stop_repeating_date_cal.add(Calendar.DAY_OF_MONTH, 1);
+        // Initialize repeat type spinner
+        s_repeat_type.setSelection(Task.DAYS);
         
         // Make the displayed category in MainActivity the default selection
         int id = prefs.getInt(MainActivity.DISPLAY_CATEGORY, MainActivity.DISPLAY_ALL_CATEGORIES);
@@ -74,23 +70,6 @@ public class AddTaskActivity extends BaseTaskActivity {
     	{
     		Toast.makeText(this, "Task needs a name!", Toast.LENGTH_SHORT).show();
     		return false;
-    	}
-    	
-    	// Get task priority
-    	RadioGroup task_priority = (RadioGroup) findViewById(R.id.radiogroup_add_task_priority);
-    	int priority;
-    	
-    	switch (task_priority.getCheckedRadioButtonId()) {
-    	case R.id.radio_add_task_urgent:
-    		priority = Task.URGENT;
-    		break;
-    	case R.id.radio_add_task_trivial:
-    		priority = Task.TRIVIAL;
-    		break;
-    	case R.id.radio_add_task_normal:
-    	default:
-    		priority = Task.NORMAL;
-    		break;    		
     	}
     	
     	// Get task category
@@ -110,16 +89,6 @@ public class AddTaskActivity extends BaseTaskActivity {
     	if (cb_due_date.isChecked())
     		due_date_ms = due_date_cal.getTimeInMillis();
     	
-    	// Get task final due date
-    	long final_due_date_ms = 0;
-    	if (cb_final_due_date.isChecked())
-    		final_due_date_ms = final_due_date_cal.getTimeInMillis();
-    	
-    	// Get stop repeating date
-    	long stop_repeating_date_ms = 0;
-    	if (cb_stop_repeating_date.isChecked())
-    		stop_repeating_date_ms = stop_repeating_date_cal.getTimeInMillis();
-    	
     	// Get task notes
     	EditText notes = (EditText) findViewById(R.id.edit_add_task_notes);
     	    	
@@ -127,18 +96,18 @@ public class AddTaskActivity extends BaseTaskActivity {
     	Task task = new Task(
     			name, 
     			false, 
-    			priority, 
+    			s_priority.getSelectedItemPosition(), 
     			categoryID,
     			cb_due_date.isChecked(),
     			cb_final_due_date.isChecked(),
     			cb_repeating.isChecked(),
-    			cb_stop_repeating_date.isChecked(),
+    			false,
     			s_repeat_type.getSelectedItemPosition(),
     			interval,
     			GregorianCalendar.getInstance().getTimeInMillis(), 
     			due_date_ms, 
-    			final_due_date_ms,
-    			stop_repeating_date_ms,
+    			0,
+    			0,
     			notes.getText().toString());
     	
     	// Assign the task a unique ID and store it in the database

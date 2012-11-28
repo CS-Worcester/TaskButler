@@ -33,23 +33,21 @@
     <!-- TextView items -->
     <string name="text_empty_list">No tasks found.</string>
     <string name="text_no_categories">No categories found.</string>
-    <string name="text_task_name">Name</string>
-    <string name="text_task_priority">Priority</string>
-    <string name="text_task_category">Category</string>
-    <string name="text_task_due">Due date</string>
-    <string name="text_task_notes">Notes</string>
-    <string name="text_no_stop_repeating_date">Repeat forever</string>
-    <string name="text_task_repeats">Repeat every </string>
+    <string name="text_task_name">NAME</string>
+    <string name="text_task_priority">PRIORITY</string>
+    <string name="text_task_category">CATEGORY</string>
+    <string name="text_task_due">DUE DATE</string>
+    <string name="text_task_notes">NOTES</string>
     <string name="text_date_time">Set date and time</string>
     <string name="text_priority_urgent">Urgent</string>
     <string name="text_priority_normal">Normal</string>
     <string name="text_priority_trivial">Trivial</string>
-    <string name="text_main_all_categories">All tasks</string>
+    <string name="text_main_all_categories">All Tasks</string>
     <string name="text_at">at</string>
 
     <!-- EditText items -->
     <string name="edit_task_name">Enter task name</string>
-    <string name="edit_task_notes">You can enter notes here</string>
+    <string name="edit_task_notes">Enter task details</string>
     <string name="edit_category_name">Enter category name</string>
 
     <!-- RadioButton items -->
@@ -62,8 +60,7 @@
     <string name="checkbox_auto_delete">Auto-delete completed tasks</string>
     <string name="checkbox_has_due_date">Due date</string>
     <string name="checkbox_has_final_due_date">Procrastination alarm</string>
-    <string name="checkbox_has_repetition">Repeats</string>
-    <string name="checkbox_stop_repeating">Stop repeating</string>
+    <string name="checkbox_has_repetition">Repeat every</string>
     <string name="checkbox_complete">Complete this task</string>
     
     <!-- ImageView items -->
@@ -90,9 +87,9 @@
 	</string-array>
 	
 	<string-array name="spinner_priorities">
-	    <item>Urgent</item>
-	    <item>Normal</item>
 	    <item>Trivial</item>
+	    <item>Normal</item>
+	    <item>Urgent</item>
 	</string-array>
 	
 </resources>

@@ -113,7 +113,7 @@ DialogInterface.OnClickListener {
 			((ImageView) findViewById(R.id.image_date)).setVisibility(View.VISIBLE);
 			TextView date_due = ((TextView) findViewById(R.id.text_date_due));
 			date_due.setVisibility(View.VISIBLE);
-			date_due.setText(DateFormat.format("MM/dd/yy 'at' h:mm AA", task.getDateDueCal()));
+			date_due.setText(DateFormat.format("'Due' MM/dd/yy 'at' h:mm AA", task.getDateDueCal()));
 
 			if (task.isPastDue())
 				date_due.setTextColor(Color.RED);
@@ -136,11 +136,7 @@ DialogInterface.OnClickListener {
 			TextView repeat_text = (TextView) findViewById(R.id.text_repeat);
 			repeat_text.setVisibility(View.VISIBLE);
 			
-			StringBuilder message = new StringBuilder();
-			message.append("Repeat every " + task.getRepeatInterval() + ' ' + Task.REPEAT_LABELS[task.getRepeatType()]);
-			if (task.hasStopRepeatingDate())
-				message.append(" until " + DateFormat.format("MM/dd/yy", task.getStopRepeatingDateCal()));
-			repeat_text.setText(message.toString());
+			repeat_text.setText("Repeat every " + task.getRepeatInterval() + ' ' + Task.REPEAT_LABELS[task.getRepeatType()]);
 		} else {
 			((TextView) findViewById(R.id.text_repeat)).setVisibility(View.GONE);
 			((ImageView) findViewById(R.id.image_repeat)).setVisibility(View.GONE);

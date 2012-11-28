@@ -26,7 +26,6 @@ import java.util.GregorianCalendar;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.EditText;
-import android.widget.RadioGroup;
 import android.widget.Toast;
 import edu.worcester.cs499summer2012.R;
 import edu.worcester.cs499summer2012.task.Category;
@@ -37,7 +36,6 @@ public class EditTaskActivity extends BaseTaskActivity {
 	private Task task;
 	
 	private EditText et_name;
-	private RadioGroup rg_priority;
 	private EditText et_notes;
 	
 	@Override
@@ -57,20 +55,7 @@ public class EditTaskActivity extends BaseTaskActivity {
         et_name.setText(task.getName());
         
         // Set priority
-        rg_priority = (RadioGroup) findViewById(R.id.radiogroup_add_task_priority);
-        switch (task.getPriority()) {
-        case Task.URGENT:
-        	rg_priority.check(R.id.radio_add_task_urgent);
-        	break;
-        	
-        case Task.NORMAL:
-        	rg_priority.check(R.id.radio_add_task_normal);
-        	break;
-        	
-        case Task.TRIVIAL:
-        	rg_priority.check(R.id.radio_add_task_trivial);
-        	break;
-        }
+        s_priority.setSelection(task.getPriority());
         
         // Set category
         s_category.setSelection(category_adapter.getPosition(data_source.getCategory(task.getCategory())));
@@ -88,14 +73,8 @@ public class EditTaskActivity extends BaseTaskActivity {
         }
         
         // Set final due date
-        if (task.hasFinalDateDue()) {
-        	final_due_date_cal = task.getFinalDateDueCal();
-        	prevent_initial_final_due_date_popup = true;
+        if (task.hasFinalDateDue())
         	cb_final_due_date.setChecked(true);
-        } else {
-        	final_due_date_cal = (Calendar) due_date_cal.clone();
-            final_due_date_cal.add(Calendar.HOUR, 1);
-        }
         
         // Set repeating
         if (task.isRepeating()) {
@@ -103,16 +82,6 @@ public class EditTaskActivity extends BaseTaskActivity {
         	repeat_interval_string = String.valueOf(task.getRepeatInterval());
         	et_repeat_interval.setText(repeat_interval_string);
         	s_repeat_type.setSelection(task.getRepeatType());
-        }
-        
-        // Set stop repeating date
-        if (task.hasStopRepeatingDate()) {
-        	stop_repeating_date_cal = task.getStopRepeatingDateCal();
-        	prevent_initial_stop_repeating_date_popup = true;
-        	cb_stop_repeating_date.setChecked(true);
-        } else {
-        	stop_repeating_date_cal = (Calendar) due_date_cal.clone();
-            stop_repeating_date_cal.add(Calendar.HOUR, 3);
         }
           
         // Set notes
@@ -136,20 +105,7 @@ public class EditTaskActivity extends BaseTaskActivity {
     	// 3. Is completed (not modified)
     	
     	// 4. Task priority
-    	int priority;
-    	switch (rg_priority.getCheckedRadioButtonId()) {
-    	case R.id.radio_add_task_urgent:
-    		priority = Task.URGENT;
-    		break;
-    	case R.id.radio_add_task_trivial:
-    		priority = Task.TRIVIAL;
-    		break;
-    	case R.id.radio_add_task_normal:
-    	default:
-    		priority = Task.NORMAL;
-    		break;    		
-    	}
-    	task.setPriority(priority);
+    	task.setPriority(s_priority.getSelectedItemPosition());
     	
     	// 5. Task category
     	task.setCategory(((Category) s_category.getSelectedItem()).getID());
@@ -163,8 +119,7 @@ public class EditTaskActivity extends BaseTaskActivity {
     	// 8. Is repeating
 		task.setIsRepeating(cb_repeating.isChecked());
 		
-		// 9. Has stop repeating date
-		task.setHasStopRepeatingDate(cb_stop_repeating_date.isChecked());
+		// 9. Has stop repeating date (not modified)
     	
     	// 10. Repeat type
 		// 11. Repeat interval
@@ -192,13 +147,9 @@ public class EditTaskActivity extends BaseTaskActivity {
     	if (task.hasDateDue())
     		task.setDateDue(due_date_cal.getTimeInMillis());
     	
-    	// 15. Task final due date
-    	if (task.hasFinalDateDue())
-    		task.setFinalDateDue(final_due_date_cal.getTimeInMillis());
+    	// 15. Task final due date (not modified)
     	
-    	// 16. Stop repeating date
-    	if (task.hasStopRepeatingDate())
-    		task.setStopRepeatingDate(stop_repeating_date_cal.getTimeInMillis());
+    	// 16. Stop repeating date (not modified)
     	
     	// 17. Task notes
     	task.setNotes(et_notes.getText().toString());
