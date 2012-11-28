@@ -35,34 +35,13 @@
 	        android:textSize="18sp"
 	        android:inputType="textCapSentences|textAutoCorrect" />
 	    
-	    <CheckBox
-	        android:id="@+id/checkbox_already_completed"
-	        android:layout_width="wrap_content"
-	        android:layout_height="40dp"
-	        android:layout_below="@id/edit_add_task_name"
-	        android:layout_alignParentLeft="true"
-	        android:layout_marginTop="4dp"
-	        android:layout_marginBottom="4dp"
-	        android:text="@string/checkbox_already_completed"
-	        android:textSize="16sp"
-	        android:checked="false" />
-	    
-	    <View
-	        android:id="@+id/ruler_1"
-	        android:layout_width="match_parent"
-			android:layout_height="1dp"
-			android:layout_below="@id/checkbox_already_completed"
-			android:layout_marginTop="4dp"
-			android:layout_marginBottom="4dp"
-			android:background="#33B5E5" />
-	    
 	    <!--  Group 2: Priority -->
 	    
 	    <TextView
 	        android:id="@+id/text_add_task_priority"
 	        android:layout_width="match_parent"
 	        android:layout_height="wrap_content"
-	        android:layout_below="@id/ruler_1"
+	        android:layout_below="@id/edit_add_task_name"
 	        android:layout_marginTop="4dp"
 	        android:layout_marginBottom="4dp"
 	        android:text="@string/text_task_priority"
@@ -103,22 +82,13 @@
 	
 	    </RadioGroup>
 	    
-	    <View
-	        android:id="@+id/ruler_2"
-	        android:layout_width="match_parent"
-			android:layout_height="1dp"
-			android:layout_below="@id/radiogroup_add_task_priority"
-			android:layout_marginTop="4dp"
-			android:layout_marginBottom="4dp"
-			android:background="#33B5E5" />
-	    
 	    <!-- Group 3: Category -->
 	    
 	    <TextView
 	        android:id="@+id/text_add_task_category"
 	        android:layout_width="match_parent"
 	        android:layout_height="wrap_content"
-	        android:layout_below="@id/ruler_2"
+	        android:layout_below="@id/radiogroup_add_task_priority"
 	        android:layout_marginTop="4dp"
 			android:layout_marginBottom="4dp"
 	        android:text="@string/text_task_category"
@@ -132,15 +102,6 @@
 	        android:layout_marginTop="4dp"
 			android:layout_marginBottom="4dp"
 			android:textSize="18sp" />
-	    
-	    <View
-	        android:id="@+id/ruler_3"
-	        android:layout_width="match_parent"
-			android:layout_height="1dp"
-			android:layout_below="@id/spinner_add_task_category"
-			android:layout_marginTop="4dp"
-			android:layout_marginBottom="4dp"
-			android:background="#33B5E5" />	
 		
 	    <!-- Group 4: Due date -->	
 	    
@@ -148,7 +109,7 @@
 	        android:id="@+id/text_add_task_due"
 	        android:layout_width="match_parent"
 	        android:layout_height="wrap_content"
-	        android:layout_below="@id/ruler_3"
+	        android:layout_below="@id/spinner_add_task_category"
 	        android:layout_marginTop="4dp"
 			android:layout_marginBottom="4dp"
 	        android:text="@string/text_task_due"
@@ -367,15 +328,6 @@
 	        android:textSize="18sp"
 	        android:textColor="#ffffffff"
 	        android:gravity="center" />
-   	    
-   	    <View
-	        android:id="@+id/ruler_4"
-	        android:layout_width="match_parent"
-			android:layout_height="1dp"
-			android:layout_below="@id/text_add_task_stop_repeating_date"
-			android:layout_marginTop="4dp"
-			android:layout_marginBottom="4dp"
-			android:background="#33B5E5" />	
 		
 	    <!-- Group 5: Notes -->	
 	    
@@ -383,7 +335,7 @@
 	        android:id="@+id/text_add_task_notes"
 	        android:layout_width="match_parent"
 	        android:layout_height="wrap_content"
-	        android:layout_below="@id/ruler_4"
+	        android:layout_below="@id/text_add_task_stop_repeating_time"
 	        android:layout_marginTop="4dp"
 			android:layout_marginBottom="4dp"
 	        android:text="@string/text_task_notes"

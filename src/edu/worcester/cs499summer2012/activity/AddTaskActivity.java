@@ -29,7 +29,6 @@ import edu.worcester.cs499summer2012.task.Task;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.RadioGroup;
 import android.widget.Toast;
@@ -76,9 +75,6 @@ public class AddTaskActivity extends BaseTaskActivity {
     		Toast.makeText(this, "Task needs a name!", Toast.LENGTH_SHORT).show();
     		return false;
     	}
-    	
-    	// Get completion status
-    	CheckBox is_completed = (CheckBox) findViewById(R.id.checkbox_already_completed);
     	
     	// Get task priority
     	RadioGroup task_priority = (RadioGroup) findViewById(R.id.radiogroup_add_task_priority);
@@ -130,7 +126,7 @@ public class AddTaskActivity extends BaseTaskActivity {
     	// Create the task
     	Task task = new Task(
     			name, 
-    			is_completed.isChecked(), 
+    			false, 
     			priority, 
     			categoryID,
     			cb_due_date.isChecked(),

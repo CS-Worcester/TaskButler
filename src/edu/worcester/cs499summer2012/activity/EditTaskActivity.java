@@ -25,7 +25,6 @@ import java.util.GregorianCalendar;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.RadioGroup;
 import android.widget.Toast;
@@ -38,7 +37,6 @@ public class EditTaskActivity extends BaseTaskActivity {
 	private Task task;
 	
 	private EditText et_name;
-	private CheckBox cb_completed;
 	private RadioGroup rg_priority;
 	private EditText et_notes;
 	
@@ -57,10 +55,6 @@ public class EditTaskActivity extends BaseTaskActivity {
         // Set task name
         et_name = (EditText) findViewById(R.id.edit_add_task_name);
         et_name.setText(task.getName());
-        
-        // Set is completed
-        cb_completed = (CheckBox) findViewById(R.id.checkbox_already_completed);
-        cb_completed.setChecked(task.isCompleted());
         
         // Set priority
         rg_priority = (RadioGroup) findViewById(R.id.radiogroup_add_task_priority);
@@ -139,8 +133,7 @@ public class EditTaskActivity extends BaseTaskActivity {
     	}
     	task.setName(name);
     	
-    	// 3. Is completed
-    	task.setIsCompleted(cb_completed.isChecked());
+    	// 3. Is completed (not modified)
     	
     	// 4. Task priority
     	int priority;
