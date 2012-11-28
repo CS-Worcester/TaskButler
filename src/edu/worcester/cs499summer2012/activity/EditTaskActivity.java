@@ -58,7 +58,8 @@ public class EditTaskActivity extends BaseTaskActivity {
         s_priority.setSelection(task.getPriority());
         
         // Set category
-        s_category.setSelection(category_adapter.getPosition(data_source.getCategory(task.getCategory())));
+        default_category = data_source.getCategory(task.getCategory());
+        s_category.setSelection(category_adapter.getPosition(default_category));
 		
         // Set due date
         if (task.hasDateDue()) {
@@ -93,7 +94,7 @@ public class EditTaskActivity extends BaseTaskActivity {
 		// 1. ID (not modified)
 		
     	// 2. Task name
-    	String name = et_name.getText().toString();
+    	String name = et_name.getText().toString().trim();
     	// If there is no task name, don't create the task
     	if (name.equals(""))
     	{

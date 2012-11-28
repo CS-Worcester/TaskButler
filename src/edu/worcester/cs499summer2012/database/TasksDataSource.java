@@ -462,24 +462,35 @@ public class TasksDataSource {
 		return categories;
 	}
 	
-	public boolean doesCategoryNameExist(String name) {
+	/**
+	 * Returns an existing category by its name. Returns null if the category
+	 * doesn't exist.
+	 * @param name The name of the category.
+	 * @return the category, or null if the category doesn't exist
+	 */
+	public Category getExistingCategory(String name) {
 		// Select All Query
 		String selectQuery = "SELECT * FROM " + 
 				DatabaseHandler.TABLE_CATEGORIES + " WHERE " +
 				DatabaseHandler.KEY_NAME + " = '" + name + "'";
 		
-		boolean exists = false;
-
 		open();
+		Category category = null;
 		Cursor cursor = db.rawQuery(selectQuery, null);
 
-		if (cursor.moveToFirst())
-			exists = true;
+		if (cursor.moveToFirst()) {
+			category = new Category(
+					cursor.getInt(0),
+					cursor.getString(1),
+					cursor.getInt(2),
+					cursor.getLong(3),
+					cursor.getString(4));
+		}
 
 		cursor.close();
 		close();
 
-		return exists;
+		return category;
 	}
 	
 	/************************************************************

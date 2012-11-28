@@ -113,6 +113,7 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
     // Task properties that are modified by UI elements
     protected Calendar due_date_cal;
     protected int selected_dialog;
+    protected Category default_category;
     
     // Flags to prevent date-time picker dialogs popping up immediately on  	
     // entering EditTaskActivity
@@ -214,10 +215,8 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
     protected void onSaveInstanceState(Bundle outState) {
     	outState.putBoolean(PREVENT_DUE_DATE, cb_due_date.isChecked() ? true : false);
     	
-    	if (category_dialog.isShowing()) {
-    		s_category.setSelection(0);
+    	if (category_dialog != null && category_dialog.isShowing())
 			category_dialog.cancel();
-    	}
     	
     	super.onSaveInstanceState(outState);
     }
@@ -368,23 +367,28 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
 		if (selected_dialog == CATEGORY_DIALOG) {
 			selected_dialog = NO_DIALOG;
 			if (id == DialogInterface.BUTTON_POSITIVE) {
-				String name = et_category.getText().toString();
+				String name = et_category.getText().toString().trim();
 				if (name.equals("")) {
 					// No name, cancel dialog
 					Toast.makeText(this, "Category needs a name!", Toast.LENGTH_SHORT).show();
-					s_category.setSelection(0);
+					s_category.setSelection(category_adapter.getPosition(default_category));
 					dialog.cancel();
-				} else if (data_source.doesCategoryNameExist(name)) {
+					return;
+				} 
+				
+				Category existing_category = data_source.getExistingCategory(name);
+				
+				if (existing_category != null) {
 					// Category name already exists, cancel dialog
 					Toast.makeText(this, "Category name already exists", Toast.LENGTH_SHORT).show();
-					s_category.setSelection(0);
+					s_category.setSelection(category_adapter.getPosition(existing_category));
 					dialog.cancel();
 				} else  {
 					AmbilWarnaDialog color_dialog = new AmbilWarnaDialog(this, Color.RED, new OnAmbilWarnaListener() {
 	
 						@Override
 						public void onCancel(AmbilWarnaDialog dialog) {
-							s_category.setSelection(0);
+							s_category.setSelection(category_adapter.getPosition(default_category));
 						}
 	
 						@Override
@@ -423,7 +427,7 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
 			
 			AlertDialog.Builder new_category_builder = new AlertDialog.Builder(this);
 			new_category_builder.setView(category_name_view);
-			new_category_builder.setTitle("Enter category name");
+			new_category_builder.setTitle("Set name");
 			new_category_builder.setPositiveButton("Next", this);
 			new_category_builder.setNegativeButton("Cancel", this);
 			category_dialog = new_category_builder.create();

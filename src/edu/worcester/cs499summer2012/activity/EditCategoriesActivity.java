@@ -157,7 +157,7 @@ public class EditCategoriesActivity extends SherlockListActivity implements Acti
 			
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			builder.setView(category_name_view);
-			builder.setTitle("Enter category name");
+			builder.setTitle("Set name");
 			builder.setPositiveButton("Next", this);
 			builder.setNegativeButton("Cancel", this);
     		builder.create().show();
@@ -196,12 +196,12 @@ public class EditCategoriesActivity extends SherlockListActivity implements Acti
 		case EDIT_DIALOG:
 			switch (which) {
 			case DialogInterface.BUTTON_POSITIVE:
-				String name = et_category_name.getText().toString();
+				String name = et_category_name.getText().toString().trim();
 				if (name.equals("")) {
 					// No name, cancel dialog
 					Toast.makeText(this, "Category needs a name!", Toast.LENGTH_SHORT).show();
 					dialog.cancel();
-				} else if (selected_dialog == CREATE_DIALOG && data_source.doesCategoryNameExist(name)) {
+				} else if (selected_dialog == CREATE_DIALOG && data_source.getExistingCategory(name) != null) {
 					// Category name already exists, cancel dialog
 					Toast.makeText(this, "Category name already exists", Toast.LENGTH_SHORT).show();
 					dialog.cancel();

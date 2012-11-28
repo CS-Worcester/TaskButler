@@ -56,14 +56,14 @@ public class AddTaskActivity extends BaseTaskActivity {
         s_repeat_type.setSelection(Task.DAYS);
         
         // Make the displayed category in MainActivity the default selection
-        int id = prefs.getInt(MainActivity.DISPLAY_CATEGORY, MainActivity.DISPLAY_ALL_CATEGORIES);
-        s_category.setSelection(category_adapter.getPosition(data_source.getCategory(id)));
+        default_category = data_source.getCategory(prefs.getInt(MainActivity.DISPLAY_CATEGORY, MainActivity.DISPLAY_ALL_CATEGORIES));
+        s_category.setSelection(category_adapter.getPosition(default_category));
 	}
 
 	protected boolean addTask() {
     	// Get task name
     	EditText et_name = (EditText) findViewById(R.id.edit_add_task_name);
-    	String name = et_name.getText().toString();
+    	String name = et_name.getText().toString().trim();
     	
     	// If there is no task name, don't create the task
     	if (name.equals(""))
