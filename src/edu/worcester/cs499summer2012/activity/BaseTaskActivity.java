@@ -37,7 +37,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.DatePicker;
@@ -102,22 +101,25 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
     
     // UI elements
     protected CheckBox cb_due_date;
-    protected Button b_due_date;
     protected TextView tv_due_date;
+    protected TextView tv_due_time;
     protected CheckBox cb_final_due_date;
-    protected Button b_final_due_date;
     protected TextView tv_final_due_date;
+    protected TextView tv_final_due_time;
     protected CheckBox cb_repeating;   
     protected TextView tv_repeating;
     protected EditText et_repeat_interval;
     protected Spinner s_category;
     protected Spinner s_repeat_type;
     protected CheckBox cb_stop_repeating_date;
-    protected Button b_stop_repeating_date;
     protected TextView tv_stop_repeating_date;
+    protected TextView tv_stop_repeating_time;
     protected DatePicker date_picker;
     protected TimePicker time_picker;
     protected EditText et_category;
+    protected TextView tv_at_1;
+    protected TextView tv_at_2;
+    protected TextView tv_at_3;
     
     // Task properties that are modified by UI elements
     protected Calendar due_date_cal;
@@ -162,28 +164,34 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
         
         // Initialize the fields that can be enabled/disabled or listened to
         cb_due_date = (CheckBox) findViewById(R.id.checkbox_has_due_date);
-        b_due_date = (Button) findViewById(R.id.button_edit_due_date);
         tv_due_date = (TextView) findViewById(R.id.text_add_task_due_date);
+        tv_due_time = (TextView) findViewById(R.id.text_add_task_due_time);
         cb_final_due_date = (CheckBox) findViewById(R.id.checkbox_has_final_due_date);
-        b_final_due_date = (Button) findViewById(R.id.button_edit_final_due_date);
         tv_final_due_date = (TextView) findViewById(R.id.text_add_task_final_due_date);
+        tv_final_due_time = (TextView) findViewById(R.id.text_add_task_final_due_time);
         cb_repeating = (CheckBox) findViewById(R.id.checkbox_has_repetition);   
         tv_repeating = (TextView) findViewById(R.id.text_add_task_repeats);
         et_repeat_interval = (EditText) findViewById(R.id.edit_add_task_repeat_interval);
         s_category = (Spinner) findViewById(R.id.spinner_add_task_category);
         s_repeat_type = (Spinner) findViewById(R.id.spinner_add_task_repeat_type);
         cb_stop_repeating_date = (CheckBox) findViewById(R.id.checkbox_stop_repeating);
-        b_stop_repeating_date = (Button) findViewById(R.id.button_edit_stop_repeating_date);
         tv_stop_repeating_date = (TextView) findViewById(R.id.text_add_task_stop_repeating_date);
+        tv_stop_repeating_time = (TextView) findViewById(R.id.text_add_task_stop_repeating_time);
+        tv_at_1 = (TextView) findViewById(R.id.text_at_1);
+        tv_at_2 = (TextView) findViewById(R.id.text_at_2);
+        tv_at_3 = (TextView) findViewById(R.id.text_at_3);
                 
         // Set listeners
         cb_due_date.setOnCheckedChangeListener(this);
         cb_final_due_date.setOnCheckedChangeListener(this);
         cb_repeating.setOnCheckedChangeListener(this);
         cb_stop_repeating_date.setOnCheckedChangeListener(this);
-        b_due_date.setOnClickListener(this);
-        b_final_due_date.setOnClickListener(this);
-        b_stop_repeating_date.setOnClickListener(this);
+        tv_due_date.setOnClickListener(this);
+        tv_due_time.setOnClickListener(this);
+        tv_final_due_date.setOnClickListener(this);
+        tv_final_due_time.setOnClickListener(this);
+        tv_stop_repeating_date.setOnClickListener(this);
+        tv_stop_repeating_time.setOnClickListener(this);
         
         // Allow Action bar icon to act as a button
         ActionBar action_bar = getSupportActionBar();
@@ -209,18 +217,21 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
         s_repeat_type.setSelection(Task.DAYS);
         
         // Hide certain due date items to start
-        b_due_date.setVisibility(View.GONE);
         tv_due_date.setVisibility(View.GONE);
+        tv_due_time.setVisibility(View.GONE);
         cb_final_due_date.setVisibility(View.GONE);
-        b_final_due_date.setVisibility(View.GONE);
         tv_final_due_date.setVisibility(View.GONE);
+        tv_final_due_time.setVisibility(View.GONE);
         cb_repeating.setVisibility(View.GONE);
         tv_repeating.setVisibility(View.GONE);
         et_repeat_interval.setVisibility(View.GONE);
         s_repeat_type.setVisibility(View.GONE);
         cb_stop_repeating_date.setVisibility(View.GONE);
-        b_stop_repeating_date.setVisibility(View.GONE);
         tv_stop_repeating_date.setVisibility(View.GONE);
+        tv_stop_repeating_time.setVisibility(View.GONE);
+        tv_at_1.setVisibility(View.GONE);
+        tv_at_2.setVisibility(View.GONE);
+        tv_at_3.setVisibility(View.GONE);
         
         // Check bundle for prevent popup flags
         if (savedInstanceState != null) {
@@ -277,10 +288,11 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
 		case R.id.checkbox_has_due_date:
 			if (isChecked) {
 				// Make edit button, textview, and other checkboxes visible
-				b_due_date.setVisibility(View.VISIBLE);
 				tv_due_date.setVisibility(View.VISIBLE);
-				tv_due_date.setText(DateFormat.format("'Due:' MM/dd/yy 'at' h:mm AA", 
-						due_date_cal));
+				tv_at_1.setVisibility(View.VISIBLE);
+				tv_due_time.setVisibility(View.VISIBLE);
+				tv_due_date.setText(DateFormat.format("MM/dd/yy", due_date_cal));
+				tv_due_time.setText(DateFormat.format("h:mm AA", due_date_cal));
 				cb_final_due_date.setVisibility(View.VISIBLE);
 				cb_repeating.setVisibility(View.VISIBLE);
 				
@@ -288,11 +300,12 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
 				if (prevent_initial_due_date_popup)
 					prevent_initial_due_date_popup = false;
 				else
-					onClick(b_due_date);
+					onClick(tv_due_date);
 			} else {
 				// Hide edit button, textview, and other checkboxes
-				b_due_date.setVisibility(View.GONE);
 				tv_due_date.setVisibility(View.GONE);
+				tv_at_1.setVisibility(View.GONE);
+				tv_due_time.setVisibility(View.GONE);
 				cb_final_due_date.setVisibility(View.GONE);
 				cb_repeating.setVisibility(View.GONE);
 				
@@ -307,20 +320,22 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
 		case R.id.checkbox_has_final_due_date:
 			if (isChecked) {
 				// Make edit button and textview visible
-				b_final_due_date.setVisibility(View.VISIBLE);
 				tv_final_due_date.setVisibility(View.VISIBLE);
-				tv_final_due_date.setText(DateFormat.format("'Alarm:' MM/dd/yy 'at' h:mm AA", 
-						final_due_date_cal));
+				tv_at_2.setVisibility(View.VISIBLE);
+				tv_final_due_time.setVisibility(View.VISIBLE);
+				tv_final_due_date.setText(DateFormat.format("MM/dd/yy", final_due_date_cal));
+				tv_final_due_time.setText(DateFormat.format("h:mm AA", final_due_date_cal));
 				
 				// Pop up date-time dialog as if user had clicked edit button
 				if (prevent_initial_final_due_date_popup)
 					prevent_initial_final_due_date_popup = false;
 				else
-					onClick(b_final_due_date);
+					onClick(tv_final_due_date);
 			} else {
 				// Hide edit button and textview
-				b_final_due_date.setVisibility(View.GONE);
 				tv_final_due_date.setVisibility(View.GONE);
+				tv_at_2.setVisibility(View.GONE);
+				tv_final_due_time.setVisibility(View.GONE);
 			}
 			break;
 			
@@ -348,20 +363,22 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
 		case R.id.checkbox_stop_repeating:
 			if (isChecked) {
 				// Make edit button and textview visible
-				b_stop_repeating_date.setVisibility(View.VISIBLE);
 				tv_stop_repeating_date.setVisibility(View.VISIBLE);
-				tv_stop_repeating_date.setText(DateFormat.format("'Ends:' MM/dd/yy 'at' h:mm AA", 
-						stop_repeating_date_cal));
+				tv_at_3.setVisibility(View.VISIBLE);
+				tv_stop_repeating_time.setVisibility(View.VISIBLE);
+				tv_stop_repeating_date.setText(DateFormat.format("MM/dd/yy", stop_repeating_date_cal));
+				tv_stop_repeating_time.setText(DateFormat.format("h:mm AA", stop_repeating_date_cal));
 				
 				// Pop up date-time dialog as if user had clicked edit button
 				if (prevent_initial_stop_repeating_date_popup)
 					prevent_initial_stop_repeating_date_popup = false;
 				else
-					onClick(b_stop_repeating_date);
+					onClick(tv_stop_repeating_date);
 			} else {
 				// Hide edit button and textview
-				b_stop_repeating_date.setVisibility(View.GONE);
 				tv_stop_repeating_date.setVisibility(View.GONE);
+				tv_at_3.setVisibility(View.GONE);
+				tv_stop_repeating_time.setVisibility(View.GONE);
 			}
 		}
 	}
@@ -379,8 +396,8 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
         time_picker = (TimePicker) picker_view.findViewById(R.id.dialog_time_picker);
 		
 		switch (v.getId()) {
-		case R.id.button_edit_due_date:
-			selected_calendar = R.id.button_edit_due_date;
+		case R.id.text_add_task_due_date:
+			selected_calendar = R.id.text_add_task_due_date;
 			date_picker.updateDate(due_date_cal.get(Calendar.YEAR), 
 					due_date_cal.get(Calendar.MONTH), 
 					due_date_cal.get(Calendar.DAY_OF_MONTH));
@@ -388,8 +405,8 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
 			time_picker.setCurrentMinute(due_date_cal.get(Calendar.MINUTE));
 			break;
 			
-		case R.id.button_edit_final_due_date:
-			selected_calendar = R.id.button_edit_final_due_date;
+		case R.id.text_add_task_final_due_date:
+			selected_calendar = R.id.text_add_task_final_due_date;
 			date_picker.updateDate(final_due_date_cal.get(Calendar.YEAR), 
 					final_due_date_cal.get(Calendar.MONTH), 
 					final_due_date_cal.get(Calendar.DAY_OF_MONTH));
@@ -397,13 +414,17 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
 			time_picker.setCurrentMinute(final_due_date_cal.get(Calendar.MINUTE));
 			break;
 			
-		case R.id.button_edit_stop_repeating_date:
-			selected_calendar = R.id.button_edit_stop_repeating_date;
+		case R.id.text_add_task_stop_repeating_date:
+			selected_calendar = R.id.text_add_task_stop_repeating_date;
 			date_picker.updateDate(stop_repeating_date_cal.get(Calendar.YEAR), 
 					stop_repeating_date_cal.get(Calendar.MONTH), 
 					stop_repeating_date_cal.get(Calendar.DAY_OF_MONTH));
 			time_picker.setCurrentHour(stop_repeating_date_cal.get(Calendar.HOUR_OF_DAY));
 			time_picker.setCurrentMinute(stop_repeating_date_cal.get(Calendar.MINUTE));
+			break;
+			
+		default:
+			return;
 		}
 		
 		selected_dialog = DATETIME_DIALOG;
@@ -427,15 +448,15 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
 		case DATETIME_DIALOG:
 			if (id == DialogInterface.BUTTON_POSITIVE) {
 				switch (selected_calendar) {
-				case R.id.button_edit_due_date:
+				case R.id.text_add_task_due_date:
 					// User modified the due date. There are no restrictions on this action.
 					due_date_cal.set(Calendar.YEAR, date_picker.getYear());
 					due_date_cal.set(Calendar.MONTH, date_picker.getMonth());
 					due_date_cal.set(Calendar.DAY_OF_MONTH, date_picker.getDayOfMonth());
 					due_date_cal.set(Calendar.HOUR_OF_DAY, time_picker.getCurrentHour());
 					due_date_cal.set(Calendar.MINUTE, time_picker.getCurrentMinute());
-					tv_due_date.setText(DateFormat.format("'Due:' MM/dd/yy 'at' h:mm AA", 
-							due_date_cal));
+					tv_due_date.setText(DateFormat.format("MM/dd/yy", due_date_cal));
+					tv_due_time.setText(DateFormat.format("h:mm AA", due_date_cal));
 					
 					// Check to ensure final due date > due date
 					if (due_date_cal.getTimeInMillis() > final_due_date_cal.getTimeInMillis()) {
@@ -443,7 +464,8 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
 						
 						// Update the view and notify user, if final due date is active
 						if (cb_final_due_date.isChecked()) {
-							tv_final_due_date.setText(DateFormat.format("'Alarm:' MM/dd/yy 'at' h:mm AA", final_due_date_cal));
+							tv_final_due_date.setText(DateFormat.format("MM/dd/yy", final_due_date_cal));
+							tv_final_due_time.setText(DateFormat.format("h:mm AA", final_due_date_cal));
 							toast("Procrastination alarm has been modified to be compatible with your new selection");
 						}
 					}
@@ -478,7 +500,8 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
 							
 							// Update the view and notify user, if stop repeating date is active
 							if (cb_stop_repeating_date.isChecked()) {
-								tv_stop_repeating_date.setText(DateFormat.format("'Ends:' MM/dd/yy 'at' h:mm AA", stop_repeating_date_cal));
+								tv_stop_repeating_date.setText(DateFormat.format("MM/dd/yy", stop_repeating_date_cal));
+								tv_stop_repeating_time.setText(DateFormat.format("h:mm AA", stop_repeating_date_cal));
 								toast("Stop repeating date has been modified to be compatible with your new selection");
 							}
 						}
@@ -487,14 +510,15 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
 						
 						// Update the view and notify user, if stop repeating date is active
 						if (cb_stop_repeating_date.isChecked()) {
-							tv_stop_repeating_date.setText(DateFormat.format("'Ends:' MM/dd/yy 'at' h:mm AA", stop_repeating_date_cal));
+							tv_stop_repeating_date.setText(DateFormat.format("MM/dd/yy", stop_repeating_date_cal));
+							tv_stop_repeating_time.setText(DateFormat.format("h:mm AA", stop_repeating_date_cal));
 							toast("Stop repeating date has been modified to be compatible with your new selection");
 						}
 					}
 					
 					break;
 					
-				case R.id.button_edit_final_due_date:
+				case R.id.text_add_task_final_due_date:
 					// User modified the final due date. It cannot be earlier than due date.
 					Calendar new_final_due_date_cal = (Calendar) final_due_date_cal.clone();
 					new_final_due_date_cal.set(Calendar.YEAR, date_picker.getYear());
@@ -511,7 +535,8 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
 					}
 					
 					final_due_date_cal = new_final_due_date_cal;
-					tv_final_due_date.setText(DateFormat.format("'Alarm:' MM/dd/yy 'at' h:mm AA", final_due_date_cal));
+					tv_final_due_date.setText(DateFormat.format("MM/dd/yy", final_due_date_cal));
+					tv_final_due_time.setText(DateFormat.format("h:mm AA", final_due_date_cal));
 					
 					// Check to ensure repeat period > final due date - due date
 					long original_repeat_interval = Long.parseLong(et_repeat_interval.getText().toString());
@@ -540,13 +565,14 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
 						
 						// Update the view and notify user, if stop repeating date is active
 						if (cb_stop_repeating_date.isChecked()) {
-							tv_stop_repeating_date.setText(DateFormat.format("'Ends:' MM/dd/yy 'at' h:mm AA", stop_repeating_date_cal));
+							tv_stop_repeating_date.setText(DateFormat.format("MM/dd/yy", stop_repeating_date_cal));
+							tv_stop_repeating_time.setText(DateFormat.format("h:mm AA", stop_repeating_date_cal));
 							toast("Stop repeating date has been modified to be compatible with your new selection");
 						}
 					}
 					break;
 				
-				case R.id.button_edit_stop_repeating_date:
+				case R.id.text_add_task_stop_repeating_date:
 					// User modified the stop repeating date. It cannot be earlier than due date (and final due date).
 					Calendar new_stop_repeating_date_cal = (Calendar) stop_repeating_date_cal.clone();
 					new_stop_repeating_date_cal.set(Calendar.YEAR, date_picker.getYear());
@@ -569,8 +595,8 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
 					}
 					
 					stop_repeating_date_cal = new_stop_repeating_date_cal;
-					tv_stop_repeating_date.setText(DateFormat.format("'Ends:' MM/dd/yy 'at' h:mm AA", 
-							stop_repeating_date_cal));
+					tv_stop_repeating_date.setText(DateFormat.format("MM/dd/yy", stop_repeating_date_cal));
+					tv_stop_repeating_time.setText(DateFormat.format("h:mm AA", stop_repeating_date_cal));
 					break;
 				}
 			} else

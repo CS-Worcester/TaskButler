@@ -50,6 +50,7 @@
     <string name="text_date_created_label">Created:</string>
     <string name="text_date_modified_label">Modified:</string>
     <string name="text_main_all_categories">All tasks</string>
+    <string name="text_at">at</string>
 
     <!-- EditText items -->
     <string name="edit_task_name">Enter task name</string>
@@ -71,9 +72,6 @@
     <string name="checkbox_stop_repeating">Stop repeating</string>
     
     <!-- Buttons -->
-    <string name="button_edit_date">Edit</string>
-    <string name="button_dialog_ok">Accept</string>
-    <string name="button_dialog_cancel">Cancel</string>
     <string name="button_not_completed">Not Completed!</string>
     <string name="button_completed">Completed!</string>
     
