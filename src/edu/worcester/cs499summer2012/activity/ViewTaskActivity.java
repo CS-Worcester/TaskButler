@@ -29,7 +29,7 @@ import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -73,13 +73,10 @@ DialogInterface.OnClickListener {
 		// Set name
 		((TextView) findViewById(R.id.text_view_task_name)).setText(task.getName());
 
-		// Set completion button
-		Button button = (Button) findViewById(R.id.button_complete_task);
-		if (!task.isCompleted())
-			button.setText(R.string.button_not_completed);
-		else
-			button.setText(R.string.button_completed);
-		button.setOnClickListener(this);
+		// Set completion checkbox
+		CheckBox checkbox = (CheckBox) findViewById(R.id.checkbox_complete_task);
+		checkbox.setChecked(task.isCompleted());
+		checkbox.setOnClickListener(this);
 
 		// Set priority
 		((TextView) findViewById(R.id.text_priority)).setText(Task.LABELS[task.getPriority()]);
@@ -98,56 +95,68 @@ DialogInterface.OnClickListener {
 		}
 
 		// Set category (if category ID is not 1, i.e. no category)
-		ImageView iv_category_color = (ImageView) findViewById(R.id.image_category);
+		View v_category_color = (View) findViewById(R.id.view_category);
 		TextView tv_category_name = (TextView) findViewById(R.id.text_category);
 		if (task.getCategory() != 1) {
+			v_category_color.setVisibility(View.VISIBLE);
+			tv_category_name.setVisibility(View.VISIBLE);
 			Category category = data_source.getCategory(task.getCategory());
-			iv_category_color.setBackgroundColor(category.getColor());
+			v_category_color.setBackgroundColor(category.getColor());
 			tv_category_name.setText(category.getName());
 		} else {
-			iv_category_color.setBackgroundColor(Color.TRANSPARENT);
-			tv_category_name.setText("");
+			v_category_color.setVisibility(View.GONE);
+			tv_category_name.setVisibility(View.GONE);
 		}
 
 		// Set due date
 		if (task.hasDateDue()) {
+			((ImageView) findViewById(R.id.image_date)).setVisibility(View.VISIBLE);
 			TextView date_due = ((TextView) findViewById(R.id.text_date_due));
+			date_due.setVisibility(View.VISIBLE);
 			date_due.setText(DateFormat.format("MM/dd/yy 'at' h:mm AA", task.getDateDueCal()));
 
 			if (task.isPastDue())
 				date_due.setTextColor(Color.RED);
 			else
 				date_due.setTextColor(Color.LTGRAY);
-		} else
-			((TextView) findViewById(R.id.text_date_due)).setText(R.string.text_no_due_date);
+		} else {
+			((TextView) findViewById(R.id.text_date_due)).setVisibility(View.GONE);
+			((ImageView) findViewById(R.id.image_date)).setVisibility(View.GONE);
+		}
 
 		// Set final due date
 		if (task.hasFinalDateDue())
-			((TextView) findViewById(R.id.text_alarm)).setText(DateFormat.format("MM/dd/yy 'at' h:mm AA", task.getFinalDateDueCal()));
+			((ImageView) findViewById(R.id.image_alarm)).setVisibility(View.VISIBLE);
 		else
-			((TextView) findViewById(R.id.text_alarm)).setText(R.string.text_no_final_due_date);
+			((ImageView) findViewById(R.id.image_alarm)).setVisibility(View.GONE);
 
 		// Set repetition
 		if (task.isRepeating()) {
-			((TextView) findViewById(R.id.text_repeat)).setText("Repeat every " + task.getRepeatInterval() + ' ' + Task.REPEAT_LABELS[task.getRepeatType()]);
-
+			((ImageView) findViewById(R.id.image_repeat)).setVisibility(View.VISIBLE);
+			TextView repeat_text = (TextView) findViewById(R.id.text_repeat);
+			repeat_text.setVisibility(View.VISIBLE);
+			
+			StringBuilder message = new StringBuilder();
+			message.append("Repeat every " + task.getRepeatInterval() + ' ' + Task.REPEAT_LABELS[task.getRepeatType()]);
 			if (task.hasStopRepeatingDate())
-				((TextView) findViewById(R.id.text_repeat_2)).setText(DateFormat.format("'until' MM/dd/yy 'at' h:mm AA", task.getStopRepeatingDateCal()));
-			else
-				((TextView) findViewById(R.id.text_repeat_2)).setText(R.string.text_no_stop_repeating_date);
+				message.append(" until " + DateFormat.format("MM/dd/yy", task.getStopRepeatingDateCal()));
+			repeat_text.setText(message.toString());
 		} else {
-			((TextView) findViewById(R.id.text_repeat)).setText(R.string.text_no_repetition);
-			((TextView) findViewById(R.id.text_repeat_2)).setVisibility(View.GONE);
+			((TextView) findViewById(R.id.text_repeat)).setVisibility(View.GONE);
+			((ImageView) findViewById(R.id.image_repeat)).setVisibility(View.GONE);
 		}
 
 		// Set notes
-		((TextView) findViewById(R.id.text_notes)).setText(task.getNotes());
-
-		// Set date created
-		((TextView) findViewById(R.id.text_date_created)).setText(DateFormat.format("MM/dd/yy 'at' h:mm AA", task.getDateCreatedCal()));
-
-		// Set date modified
-		((TextView) findViewById(R.id.text_date_modified)).setText(DateFormat.format("MM/dd/yy 'at' h:mm AA", task.getDateModifiedCal()));
+		String notes = task.getNotes();
+		if (!notes.equals("")) {
+			((ImageView) findViewById(R.id.image_notes)).setVisibility(View.VISIBLE);
+			TextView notes_text = (TextView) findViewById(R.id.text_notes);
+			notes_text.setVisibility(View.VISIBLE);
+			notes_text.setText(notes);
+		} else {
+			((TextView) findViewById(R.id.text_notes)).setVisibility(View.GONE);
+			((ImageView) findViewById(R.id.image_notes)).setVisibility(View.GONE);
+		}
 	}
 
 	/**
@@ -230,7 +239,7 @@ DialogInterface.OnClickListener {
 
 	@Override
 	public void onClick(View v) {	
-		if (v.getId() == R.id.button_complete_task) {
+		if (v.getId() == R.id.checkbox_complete_task) {
 			task.toggleIsCompleted();
 			task.setDateModified(GregorianCalendar.getInstance().getTimeInMillis());
 			if (task.isCompleted())

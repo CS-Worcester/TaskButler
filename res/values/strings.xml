@@ -38,17 +38,12 @@
     <string name="text_task_category">Category</string>
     <string name="text_task_due">Due date</string>
     <string name="text_task_notes">Notes</string>
-    <string name="text_no_due_date">No due date</string>
-    <string name="text_no_final_due_date">No procrastination alarm</string>
-    <string name="text_no_repetition">Does not repeat</string>
     <string name="text_no_stop_repeating_date">Repeat forever</string>
     <string name="text_task_repeats">Repeat every </string>
     <string name="text_date_time">Set date and time</string>
     <string name="text_priority_urgent">Urgent</string>
     <string name="text_priority_normal">Normal</string>
     <string name="text_priority_trivial">Trivial</string>
-    <string name="text_date_created_label">Created:</string>
-    <string name="text_date_modified_label">Modified:</string>
     <string name="text_main_all_categories">All tasks</string>
     <string name="text_at">at</string>
 
@@ -69,10 +64,7 @@
     <string name="checkbox_has_final_due_date">Procrastination alarm</string>
     <string name="checkbox_has_repetition">Repeats</string>
     <string name="checkbox_stop_repeating">Stop repeating</string>
-    
-    <!-- Buttons -->
-    <string name="button_not_completed">Not Completed!</string>
-    <string name="button_completed">Completed!</string>
+    <string name="checkbox_complete">Complete this task</string>
     
     <!-- ImageView items -->
     <string name="image_priority">Priority</string>
