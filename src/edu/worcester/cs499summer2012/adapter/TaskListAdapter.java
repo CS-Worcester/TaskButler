@@ -20,6 +20,7 @@
 package edu.worcester.cs499summer2012.adapter;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import android.app.Activity;
@@ -69,8 +70,6 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 		public View category;
 		public ImageView priority;
 		public TextView due_date;
-		public ImageView alarm;
-		public ImageView recurrence;
 	}
 	
 	/**************************************************************************
@@ -148,8 +147,6 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 			view_holder.category = (View) view.findViewById(R.id.view_row_category);
 			view_holder.priority = (ImageView) view.findViewById(R.id.image_row_priority);
 			view_holder.due_date = (TextView) view.findViewById(R.id.text_row_due_date);
-			view_holder.alarm = (ImageView) view.findViewById(R.id.image_row_alarm);
-			view_holder.recurrence = (ImageView) view.findViewById(R.id.image_row_recurrence);
 			
 			view.setTag(view_holder);
 			view_holder.is_completed.setTag(task);
@@ -164,19 +161,15 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 		
 		// Set name
 		holder.name.setText(task.getName());
-		holder.name.setTextColor(is_complete ? Color.DKGRAY : Color.WHITE);
+		holder.name.setTextColor(is_complete ? Color.GRAY : Color.WHITE);
 		
 		// Set category
-		if (is_complete)
-			holder.category.setVisibility(View.GONE);
-		else {
-			holder.category.setVisibility(View.VISIBLE);
-			holder.category.setBackgroundColor(data_source.getCategory(task.getCategory()).getColor());
-		}
+		holder.category.setVisibility(View.VISIBLE);
+		holder.category.setBackgroundColor(data_source.getCategory(task.getCategory()).getColor());
 		
 		// Set priority
 		if (is_complete)
-			holder.priority.setVisibility(View.GONE);
+			holder.priority.setVisibility(View.INVISIBLE);
 		else {
 			holder.priority.setVisibility(View.VISIBLE);
 			
@@ -196,36 +189,35 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 		
 		// Set due date
 		if (is_complete)
-			holder.due_date.setVisibility(View.GONE);
+			holder.due_date.setVisibility(View.INVISIBLE);
 		else {
 			holder.due_date.setVisibility(View.VISIBLE);
+			holder.due_date.setTextColor(Color.LTGRAY);
 			
 			if (task.hasDateDue()) {
-				holder.due_date.setText(DateFormat.format("'Due' MM/dd/yy h:mmAA", task.getDateDueCal()));
+				Calendar current_date = GregorianCalendar.getInstance();
+				Calendar due_date = task.getDateDueCal();
 				
-				if (task.isPastDue())
-	        		holder.due_date.setTextColor(Color.RED);
-				else
-					holder.due_date.setTextColor(Color.LTGRAY);
+				if (due_date.get(Calendar.YEAR) > current_date.get(Calendar.YEAR)) {
+					// Due date is in a future year
+					holder.due_date.setText(DateFormat.format("MMM d'\n'yyyy", due_date));
+				} else if (due_date.get(Calendar.DAY_OF_YEAR) - current_date.get(Calendar.DAY_OF_YEAR) > 6) {
+					// Due date is more than a week away
+					holder.due_date.setText(DateFormat.format("MMM d", due_date));
+				} else if (due_date.get(Calendar.DAY_OF_YEAR) > current_date.get(Calendar.DAY_OF_YEAR)) {
+					// Due date is after today
+					holder.due_date.setText(DateFormat.format("E'\n'h:mmaa", due_date));
+				} else if (!task.isPastDue()) {
+					// Due date is today
+					holder.due_date.setText(DateFormat.format("h:mmaa", due_date));
+				} else {
+					// Due date is past
+					holder.due_date.setText("Past\ndue");
+					holder.due_date.setTextColor(Color.RED);
+				}	
 			} else
 				holder.due_date.setText("");
 		}
-		
-		// Set alarm
-		if (is_complete)
-			holder.alarm.setVisibility(View.GONE);
-		else if (task.hasFinalDateDue())
-			holder.alarm.setVisibility(View.VISIBLE);
-		else
-			holder.alarm.setVisibility(View.INVISIBLE);
-		
-		// Set recurrence
-		if (is_complete)
-			holder.recurrence.setVisibility(View.GONE);
-		else if (task.isRepeating())
-			holder.recurrence.setVisibility(View.VISIBLE);
-		else
-			holder.recurrence.setVisibility(View.INVISIBLE);
 		
 		return view;
 	}
