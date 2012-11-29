@@ -75,6 +75,7 @@ public final class CustomSortActivity extends SherlockListActivity {
 		
 		// Allow Action bar icon to act as a button
         ActionBar action_bar = getSupportActionBar();
+        action_bar.setIcon(R.drawable.ic_sort);
         action_bar.setHomeButtonEnabled(true);
         action_bar.setDisplayHomeAsUpEnabled(true);
 	}
@@ -89,7 +90,6 @@ public final class CustomSortActivity extends SherlockListActivity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		case R.id.menu_custom_sort_accept:
 		case android.R.id.home:
 			finish();
 

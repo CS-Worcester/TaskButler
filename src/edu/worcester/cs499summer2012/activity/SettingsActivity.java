@@ -86,6 +86,7 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
         
         // Allow Action bar icon to act as a button
         ActionBar action_bar = getSupportActionBar();
+        action_bar.setIcon(R.drawable.ic_settings);
         action_bar.setHomeButtonEnabled(true);
         action_bar.setDisplayHomeAsUpEnabled(true);
         
