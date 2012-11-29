@@ -46,6 +46,7 @@ public class AddTaskActivity extends BaseTaskActivity {
         // Initialize calendars: Due date defaults to +1 hour
         due_date_cal = GregorianCalendar.getInstance();
         due_date_cal.add(Calendar.HOUR, 1);
+        due_date_cal.set(Calendar.MINUTE, 0);
         due_date_cal.set(Calendar.SECOND, 0);
         due_date_cal.set(Calendar.MILLISECOND, 0);
         
@@ -56,7 +57,7 @@ public class AddTaskActivity extends BaseTaskActivity {
         s_repeat_type.setSelection(Task.DAYS);
         
         // Make the displayed category in MainActivity the default selection
-        default_category = data_source.getCategory(prefs.getInt(MainActivity.DISPLAY_CATEGORY, MainActivity.DISPLAY_ALL_CATEGORIES));
+        default_category = data_source.getCategory(prefs.getInt(SettingsActivity.DISPLAY_CATEGORY, MainActivity.DISPLAY_ALL_CATEGORIES));
         s_category.setSelection(category_adapter.getPosition(default_category));
 	}
 

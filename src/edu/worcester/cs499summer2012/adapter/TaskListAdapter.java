@@ -36,7 +36,7 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 import edu.worcester.cs499summer2012.R;
-import edu.worcester.cs499summer2012.activity.MainActivity;
+import edu.worcester.cs499summer2012.activity.SettingsActivity;
 import edu.worcester.cs499summer2012.comparator.TaskAutoComparator;
 import edu.worcester.cs499summer2012.comparator.TaskCategoryComparator;
 import edu.worcester.cs499summer2012.comparator.TaskCompletionComparator;
@@ -59,7 +59,7 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 	/**************************************************************************
 	 * Static fields and methods                                              *
 	 **************************************************************************/
-
+	
 	public static final int AUTO_SORT = 0;
 	public static final int CUSTOM_SORT = 1;
 	
@@ -138,7 +138,7 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 					data_source.updateTask(task);
 					
 					// If "hide completed tasks" option, then remove the task from the adapter
-					if (prefs.getBoolean(MainActivity.HIDE_COMPLETED, false))
+					if (prefs.getBoolean(SettingsActivity.HIDE_COMPLETED, false))
 							tasks.remove(task);
 					
 					sort();
