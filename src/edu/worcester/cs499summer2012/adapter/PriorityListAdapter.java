@@ -19,33 +19,24 @@
 
 package edu.worcester.cs499summer2012.adapter;
 
-import java.util.ArrayList;
-
 import android.app.Activity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 import edu.worcester.cs499summer2012.R;
-import edu.worcester.cs499summer2012.task.Category;
+import edu.worcester.cs499summer2012.task.Task;
 
-public class CategoryListAdapter extends ArrayAdapter<Category> {
-	/**************************************************************************
-	 * Static fields and methods                                              *
-	 **************************************************************************/
-	
-	static class ViewHolder {
-		public View color;
-		public TextView name;
-	}
+public class PriorityListAdapter extends ArrayAdapter<String> {
 	
 	/**************************************************************************
 	 * Private fields                                                         *
 	 **************************************************************************/
 	
 	private final Activity activity;
-	private final ArrayList<Category> categories;
+	private final String[] priorities;
 	private final int textViewResourceId;
 	
 	/**************************************************************************
@@ -57,10 +48,10 @@ public class CategoryListAdapter extends ArrayAdapter<Category> {
 	 * @param
 	 * @param
 	 */
-	public CategoryListAdapter(Activity activity, int textViewResourceId, ArrayList<Category> categories) {
-		super(activity, textViewResourceId, categories);
+	public PriorityListAdapter(Activity activity, int textViewResourceId, String[] priorities) {
+		super(activity, textViewResourceId, priorities);
 		this.activity = activity;
-		this.categories = categories;
+		this.priorities = priorities;
 		this.textViewResourceId = textViewResourceId;
 		setNotifyOnChange(true);
 	}
@@ -70,29 +61,23 @@ public class CategoryListAdapter extends ArrayAdapter<Category> {
 	 **************************************************************************/
 	
 	public View getCustomView(int position, View convert_view, ViewGroup parent) {
-		View view = convert_view;
-		Category category = categories.get(position);
-		
-		if (view == null) {		
-			LayoutInflater inflater = activity.getLayoutInflater();
-			view = inflater.inflate(textViewResourceId, null);
-			
-			final ViewHolder view_holder = new ViewHolder();
-			view_holder.color = (View) view.findViewById(R.id.view_row_category_color);
-			view_holder.name = (TextView) view.findViewById(R.id.text_row_category_name);
-			
-			view.setTag(view_holder);
-			view_holder.name.setTag(category);
-		} else
-			((ViewHolder) view.getTag()).name.setTag(category); 
+		LayoutInflater inflater = activity.getLayoutInflater();
+		View view = inflater.inflate(textViewResourceId, null);
 
-		ViewHolder holder = (ViewHolder) view.getTag();
+		((TextView) view.findViewById(R.id.text_row_priority)).setText(priorities[position]);
+		ImageView icon = (ImageView) view.findViewById(R.id.image_row_priority);
 		
-		// Set color
-		holder.color.setBackgroundColor(category.getColor());
-		
-		// Set name
-		holder.name.setText(category.getName());
+		switch (position) {
+		case Task.TRIVIAL:
+			icon.setImageResource(R.drawable.ic_trivial);
+			break;
+		case Task.NORMAL:
+			icon.setImageResource(R.drawable.ic_normal);
+			break;
+		case Task.URGENT:
+			icon.setImageResource(R.drawable.ic_urgent);
+			break;
+		}
 		
 		return view;
 	}

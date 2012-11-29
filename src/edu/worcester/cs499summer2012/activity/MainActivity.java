@@ -70,7 +70,7 @@ import edu.worcester.cs499summer2012.task.Task;
  * @author James Celona
  */
 public final class MainActivity extends SherlockListActivity implements 
-OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener, OnTouchListener {
+OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener, OnTouchListener, android.content.DialogInterface.OnClickListener {
 
 	/**************************************************************************
 	 * Static fields and methods                                              *
@@ -98,6 +98,7 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 	private GestureDetector gesture_detector;
 	private Object action_mode;
 	private int selected_task;
+	private int delete_mode;
 
 	/**************************************************************************
 	 * Class methods                                                          *
@@ -113,51 +114,11 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 
 	private void deleteAlert(String question, final int mode)
 	{
+		delete_mode = mode;
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setMessage(question)
 		.setCancelable(true)
-		.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int id) {
-				int deleted_tasks;
-				switch (mode) {
-				case DELETE_MODE_SINGLE:
-					Task task = adapter.getItem(selected_task);
-					data_source.deleteTask(task);
-					adapter.remove(task);
-					if (task.hasDateDue()) {
-						TaskAlarm alarm = new TaskAlarm();
-						alarm.cancelAlarm(getApplicationContext(), task.getID());
-					}
-					toast("Task deleted");
-					break;
-
-				case DELETE_MODE_FINISHED:
-					deleted_tasks = data_source.deleteFinishedTasks();
-					for (int i = 0; i < adapter.getCount(); i++)
-					{
-						if (adapter.getItem(i).isCompleted())
-						{
-							adapter.remove(adapter.getItem(i));
-							i--;
-						}
-					}
-					toast(deleted_tasks + " tasks deleted");
-					break;
-
-				case DELETE_MODE_ALL:
-					ArrayList<Task> tasks = data_source.getTasks(true, null);
-					TaskAlarm alarm = new TaskAlarm();
-					for (Task t : tasks) {
-						if (t.hasDateDue())
-							alarm.cancelAlarm(getApplicationContext(), t.getID());
-					}
-					deleted_tasks = data_source.deleteAllTasks();
-					adapter.clear();
-					toast(deleted_tasks + " tasks deleted");
-					break;
-				}
-			}
-		})
+		.setPositiveButton("Yes", this)
 		.setNegativeButton("No", new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int id) {
 				dialog.cancel();
@@ -172,12 +133,19 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 
 	private void createCategoryBar(int display_category) {
 		// Populate bottom category bar
-		ArrayList<Category> categories = data_source.getCategories();
+		ArrayList<Category> all_categories = data_source.getCategories();
+		ArrayList<Category> categories = new ArrayList<Category>(all_categories);
+		
+		for (Category category : all_categories) {
+			if (!data_source.categoryHasTasks(category) && category.getID() != Category.NO_CATEGORY)
+				categories.remove(category);
+		}
 
 		if (categories.size() == 1) {
 			findViewById(R.id.main_ruler).setVisibility(View.GONE);
 			((HorizontalScrollView) findViewById(R.id.main_category_bar_scroll)).setVisibility(View.GONE);
 		} else {
+			findViewById(R.id.main_ruler).setVisibility(View.VISIBLE);
 			((HorizontalScrollView) findViewById(R.id.main_category_bar_scroll)).setVisibility(View.VISIBLE);
 			LinearLayout category_bar = (LinearLayout) findViewById(R.id.main_category_bar);
 			category_bar.removeAllViews();
@@ -578,5 +546,55 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 	public boolean onTouch(View v, MotionEvent event) {
 		gesture_detector.onTouchEvent(event);
 		return true;
+	}
+	
+	/**************************************************************************
+	 * Methods implementing DialogInterFace.OnClickListener interface         *
+	 **************************************************************************/
+
+	@Override
+	public void onClick(DialogInterface dialog, int which) {
+		int deleted_tasks;
+		
+		switch (delete_mode) {
+		case DELETE_MODE_SINGLE:
+			Task task = adapter.getItem(selected_task);
+			data_source.deleteTask(task);
+			adapter.remove(task);
+			if (task.hasDateDue()) {
+				TaskAlarm alarm = new TaskAlarm();
+				alarm.cancelAlarm(getApplicationContext(), task.getID());
+			}
+			toast("Task deleted");
+			break;
+
+		case DELETE_MODE_FINISHED:
+			deleted_tasks = data_source.deleteFinishedTasks();
+			for (int i = 0; i < adapter.getCount(); i++)
+			{
+				if (adapter.getItem(i).isCompleted())
+				{
+					adapter.remove(adapter.getItem(i));
+					i--;
+				}
+			}
+			toast(deleted_tasks + " tasks deleted");
+			break;
+
+		case DELETE_MODE_ALL:
+			ArrayList<Task> tasks = data_source.getTasks(true, null);
+			TaskAlarm alarm = new TaskAlarm();
+			for (Task t : tasks) {
+				if (t.hasDateDue())
+					alarm.cancelAlarm(getApplicationContext(), t.getID());
+			}
+			deleted_tasks = data_source.deleteAllTasks();
+			adapter.clear();
+			toast(deleted_tasks + " tasks deleted");
+			break;
+		}
+				
+		int display_category = prefs.getInt(DISPLAY_CATEGORY, DISPLAY_ALL_CATEGORIES);
+		createCategoryBar(display_category);
 	}
 }

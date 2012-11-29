@@ -79,7 +79,7 @@ DialogInterface.OnClickListener {
 		checkbox.setOnClickListener(this);
 
 		// Set priority
-		((TextView) findViewById(R.id.text_priority)).setText(Task.LABELS[task.getPriority()]);
+		((TextView) findViewById(R.id.text_priority)).setText(Task.PRIORITY_LABELS[task.getPriority()]);
 
 		// Set priority icon
 		switch (task.getPriority()) {

@@ -58,7 +58,8 @@ public class EditTaskActivity extends BaseTaskActivity {
         s_priority.setSelection(task.getPriority());
         
         // Set category
-        s_category.setSelection(category_adapter.getPosition(data_source.getCategory(task.getCategory())));
+        default_category = data_source.getCategory(task.getCategory());
+        s_category.setSelection(category_adapter.getPosition(default_category));
 		
         // Set due date
         if (task.hasDateDue()) {
@@ -93,7 +94,7 @@ public class EditTaskActivity extends BaseTaskActivity {
 		// 1. ID (not modified)
 		
     	// 2. Task name
-    	String name = et_name.getText().toString();
+    	String name = et_name.getText().toString().trim();
     	// If there is no task name, don't create the task
     	if (name.equals(""))
     	{
@@ -118,11 +119,9 @@ public class EditTaskActivity extends BaseTaskActivity {
     	
     	// 8. Is repeating
 		task.setIsRepeating(cb_repeating.isChecked());
-		
-		// 9. Has stop repeating date (not modified)
     	
-    	// 10. Repeat type
-		// 11. Repeat interval
+    	// 9. Repeat type
+		// 10. Repeat interval
 		if (task.isRepeating())	{
 			task.setRepeatType(s_repeat_type.getSelectedItemPosition());
 
@@ -138,20 +137,18 @@ public class EditTaskActivity extends BaseTaskActivity {
 	    		task.setRepeatInterval(interval);
 		}
     	
-    	// 12. Date created (not modified)
+    	// 11. Date created (not modified)
     	
-    	// 13. Date modified
+    	// 12. Date modified
     	task.setDateModified(GregorianCalendar.getInstance().getTimeInMillis());
     	
-    	// 14. Task due date
+    	// 13. Task due date
     	if (task.hasDateDue())
     		task.setDateDue(due_date_cal.getTimeInMillis());
     	
-    	// 15. Task final due date (not modified)
+    	// 14. gID (not modified)
     	
-    	// 16. Stop repeating date (not modified)
-    	
-    	// 17. Task notes
+    	// 15. Task notes
     	task.setNotes(et_notes.getText().toString());
     	
     	// Update the task in the database
