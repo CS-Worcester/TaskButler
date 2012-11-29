@@ -48,12 +48,8 @@ public class TaskButlerService extends WakefulIntentService{
 		for (Task task : tasks) {
 			//handle edge case of phone being off during an alarm going off.
 			if(task.isRepeating()){
-				if(task.hasStopRepeatingDate() && task.getStopRepeatingDate() <= System.currentTimeMillis()){
-					/*Indented do nothing*/
-				} else {
-					while(task.getDateDue() <= System.currentTimeMillis())
+				while(task.getDateDue() <= System.currentTimeMillis())
 						task = alarm.setRepeatingAlarm(this, task.getID());
-				}
 			}
 			
 			//set procrastinator alarm if the task has a finalDateDue

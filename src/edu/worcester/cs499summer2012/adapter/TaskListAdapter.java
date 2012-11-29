@@ -43,7 +43,6 @@ import edu.worcester.cs499summer2012.comparator.TaskCompletionComparator;
 import edu.worcester.cs499summer2012.comparator.TaskDateCreatedComparator;
 import edu.worcester.cs499summer2012.comparator.TaskDateDueComparator;
 import edu.worcester.cs499summer2012.comparator.TaskDateModifiedComparator;
-import edu.worcester.cs499summer2012.comparator.TaskFinalDateDueComparator;
 import edu.worcester.cs499summer2012.comparator.TaskNameComparator;
 import edu.worcester.cs499summer2012.comparator.TaskPriorityComparator;
 import edu.worcester.cs499summer2012.database.TasksDataSource;
@@ -259,10 +258,6 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 						
 					case edu.worcester.cs499summer2012.task.Comparator.DATE_DUE:
 						this.sort(new TaskDateDueComparator());
-						break;
-						
-					case edu.worcester.cs499summer2012.task.Comparator.FINAL_DATE_DUE:
-						this.sort(new TaskFinalDateDueComparator());
 						break;
 						
 					case edu.worcester.cs499summer2012.task.Comparator.DATE_CREATED:

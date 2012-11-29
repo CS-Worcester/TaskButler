@@ -92,22 +92,25 @@ public class AddTaskActivity extends BaseTaskActivity {
     	// Get task notes
     	EditText notes = (EditText) findViewById(R.id.edit_add_task_notes);
     	    	
+    	// Current time
+    	long current_time = GregorianCalendar.getInstance().getTimeInMillis();
+    	
     	// Create the task
     	Task task = new Task(
-    			name, 
+    			data_source.getNextID(DatabaseHandler.TABLE_TASKS),
+    			name,
     			false, 
     			s_priority.getSelectedItemPosition(), 
     			categoryID,
     			cb_due_date.isChecked(),
     			cb_final_due_date.isChecked(),
     			cb_repeating.isChecked(),
-    			false,
     			s_repeat_type.getSelectedItemPosition(),
     			interval,
-    			GregorianCalendar.getInstance().getTimeInMillis(), 
-    			due_date_ms, 
-    			0,
-    			0,
+    			current_time,
+    			current_time,
+    			due_date_ms,
+    			"",
     			notes.getText().toString());
     	
     	// Assign the task a unique ID and store it in the database

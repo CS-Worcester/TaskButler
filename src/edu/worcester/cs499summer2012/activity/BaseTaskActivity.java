@@ -183,7 +183,7 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
         s_category.setOnItemSelectedListener(this);
         
         // Populate the priority spinner
-        priority_adapter = new PriorityListAdapter(this, R.layout.row_priority_small, Task.LABELS);
+        priority_adapter = new PriorityListAdapter(this, R.layout.row_priority_small, Task.PRIORITY_LABELS);
         priority_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         s_priority.setAdapter(priority_adapter);
         

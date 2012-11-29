@@ -89,14 +89,11 @@ public class TasksDataSource {
 				DatabaseHandler.KEY_HAS_DUE_DATE,
 				DatabaseHandler.KEY_HAS_FINAL_DUE_DATE,
 				DatabaseHandler.KEY_IS_REPEATING,
-				DatabaseHandler.KEY_HAS_STOP_REPEATING_DATE,
 				DatabaseHandler.KEY_REPEAT_TYPE,
 				DatabaseHandler.KEY_REPEAT_INTERVAL,
 				DatabaseHandler.KEY_CREATION_DATE,
 				DatabaseHandler.KEY_MODIFICATION_DATE, 
 				DatabaseHandler.KEY_DUE_DATE,
-				DatabaseHandler.KEY_FINAL_DUE_DATE,
-				DatabaseHandler.KEY_STOP_REPEATING_DATE,
 				DatabaseHandler.KEY_G_ID,
 				DatabaseHandler.KEY_NOTES }, 
 				DatabaseHandler.KEY_ID + " = " + id,
@@ -111,16 +108,13 @@ public class TasksDataSource {
 					cursor.getInt(5) > 0,
 					cursor.getInt(6) > 0,
 					cursor.getInt(7) > 0,
-					cursor.getInt(8) > 0,
-					cursor.getInt(9),
-					cursor.getInt(10), 
+					cursor.getInt(8),
+					cursor.getInt(9), 
+					cursor.getLong(10), 
 					cursor.getLong(11), 
 					cursor.getLong(12), 
-					cursor.getLong(13), 
-					cursor.getLong(14),
-					cursor.getLong(15),
-					cursor.getString(16),
-					cursor.getString(17));
+					cursor.getString(13),
+					cursor.getString(14));
 			close();
 			cursor.close();
 			return task;
@@ -152,16 +146,13 @@ public class TasksDataSource {
 						cursor.getInt(5) > 0,
 						cursor.getInt(6) > 0,
 						cursor.getInt(7) > 0,
-						cursor.getInt(8) > 0,
-						cursor.getInt(9),
-						cursor.getInt(10), 
+						cursor.getInt(8),
+						cursor.getInt(9), 
+						cursor.getLong(10), 
 						cursor.getLong(11), 
 						cursor.getLong(12), 
-						cursor.getLong(13), 
-						cursor.getLong(14),
-						cursor.getLong(15),
-						cursor.getString(16),
-						cursor.getString(17));
+						cursor.getString(13),
+						cursor.getString(14));
 
 				// Adding task to list
 				taskList.add(task);
@@ -217,16 +208,13 @@ public class TasksDataSource {
 						cursor.getInt(5) > 0,
 						cursor.getInt(6) > 0,
 						cursor.getInt(7) > 0,
-						cursor.getInt(8) > 0,
-						cursor.getInt(9),
-						cursor.getInt(10), 
+						cursor.getInt(8),
+						cursor.getInt(9), 
+						cursor.getLong(10), 
 						cursor.getLong(11), 
 						cursor.getLong(12), 
-						cursor.getLong(13), 
-						cursor.getLong(14),
-						cursor.getLong(15),
-						cursor.getString(16),
-						cursor.getString(17));
+						cursor.getString(13),
+						cursor.getString(14));
 
 				// Adding task to list
 				taskList.add(task);
@@ -278,14 +266,12 @@ public class TasksDataSource {
 		values.put(DatabaseHandler.KEY_HAS_DUE_DATE, task.hasDateDue());
 		values.put(DatabaseHandler.KEY_HAS_FINAL_DUE_DATE, task.hasFinalDateDue());
 		values.put(DatabaseHandler.KEY_IS_REPEATING, task.isRepeating());
-		values.put(DatabaseHandler.KEY_HAS_STOP_REPEATING_DATE, task.hasStopRepeatingDate());
 		values.put(DatabaseHandler.KEY_REPEAT_TYPE, task.getRepeatType());
 		values.put(DatabaseHandler.KEY_REPEAT_INTERVAL, task.getRepeatInterval());
 		values.put(DatabaseHandler.KEY_CREATION_DATE, task.getDateCreated());
 		values.put(DatabaseHandler.KEY_MODIFICATION_DATE, task.getDateModified());
 		values.put(DatabaseHandler.KEY_DUE_DATE, task.getDateDue());
-		values.put(DatabaseHandler.KEY_FINAL_DUE_DATE, task.getFinalDateDue());
-		values.put(DatabaseHandler.KEY_STOP_REPEATING_DATE, task.getStopRepeatingDate());
+		values.put(DatabaseHandler.KEY_G_ID, task.getgID());
 		values.put(DatabaseHandler.KEY_NOTES, task.getNotes());
 
 		// Inserting Row
@@ -307,14 +293,12 @@ public class TasksDataSource {
 		values.put(DatabaseHandler.KEY_HAS_DUE_DATE, task.hasDateDue());
 		values.put(DatabaseHandler.KEY_HAS_FINAL_DUE_DATE, task.hasFinalDateDue());
 		values.put(DatabaseHandler.KEY_IS_REPEATING, task.isRepeating());
-		values.put(DatabaseHandler.KEY_HAS_STOP_REPEATING_DATE, task.hasStopRepeatingDate());
 		values.put(DatabaseHandler.KEY_REPEAT_TYPE, task.getRepeatType());
 		values.put(DatabaseHandler.KEY_REPEAT_INTERVAL, task.getRepeatInterval());
 		values.put(DatabaseHandler.KEY_CREATION_DATE, task.getDateCreated());
 		values.put(DatabaseHandler.KEY_MODIFICATION_DATE, task.getDateModified());
 		values.put(DatabaseHandler.KEY_DUE_DATE, task.getDateDue());
-		values.put(DatabaseHandler.KEY_FINAL_DUE_DATE, task.getFinalDateDue());
-		values.put(DatabaseHandler.KEY_STOP_REPEATING_DATE, task.getStopRepeatingDate());
+		values.put(DatabaseHandler.KEY_G_ID, task.getgID());
 		values.put(DatabaseHandler.KEY_NOTES, task.getNotes());
 
 		// updating row
@@ -610,19 +594,16 @@ public class TasksDataSource {
 		values.put(DatabaseHandler.KEY_HAS_DUE_DATE, task.hasDateDue());
 		values.put(DatabaseHandler.KEY_HAS_FINAL_DUE_DATE, task.hasFinalDateDue());
 		values.put(DatabaseHandler.KEY_IS_REPEATING, task.isRepeating());
-		values.put(DatabaseHandler.KEY_HAS_STOP_REPEATING_DATE, task.hasStopRepeatingDate());
 		values.put(DatabaseHandler.KEY_REPEAT_TYPE, task.getRepeatType());
 		values.put(DatabaseHandler.KEY_REPEAT_INTERVAL, task.getRepeatInterval());
 		values.put(DatabaseHandler.KEY_CREATION_DATE, task.getDateCreated());
 		values.put(DatabaseHandler.KEY_MODIFICATION_DATE, task.getDateModified());
 		values.put(DatabaseHandler.KEY_DUE_DATE, task.getDateDue());
-		values.put(DatabaseHandler.KEY_FINAL_DUE_DATE, task.getFinalDateDue());
-		values.put(DatabaseHandler.KEY_STOP_REPEATING_DATE, task.getStopRepeatingDate());
 		values.put(DatabaseHandler.KEY_NOTES, task.getNotes());
 
 		// updating row
 		int i = db.update(DatabaseHandler.TABLE_TASKS, values, 
-				DatabaseHandler.KEY_NAME + " = " + "\"" + task.getgID() + "\"", null);
+				DatabaseHandler.KEY_G_ID + " = " + "\"" + task.getgID() + "\"", null);
 		close();
 		return i;		
 	}
@@ -643,14 +624,11 @@ public class TasksDataSource {
 				DatabaseHandler.KEY_HAS_DUE_DATE,
 				DatabaseHandler.KEY_HAS_FINAL_DUE_DATE,
 				DatabaseHandler.KEY_IS_REPEATING,
-				DatabaseHandler.KEY_HAS_STOP_REPEATING_DATE,
 				DatabaseHandler.KEY_REPEAT_TYPE,
 				DatabaseHandler.KEY_REPEAT_INTERVAL,
 				DatabaseHandler.KEY_CREATION_DATE,
 				DatabaseHandler.KEY_MODIFICATION_DATE, 
 				DatabaseHandler.KEY_DUE_DATE,
-				DatabaseHandler.KEY_FINAL_DUE_DATE,
-				DatabaseHandler.KEY_STOP_REPEATING_DATE,
 				DatabaseHandler.KEY_G_ID,
 				DatabaseHandler.KEY_NOTES }, 
 				DatabaseHandler.KEY_G_ID + " = " + "\"" + gID + "\"",
@@ -667,16 +645,13 @@ public class TasksDataSource {
 				cursor.getInt(5) > 0,
 				cursor.getInt(6) > 0,
 				cursor.getInt(7) > 0,
-				cursor.getInt(8) > 0,
-				cursor.getInt(9),
-				cursor.getInt(10), 
+				cursor.getInt(8),
+				cursor.getInt(9), 
+				cursor.getLong(10), 
 				cursor.getLong(11), 
 				cursor.getLong(12), 
-				cursor.getLong(13), 
-				cursor.getLong(14),
-				cursor.getLong(15),
-				cursor.getString(16),
-				cursor.getString(17));
+				cursor.getString(13),
+				cursor.getString(14));
 		close();
 		cursor.close();
 		return task;
