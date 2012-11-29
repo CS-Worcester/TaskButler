@@ -51,7 +51,6 @@ import com.actionbarsherlock.view.ActionMode;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.view.SubMenu;
 
 import edu.worcester.cs499summer2012.R;
 import edu.worcester.cs499summer2012.adapter.TaskListAdapter;
@@ -75,16 +74,11 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 	/**************************************************************************
 	 * Static fields and methods                                              *
 	 **************************************************************************/
-
-	public static final String PREF_SORT_TYPE = "sort_type";
-	public static final String DISPLAY_CATEGORY = "display_category";
-	public static final String HIDE_COMPLETED = "hide_completed";
+	
 	public static final int ADD_TASK_REQUEST = 0;
 	public static final int VIEW_TASK_REQUEST = 1;
 	public static final int EDIT_TASK_REQUEST = 2;
 	public static final int DELETE_MODE_SINGLE = 0;
-	public static final int DELETE_MODE_FINISHED = 1;
-	public static final int DELETE_MODE_ALL = 2;
 	public static final int DISPLAY_ALL_CATEGORIES = 1;
 
 	/**************************************************************************
@@ -107,13 +101,11 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 	/**
 	 * Displays a message in a Toast notification for a short duration.
 	 */
-	private void toast(String message)
-	{
+	private void toast(String message) {
 		Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
 	}
 
-	private void deleteAlert(String question, final int mode)
-	{
+	private void deleteAlert(String question, final int mode) {
 		delete_mode = mode;
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setMessage(question)
@@ -218,10 +210,10 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 	public void onStart() {
 		super.onStart();
 		
-		boolean hide_completed = prefs.getBoolean(HIDE_COMPLETED, false);
+		boolean hide_completed = prefs.getBoolean(SettingsActivity.HIDE_COMPLETED, false);
 
 		// Create an adapter for the task list
-		int display_category = prefs.getInt(DISPLAY_CATEGORY, DISPLAY_ALL_CATEGORIES);
+		int display_category = prefs.getInt(SettingsActivity.DISPLAY_CATEGORY, DISPLAY_ALL_CATEGORIES);
 		if (display_category == DISPLAY_ALL_CATEGORIES)
 			adapter = new TaskListAdapter(this, data_source.getTasks(!hide_completed, null));
 		else
@@ -229,8 +221,7 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 		setListAdapter(adapter);
 
 		// Set sort type and sort the list
-		adapter.setSortType(prefs.getInt(PREF_SORT_TYPE, 
-				TaskListAdapter.AUTO_SORT));
+		adapter.setSortType(prefs.getInt(SettingsActivity.SORT_TYPE, TaskListAdapter.AUTO_SORT));
 		adapter.sort();
 
 		createCategoryBar(display_category);
@@ -258,35 +249,6 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 			startActivityForResult(new Intent(this, AddTaskActivity.class), 
 					ADD_TASK_REQUEST);
 			return true;
-
-		case R.id.menu_main_sort:
-			SubMenu sort_menu = item.getSubMenu();
-			sort_menu.getItem(adapter.getSortType()).setChecked(true);
-			return true;
-
-		case R.id.menu_main_auto_sort:
-			adapter.setSortType(TaskListAdapter.AUTO_SORT);
-			prefs_editor.putInt(PREF_SORT_TYPE, TaskListAdapter.AUTO_SORT);
-			prefs_editor.commit();
-			adapter.sort();
-			return true;
-
-		case R.id.menu_main_custom_sort:
-			adapter.setSortType(TaskListAdapter.CUSTOM_SORT);
-			prefs_editor.putInt(PREF_SORT_TYPE, TaskListAdapter.CUSTOM_SORT);
-			prefs_editor.commit();
-			startActivity(new Intent(this, CustomSortActivity.class));
-			return true;
-
-		case R.id.menu_delete_finished:
-			deleteAlert("Are you sure you want to delete all completed tasks? This cannot be undone.",
-					DELETE_MODE_FINISHED);
-			return true;
-
-		case R.id.menu_delete_all:
-			deleteAlert("Are you sure you want to delete all tasks? This cannot be undone.",
-					DELETE_MODE_ALL);
-			return true;	
 
 		case R.id.menu_main_settings:
 			startActivity(new Intent(this, SettingsActivity.class));
@@ -421,7 +383,7 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 		Category category = (Category) v.getTag();
 		adapter.clear();
 		
-		boolean hide_completed = prefs.getBoolean(HIDE_COMPLETED, false);
+		boolean hide_completed = prefs.getBoolean(SettingsActivity.HIDE_COMPLETED, false);
 		
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
 			if (category.getID() != DISPLAY_ALL_CATEGORIES)
@@ -443,7 +405,7 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 
 		createCategoryBar(category.getID());
 
-		prefs_editor.putInt(DISPLAY_CATEGORY, category.getID());
+		prefs_editor.putInt(SettingsActivity.DISPLAY_CATEGORY, category.getID());
 		prefs_editor.commit();
 	}
 
@@ -479,7 +441,7 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 			return false;
 
 		// Get selected category
-		Category current_category = data_source.getCategory(prefs.getInt(DISPLAY_CATEGORY, DISPLAY_ALL_CATEGORIES));
+		Category current_category = data_source.getCategory(prefs.getInt(SettingsActivity.DISPLAY_CATEGORY, DISPLAY_ALL_CATEGORIES));
 
 		int current_index = categories.indexOf(current_category);
 		int new_index;
@@ -554,10 +516,7 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 
 	@Override
 	public void onClick(DialogInterface dialog, int which) {
-		int deleted_tasks;
-		
-		switch (delete_mode) {
-		case DELETE_MODE_SINGLE:
+		if (delete_mode == DELETE_MODE_SINGLE) {
 			Task task = adapter.getItem(selected_task);
 			data_source.deleteTask(task);
 			adapter.remove(task);
@@ -566,35 +525,9 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 				alarm.cancelAlarm(getApplicationContext(), task.getID());
 			}
 			toast("Task deleted");
-			break;
-
-		case DELETE_MODE_FINISHED:
-			deleted_tasks = data_source.deleteFinishedTasks();
-			for (int i = 0; i < adapter.getCount(); i++)
-			{
-				if (adapter.getItem(i).isCompleted())
-				{
-					adapter.remove(adapter.getItem(i));
-					i--;
-				}
-			}
-			toast(deleted_tasks + " tasks deleted");
-			break;
-
-		case DELETE_MODE_ALL:
-			ArrayList<Task> tasks = data_source.getTasks(true, null);
-			TaskAlarm alarm = new TaskAlarm();
-			for (Task t : tasks) {
-				if (t.hasDateDue())
-					alarm.cancelAlarm(getApplicationContext(), t.getID());
-			}
-			deleted_tasks = data_source.deleteAllTasks();
-			adapter.clear();
-			toast(deleted_tasks + " tasks deleted");
-			break;
 		}
 				
-		int display_category = prefs.getInt(DISPLAY_CATEGORY, DISPLAY_ALL_CATEGORIES);
+		int display_category = prefs.getInt(SettingsActivity.DISPLAY_CATEGORY, DISPLAY_ALL_CATEGORIES);
 		createCategoryBar(display_category);
 	}
 }
