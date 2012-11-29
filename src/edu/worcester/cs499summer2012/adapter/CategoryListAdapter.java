@@ -22,6 +22,8 @@ package edu.worcester.cs499summer2012.adapter;
 import java.util.ArrayList;
 
 import android.app.Activity;
+import android.graphics.Color;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -93,6 +95,9 @@ public class CategoryListAdapter extends ArrayAdapter<Category> {
 		
 		// Set name
 		holder.name.setText(category.getName());
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB && 
+				textViewResourceId == R.layout.row_category_small)
+				holder.name.setTextColor(Color.BLACK);
 		
 		return view;
 	}
