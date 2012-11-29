@@ -76,20 +76,4 @@
     <!-- Dialog items -->
     <string name="dialog_about">Task Butler\n\nCopyright 2012 Jonathan Hasenzahl, James Celona, Dhimitraq Jorgji.\n\nTask Butler is distributed under the GNU General Public License.</string>
 	
-	<!-- Spinner items -->
-	<string-array name="spinner_repeat_types">
-	    <item>minutes</item>
-	    <item>hours</item>
-	    <item>days</item>
-	    <item>weeks</item>
-	    <item>months</item>
-	    <item>years</item>
-	</string-array>
-	
-	<string-array name="spinner_priorities">
-	    <item>Trivial</item>
-	    <item>Normal</item>
-	    <item>Urgent</item>
-	</string-array>
-	
 </resources>

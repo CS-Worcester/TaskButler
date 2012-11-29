@@ -39,8 +39,8 @@ import android.graphics.Color;
 public class DatabaseHandler extends SQLiteOpenHelper {
 
 	// Database Version
-	private static final int DATABASE_VERSION = 7;
-
+	private static final int DATABASE_VERSION = 8;
+	private static final int RC1_DATABASE = 7;
 
 	// Database Name
 	private static final String DATABASE_NAME = "TaskButler.db";
@@ -49,6 +49,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	public static final String TABLE_TASKS = "tasks";
 	public static final String TABLE_CATEGORIES = "categories";
 	public static final String TABLE_COMPARATORS = "comparators";
+	public static final String TABLE_BACKUP = "tasks_backup";
 
 	// Column names
 	public static final String KEY_ID = "id";										 // INTEGER PRIMARY KEY
@@ -58,30 +59,32 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	public static final String KEY_CATEGORY = "category"; 							 // INTEGER
 	public static final String KEY_HAS_DUE_DATE = "hasDueDate"; 					 // INTEGER, indirectly boolean
 	public static final String KEY_HAS_FINAL_DUE_DATE = "hasFinalDueDate"; 			 // INTEGER, indirectly boolean
-	public static final String KEY_IS_REPEATING = "isRepeating"; 					 // INTEGER, indirectly boolean
-	public static final String KEY_HAS_STOP_REPEATING_DATE = "hasStopRepeatingDate"; // INTEGER, indirectly boolean
+	public static final String KEY_IS_REPEATING = "isRepeating"; 					 // INTEGER, indirectly boolean	
 	public static final String KEY_REPEAT_TYPE = "repeatType"; 						 // INTEGER
 	public static final String KEY_REPEAT_INTERVAL = "repeatInterval"; 				 // INTEGER
 	public static final String KEY_CREATION_DATE = "creationDate"; 					 // DATETIME
 	public static final String KEY_MODIFICATION_DATE = "modificationDate"; 			 // DATETIME
 	public static final String KEY_DUE_DATE = "dueDate"; 							 // DATETIME
-	public static final String KEY_FINAL_DUE_DATE = "finalDueDate";					 // DATETIME
-	public static final String KEY_STOP_REPEATING_DATE = "stopRepeatingDate"; 		 // DATETIME
 	public static final String KEY_NOTES = "notes"; 								 // TEXT, can be null
 	public static final String KEY_COLOR = "color"; 								 // INTEGER, used in category table
 	public static final String KEY_UPDATED = "updated";								 // DATETIME
 	public static final String KEY_G_ID = "gID";									 // STRING
 	public static final String KEY_ENABLED = "enabled";								 // INTEGER, indirectly boolean, used in comparators table
-	public static final String KEY_ORDER = "list_order";									 // INTEGER, used in comparators table
-
+	public static final String KEY_ORDER = "list_order";							 // INTEGER, used in comparators table
+	
+	// Deprecated column names
+	@Deprecated
+	public static final String KEY_HAS_STOP_REPEATING_DATE = "hasStopRepeatingDate"; // INTEGER, indirectly boolean
+	@Deprecated
+	public static final String KEY_FINAL_DUE_DATE = "finalDueDate";					 // DATETIME
+	@Deprecated
+	public static final String KEY_STOP_REPEATING_DATE = "stopRepeatingDate"; 		 // DATETIME
 
 	public DatabaseHandler(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
 	}
 
-	// Creating Table
-	@Override
-	public void onCreate(SQLiteDatabase db) {
+	private void createTasksTable(SQLiteDatabase db) {
 		String create_tasks_table = "CREATE TABLE " + TABLE_TASKS + "("
 				+ KEY_ID + " INTEGER PRIMARY KEY,"
 				+ KEY_NAME + " TEXT,"
@@ -91,17 +94,18 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				+ KEY_HAS_DUE_DATE + " INTEGER,"
 				+ KEY_HAS_FINAL_DUE_DATE + " INTEGER,"
 				+ KEY_IS_REPEATING + " INTEGER,"
-				+ KEY_HAS_STOP_REPEATING_DATE + " INTEGER,"
 				+ KEY_REPEAT_TYPE + " INTEGER,"
 				+ KEY_REPEAT_INTERVAL + " INTEGER,"
 				+ KEY_CREATION_DATE + " DATETIME,"
 				+ KEY_MODIFICATION_DATE + " DATETIME,"
 				+ KEY_DUE_DATE + " DATETIME,"
-				+ KEY_FINAL_DUE_DATE + " DATETIME,"
-				+ KEY_STOP_REPEATING_DATE + " DATETIME,"
 				+ KEY_G_ID + " TEXT,"
 				+ KEY_NOTES + " TEXT)";
-
+		
+		db.execSQL(create_tasks_table);
+	}
+	
+	private void createCategoriesTable(SQLiteDatabase db) {
 		String create_categories_table = "CREATE TABLE " + TABLE_CATEGORIES + "(" 
 				+ KEY_ID + " INTEGER PRIMARY KEY,"
 				+ KEY_NAME + " TEXT,"
@@ -109,27 +113,28 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				+ KEY_UPDATED + " DATETIME,"
 				+ KEY_G_ID + " TEXT)";
 		
-		String create_comparators_table = "CREATE TABLE " + TABLE_COMPARATORS + "(" 
-				+ KEY_ID + " INTEGER PRIMARY KEY,"
-				+ KEY_NAME + " TEXT,"
-				+ KEY_ENABLED + " INTEGER,"
-				+ KEY_ORDER + " INTEGER)";
-
-
-		db.execSQL(create_tasks_table);
 		db.execSQL(create_categories_table);
-		db.execSQL(create_comparators_table);
-
+		
 		// Create first entry of categories table
 		ContentValues values = new ContentValues();
 		values.put(KEY_ID, Category.NO_CATEGORY);
 		values.put(KEY_NAME, "No category");
 		values.put(KEY_COLOR, Color.parseColor("#00FFFFFF"));
 		values.put(KEY_UPDATED, GregorianCalendar.getInstance().getTimeInMillis());
-		db.insert(TABLE_CATEGORIES, null, values);
+		db.insert(TABLE_CATEGORIES, null, values);		
+	}
+	
+	private void createComparatorsTable(SQLiteDatabase db) {
+		String create_comparators_table = "CREATE TABLE " + TABLE_COMPARATORS + "(" 
+				+ KEY_ID + " INTEGER PRIMARY KEY,"
+				+ KEY_NAME + " TEXT,"
+				+ KEY_ENABLED + " INTEGER,"
+				+ KEY_ORDER + " INTEGER)";
 		
+		db.execSQL(create_comparators_table);
+
 		// Create all entries of comparators table
-		values = new ContentValues();
+		ContentValues values = new ContentValues();
 		values.put(KEY_ID, Comparator.NAME);
 		values.put(KEY_NAME, "Task name");
 		values.put(KEY_ENABLED, 0);
@@ -160,35 +165,100 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		values.put(KEY_ORDER, 4);
 		db.insert(TABLE_COMPARATORS, null, values);
 		values = new ContentValues();
-		values.put(KEY_ID, Comparator.FINAL_DATE_DUE);
-		values.put(KEY_NAME, "Alarm date");
-		values.put(KEY_ENABLED, 0);
-		values.put(KEY_ORDER, 5);
-		db.insert(TABLE_COMPARATORS, null, values);
-		values = new ContentValues();
 		values.put(KEY_ID, Comparator.DATE_CREATED);
 		values.put(KEY_NAME, "Date created");
 		values.put(KEY_ENABLED, 0);
-		values.put(KEY_ORDER, 6);
+		values.put(KEY_ORDER, 5);
 		db.insert(TABLE_COMPARATORS, null, values);
 		values = new ContentValues();
 		values.put(KEY_ID, Comparator.DATE_MODIFIED);
 		values.put(KEY_NAME, "Date modified");
 		values.put(KEY_ENABLED, 0);
-		values.put(KEY_ORDER, 7);
+		values.put(KEY_ORDER, 6);
 		db.insert(TABLE_COMPARATORS, null, values);
+	}
+	
+	// Creating Table
+	@Override
+	public void onCreate(SQLiteDatabase db) {
+		createTasksTable(db);
+		createCategoriesTable(db);
+		createComparatorsTable(db);
 	}
 
 	// Upgrading database
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-		// Drop older table if existed just for testing purposes, 
-		//TODO:change to copy over old database 
-		db.execSQL("DROP TABLE IF EXISTS " + TABLE_TASKS);
-		db.execSQL("DROP TABLE IF EXISTS " + TABLE_CATEGORIES);
-		db.execSQL("DROP TABLE IF EXISTS " + TABLE_COMPARATORS);
-
-		// Create tables again
-		onCreate(db);
+		if (db.getVersion() == RC1_DATABASE) {
+			// Convert Release Candidate 1 tables to current tables.
+			// New: Task table, comparators table are upgraded
+			// No change: Categories table do not need upgrade
+			
+			String createBackupTable = "CREATE TEMPORARY TABLE "
+					+ TABLE_BACKUP + "("
+					+ KEY_ID + " INTEGER PRIMARY KEY,"
+					+ KEY_NAME + " TEXT,"
+					+ KEY_COMPLETION + " INTEGER,"
+					+ KEY_PRIORITY + " INTEGER,"
+					+ KEY_CATEGORY + " INTEGER,"
+					+ KEY_HAS_DUE_DATE + " INTEGER,"
+					+ KEY_HAS_FINAL_DUE_DATE + " INTEGER,"
+					+ KEY_IS_REPEATING + " INTEGER,"
+					+ KEY_REPEAT_TYPE + " INTEGER,"
+					+ KEY_REPEAT_INTERVAL + " INTEGER,"
+					+ KEY_CREATION_DATE + " DATETIME,"
+					+ KEY_MODIFICATION_DATE + " DATETIME,"
+					+ KEY_DUE_DATE + " DATETIME,"
+					+ KEY_G_ID + " TEXT,"
+					+ KEY_NOTES + " TEXT)";
+			
+			String copyToBackup = "INSERT INTO "
+					+ TABLE_BACKUP + " SELECT "
+					+ KEY_ID + ","
+					+ KEY_NAME + ","
+					+ KEY_COMPLETION + ","
+					+ KEY_PRIORITY + ","
+					+ KEY_CATEGORY + ","
+					+ KEY_HAS_DUE_DATE + ","
+					+ KEY_HAS_FINAL_DUE_DATE + ","
+					+ KEY_IS_REPEATING + ","
+					+ KEY_REPEAT_TYPE + ","
+					+ KEY_REPEAT_INTERVAL + ","
+					+ KEY_CREATION_DATE + ","
+					+ KEY_MODIFICATION_DATE + ","
+					+ KEY_DUE_DATE + ","
+					+ KEY_G_ID + ","
+					+ KEY_NOTES + " FROM "
+					+ TABLE_TASKS;
+			
+			String copyToTasksTable = "INSERT INTO "
+					+ TABLE_TASKS + " SELECT "
+					+ KEY_ID + ","
+					+ KEY_NAME + ","
+					+ KEY_COMPLETION + ","
+					+ KEY_PRIORITY + ","
+					+ KEY_CATEGORY + ","
+					+ KEY_HAS_DUE_DATE + ","
+					+ KEY_HAS_FINAL_DUE_DATE + ","
+					+ KEY_IS_REPEATING + ","
+					+ KEY_REPEAT_TYPE + ","
+					+ KEY_REPEAT_INTERVAL + ","
+					+ KEY_CREATION_DATE + ","
+					+ KEY_MODIFICATION_DATE + ","
+					+ KEY_DUE_DATE + ","
+					+ KEY_G_ID + ","
+					+ KEY_NOTES + " FROM "
+					+ TABLE_BACKUP;
+			
+			db.execSQL(createBackupTable);
+			db.execSQL(copyToBackup);
+			db.execSQL("DROP TABLE " + TABLE_TASKS);
+			createTasksTable(db);
+			db.execSQL(copyToTasksTable);
+			db.execSQL("DROP TABLE " + TABLE_BACKUP);
+			
+			db.execSQL("DROP TABLE " + TABLE_COMPARATORS);
+			createComparatorsTable(db);
+		}
 	}
 }
