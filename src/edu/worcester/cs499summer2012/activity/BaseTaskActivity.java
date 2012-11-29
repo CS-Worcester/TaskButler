@@ -338,7 +338,7 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
         case R.id.text_add_task_due_time:
         	// Initialize picker dialog
     		time_dialog = new TimePickerDialog(this, this, 
-    				due_date_cal.get(Calendar.HOUR), 
+    				due_date_cal.get(Calendar.HOUR_OF_DAY), 
     				due_date_cal.get(Calendar.MINUTE), false) {
     			
     			@Override
