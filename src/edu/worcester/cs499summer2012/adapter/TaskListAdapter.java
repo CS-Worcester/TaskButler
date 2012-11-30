@@ -137,7 +137,7 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 					data_source.updateTask(task);
 					
 					// If "hide completed tasks" option, then remove the task from the adapter
-					if (prefs.getBoolean(SettingsActivity.HIDE_COMPLETED, false))
+					if (prefs.getBoolean(SettingsActivity.HIDE_COMPLETED, true))
 							tasks.remove(task);
 					
 					sort();

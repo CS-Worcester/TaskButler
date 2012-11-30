@@ -18,22 +18,12 @@ Features
 * Assign due dates, due date repetition, and procrastination alarms to tasks
 * Lightweight and low on system resources
 
-Task Butler is being developed as part of CS 499 Summer 2012 at Worcester State
-University.
-
 *******************************************************
 * Building from source - required 3rd party libraries *
 *******************************************************
 
 ActionBarSherlock - http://actionbarsherlock.com/
-    This software is Copyright Jake Wharton and is distributed under the Apache 
-    2.0 License.
-
 AndroidColorPicker - http://code.google.com/p/android-color-picker/
-    This software is Copyright yukuku@gmail.com and is distributed under the 
-    Apache 2.0 License.
-
-
 
 ***********************
 * Copyright & license *

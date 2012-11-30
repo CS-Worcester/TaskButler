@@ -25,7 +25,7 @@
 	    	    android:key="hide_completed"
 	    	    android:title="@string/pref_hide_completed"
 	    	    android:icon="@drawable/ic_notes"
-	    	    android:defaultValue="false" />
+	    	    android:defaultValue="true" />
 	    		    	    
 	   	    <PreferenceScreen
 	   	    	android:key="delete_finished_tasks"

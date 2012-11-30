@@ -2,9 +2,9 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="56dp"
-    android:paddingTop="4dp"
-    android:paddingBottom="4dp" >
+    android:layout_height="52dp"
+    android:paddingTop="2dp"
+    android:paddingBottom="2dp" >
     
     <!-- Completed Checkbox -->
     
@@ -35,7 +35,7 @@
         android:layout_marginLeft="4dp" />
     
     <!-- Task Due Date -->
-    <TextView android:text="66:66pm"
+    <TextView
         android:id="@+id/text_row_due_date"
         android:layout_width="52dp"
         android:layout_height="48dp"

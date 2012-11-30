@@ -169,7 +169,7 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 				view.setOnClickListener(this);
 
 				LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1);
-				params.setMargins(2, 2, 2, 2);
+				params.setMargins(4, 4, 4, 4);
 				category_bar.addView(view, params);
 			}
 		}
@@ -200,6 +200,7 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 
 		// Set an onItemLongClickListener to the list view
 		getListView().setOnItemLongClickListener(this);
+		getListView().setOnTouchListener(this);
 
 		//Start service to check for alarms
 		WakefulIntentService.acquireStaticLock(this);
@@ -210,7 +211,7 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 	public void onStart() {
 		super.onStart();
 		
-		boolean hide_completed = prefs.getBoolean(SettingsActivity.HIDE_COMPLETED, false);
+		boolean hide_completed = prefs.getBoolean(SettingsActivity.HIDE_COMPLETED, true);
 
 		// Create an adapter for the task list
 		int display_category = prefs.getInt(SettingsActivity.DISPLAY_CATEGORY, DISPLAY_ALL_CATEGORIES);
@@ -383,7 +384,7 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 		Category category = (Category) v.getTag();
 		adapter.clear();
 		
-		boolean hide_completed = prefs.getBoolean(SettingsActivity.HIDE_COMPLETED, false);
+		boolean hide_completed = prefs.getBoolean(SettingsActivity.HIDE_COMPLETED, true);
 		
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
 			if (category.getID() != DISPLAY_ALL_CATEGORIES)
@@ -438,7 +439,7 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 
 		// Swiping won't work unless there are categories
 		if (categories.size() == 1)
-			return false;
+			return true;
 
 		// Get selected category
 		Category current_category = data_source.getCategory(prefs.getInt(SettingsActivity.DISPLAY_CATEGORY, DISPLAY_ALL_CATEGORIES));
@@ -446,25 +447,25 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 		int current_index = categories.indexOf(current_category);
 		int new_index;
 
-		if (velocityX <= -1000) {
+		if (velocityX <= -500) {
 			// Swipe left: increase index by 1
 
 			// Check if we are at the end of the list
 			if (current_index == categories.size() - 1)
-				return false;
+				return true;
 
 			new_index = current_index + 1;
-		} else if (velocityX >= 1000) {
+		} else if (velocityX >= 500) {
 			// Swipe right: decrease index by 1
 
 			// Check if we are at the beginning of the list
 			if (current_index == 0)
-				return false;
+				return true;
 
 			new_index = current_index - 1;
 		} else
 			// A clear left or right swipe was not registered
-			return false;
+			return true;
 
 		// Swiping has the same result as the user clicking on a category, so
 		// let's tag a view with the new category and send it over to onClick
@@ -506,8 +507,7 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 
 	@Override
 	public boolean onTouch(View v, MotionEvent event) {
-		gesture_detector.onTouchEvent(event);
-		return true;
+		return gesture_detector.onTouchEvent(event);
 	}
 	
 	/**************************************************************************
