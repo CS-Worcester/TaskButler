@@ -93,7 +93,7 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 	private Object action_mode;
 	private int selected_task;
 	private int delete_mode;
-	ArrayList<Category> categories;
+	private ArrayList<Category> categories;
 
 	/**************************************************************************
 	 * Class methods                                                          *
