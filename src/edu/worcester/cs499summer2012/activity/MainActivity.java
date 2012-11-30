@@ -93,6 +93,7 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 	private Object action_mode;
 	private int selected_task;
 	private int delete_mode;
+	private ArrayList<Category> categories;
 
 	/**************************************************************************
 	 * Class methods                                                          *
@@ -126,7 +127,7 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 	private void createCategoryBar(int display_category) {
 		// Populate bottom category bar
 		ArrayList<Category> all_categories = data_source.getCategories();
-		ArrayList<Category> categories = new ArrayList<Category>(all_categories);
+		categories = new ArrayList<Category>(all_categories);
 		
 		for (Category category : all_categories) {
 			if (!data_source.categoryHasTasks(category) && category.getID() != Category.NO_CATEGORY)
@@ -433,9 +434,6 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 	@Override
 	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
 			float velocityY) {
-
-		// Get list of categories
-		ArrayList<Category> categories = data_source.getCategories();
 
 		// Swiping won't work unless there are categories
 		if (categories.size() == 1)
