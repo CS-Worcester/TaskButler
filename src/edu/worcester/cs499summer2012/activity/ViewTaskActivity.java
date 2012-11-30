@@ -283,7 +283,7 @@ DialogInterface.OnClickListener {
 			if (!task.isCompleted() && task.hasDateDue() &&
 					(task.getDateDue() >= System.currentTimeMillis())) {
 				TaskAlarm alarm = new TaskAlarm();
-				alarm.setAlarm(this, task.getID());
+				alarm.setAlarm(this, task);
 			}
 		}
 	}

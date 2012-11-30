@@ -43,6 +43,7 @@ public class TaskAlarm {
 	public static final int REPEATING_ALARM = 1;
 	public static final int PROCRASTINATOR_ALARM =2;
 	
+	private final long HOUR = 3600000;
 	private static final String DEFAULT_REMINDER_TIME = "24";
 	private static final String DEFAULT_ALARM_TIME = "15";
 
@@ -59,13 +60,19 @@ public class TaskAlarm {
 		alarmManager.cancel(pi);
 		pi.cancel();
 
-		//Cancel Reminder Alarm
+		//cancel Reminder Alarm
 		Intent intent =  new Intent(context, OnAlarmReceiver.class)
 			.putExtra(Task.EXTRA_TASK_ID, id)
 			.putExtra(TaskAlarm.ALARM_EXTRA, SettingsActivity.REMINDER_TIME);
 		pi = PendingIntent.getBroadcast(context, id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-
+		alarmManager.cancel(pi);
+		pi.cancel();
+		
+		//cancel procrastinator Alarm
+		intent =  new Intent(context, OnAlarmReceiver.class)
+			.putExtra(Task.EXTRA_TASK_ID, id)
+			.putExtra(TaskAlarm.ALARM_EXTRA, SettingsActivity.ALARM_TIME);
+		pi = PendingIntent.getBroadcast(context, id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 		alarmManager.cancel(pi);
 		pi.cancel();
 	}
@@ -75,11 +82,10 @@ public class TaskAlarm {
 	 * @param context
 	 * @param id id of task to retrieve task from SQLite database
 	 */
-	public void setAlarm(Context context, int id){
-		TasksDataSource db = TasksDataSource.getInstance(context);
-		Task task = db.getTask(id);
+	public void setAlarm(Context context, Task task){
 		AlarmManager am=(AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
-		am.set(AlarmManager.RTC_WAKEUP, task.getDateDue(), getPendingIntent(context, id));
+		am.set(AlarmManager.RTC_WAKEUP, task.getDateDue(), 
+				getPendingIntent(context, task.getID()));
 	}
 
 	/**
@@ -90,62 +96,85 @@ public class TaskAlarm {
 	public Task setRepeatingAlarm(Context context, int id){
 		TasksDataSource db = TasksDataSource.getInstance(context);
 		Task task = db.getTask(id);    	
-		Calendar cal = Calendar.getInstance();    	
+		Calendar cal = Calendar.getInstance();
+		cal.setTimeInMillis(task.getDateDue());
 
-		long newDateDue;
+		long newDateDue = task.getDateDue();
 		switch(task.getRepeatType()){
 		case Task.MINUTES:
-			cal.add(Calendar.MINUTE, task.getRepeatInterval());
-			newDateDue = cal.getTimeInMillis();
-			Log.d("MINUTES",""+newDateDue);
-			task.setDateDue(newDateDue);
-			task.setIsCompleted(false); //this allows user to mark task complete until next time
-			db.updateTask(task);
-			return task;
+			while(newDateDue <= System.currentTimeMillis()){
+				cal.add(Calendar.MINUTE, task.getRepeatInterval());
+				newDateDue = cal.getTimeInMillis();
+				if((newDateDue - System.currentTimeMillis()) <= HOUR ){
+					Log.d("in IF ",""+ newDateDue + " < " + task.getDateDue());
+					task.setDateDue(newDateDue);
+					task.setIsCompleted(false); //this allows user to mark task complete until next time
+					db.updateTask(task);
+				}
+			}
+			break;
 		case Task.HOURS:
-			cal.add(Calendar.HOUR, task.getRepeatInterval());
-			newDateDue = cal.getTimeInMillis();
-			Log.d("HOURS",""+newDateDue);
-			task.setDateDue(newDateDue);
-			task.setIsCompleted(false); //this allows user to mark task complete until next time
-			db.updateTask(task);
-			return task;
+			while(newDateDue <= System.currentTimeMillis()){
+				cal.add(Calendar.HOUR, task.getRepeatInterval());
+				newDateDue = cal.getTimeInMillis();
+				if((newDateDue - System.currentTimeMillis()) <= HOUR ){
+					Log.d("in IF ",""+ newDateDue + " < " + task.getDateDue());
+					task.setDateDue(newDateDue);
+					task.setIsCompleted(false); //this allows user to mark task complete until next time
+					db.updateTask(task);
+				}
+			}
+			break;
 		case Task.DAYS:
-			cal.add(Calendar.DAY_OF_YEAR, task.getRepeatInterval());
-			newDateDue = cal.getTimeInMillis();
-			Log.d("DAYS",""+newDateDue);
-			task.setDateDue(newDateDue);
-			task.setIsCompleted(false); //this allows user to mark task complete until next time
-			db.updateTask(task);
-			return task;
+			while(newDateDue <= System.currentTimeMillis()){
+				cal.add(Calendar.DAY_OF_YEAR, task.getRepeatInterval());
+				newDateDue = cal.getTimeInMillis();
+				if((newDateDue - System.currentTimeMillis()) <= HOUR ){
+					Log.d("in IF ",""+ newDateDue + " < " + task.getDateDue());
+					task.setDateDue(newDateDue);
+					task.setIsCompleted(false); //this allows user to mark task complete until next time
+					db.updateTask(task);
+				}
+			}
+			break;
 		case Task.WEEKS:
-			cal.add(Calendar.WEEK_OF_YEAR, task.getRepeatInterval());
-			newDateDue = cal.getTimeInMillis();
-			Log.d("WEEKS",""+newDateDue);
-			task.setDateDue(newDateDue);
-			task.setIsCompleted(false); //this allows user to mark task complete until next time
-			db.updateTask(task);
-			return task;
+			while(newDateDue <= System.currentTimeMillis()){
+				cal.add(Calendar.WEEK_OF_YEAR, task.getRepeatInterval());
+				newDateDue = cal.getTimeInMillis();
+				if((newDateDue - System.currentTimeMillis()) <= HOUR ){
+					Log.d("in IF ",""+ newDateDue + " < " + task.getDateDue());
+					task.setDateDue(newDateDue);
+					task.setIsCompleted(false); //this allows user to mark task complete until next time
+					db.updateTask(task);
+				}
+			}
+			break;
 		case Task.MONTHS:
-			cal.add(Calendar.MONTH, task.getRepeatInterval());
-			newDateDue = cal.getTimeInMillis();
-			Log.d("MONTHS",""+newDateDue);
-			task.setDateDue(newDateDue);
-			task.setIsCompleted(false); //this allows user to mark task complete until next time
-			db.updateTask(task);
-			return task;
+			while(newDateDue <= System.currentTimeMillis()){
+				cal.add(Calendar.MONTH, task.getRepeatInterval());
+				newDateDue = cal.getTimeInMillis();
+				if(( newDateDue - System.currentTimeMillis()) <= HOUR ){
+					Log.d("in IF ",""+ newDateDue + " < " + task.getDateDue());
+					task.setDateDue(newDateDue);
+					task.setIsCompleted(false); //this allows user to mark task complete until next time
+					db.updateTask(task);
+				}
+			}
+			break;
 		case Task.YEARS:
-			cal.add(Calendar.YEAR, task.getRepeatInterval());
-			newDateDue = cal.getTimeInMillis();
-			Log.d("YEARS",""+newDateDue);
-			task.setDateDue(newDateDue);
-			task.setIsCompleted(false); //this allows user to mark task complete until next time
-			db.updateTask(task);
-			return task;
-		default:
-			return task;
+			while(newDateDue <= System.currentTimeMillis()){
+				cal.add(Calendar.YEAR, task.getRepeatInterval());
+				newDateDue = cal.getTimeInMillis();
+				if((System.currentTimeMillis() - newDateDue) <= HOUR ){
+					Log.d("in IF ",""+ newDateDue + " < " + task.getDateDue());
+					task.setDateDue(newDateDue);
+					task.setIsCompleted(false); //this allows user to mark task complete until next time
+					db.updateTask(task);
+				}
+			}
+			break;
 		}
-
+		return task;
 	}
 	/**
 	 * Reads preferences, and schedule a procrastinator alarm.
@@ -159,11 +188,14 @@ public class TaskAlarm {
 		Calendar cal = Calendar.getInstance();    	
 		int iAlarm = Integer.parseInt(strAlarm);
 		cal.add(Calendar.MINUTE, iAlarm);
-		
 		long lAlarm = cal.getTimeInMillis();
 		
+		Intent intent =  new Intent(context, OnAlarmReceiver.class)
+			.putExtra(Task.EXTRA_TASK_ID, id)
+			.putExtra(TaskAlarm.ALARM_EXTRA, SettingsActivity.ALARM_TIME);
+		
 		AlarmManager am=(AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
-		am.set(AlarmManager.RTC_WAKEUP, lAlarm, getPendingIntent(context, id));
+		am.set(AlarmManager.RTC_WAKEUP, lAlarm, PendingIntent.getBroadcast(context, id, intent, PendingIntent.FLAG_UPDATE_CURRENT));
 	}
 	
 	//not done yet
@@ -174,11 +206,10 @@ public class TaskAlarm {
 		Log.d("String value of settings", strReminder);
 		Task task = db.getTask(id);
 		int iReminder = Integer.parseInt(strReminder);
-		long hour = 36000;
 		long lReminder = task.getDateDue();
 		
 		do{
-			lReminder += hour * iReminder;
+			lReminder += HOUR * iReminder;
 		}while(lReminder < System.currentTimeMillis());
 		
 		Intent intent =  new Intent(context, OnAlarmReceiver.class)
