@@ -212,7 +212,7 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 					holder.due_date.setText(DateFormat.format("h:mmaa", due_date));
 				} else {
 					// Due date is past
-					holder.due_date.setText("Past\ndue");
+					holder.due_date.setText("Past due");
 					holder.due_date.setTextColor(Color.RED);
 				}	
 			} else
