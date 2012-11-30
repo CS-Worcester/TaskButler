@@ -259,6 +259,7 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 		case R.id.menu_main_about:
 			AlertDialog.Builder about_builder = new AlertDialog.Builder(this);
 			about_builder.setTitle("About Task Butler");
+			about_builder.setIcon(R.drawable.ic_about);
 			about_builder.setMessage(R.string.dialog_about);
 			about_builder.setCancelable(true);
 			about_builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {

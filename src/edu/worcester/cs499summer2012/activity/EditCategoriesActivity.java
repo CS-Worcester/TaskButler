@@ -204,7 +204,7 @@ public class EditCategoriesActivity extends SherlockListActivity implements Acti
 					// No name, cancel dialog
 					Toast.makeText(this, "Category needs a name!", Toast.LENGTH_SHORT).show();
 					dialog.cancel();
-				} else if (selected_dialog == CREATE_DIALOG && data_source.getExistingCategory(name) != null) {
+				} else if (data_source.getExistingCategory(name) != null) {
 					// Category name already exists, cancel dialog
 					Toast.makeText(this, "Category name already exists", Toast.LENGTH_SHORT).show();
 					dialog.cancel();
