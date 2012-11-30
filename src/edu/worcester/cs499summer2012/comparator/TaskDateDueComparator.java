@@ -60,7 +60,15 @@ public class TaskDateDueComparator implements Comparator<Task> {
 				// Ex. LHS -> date 5000ms (earlier)
 				//     RHS -> date 6000ms (later)
 				//     LHS - RHS = 5000 - 6000 = -1000 = LHS ordered first
-				return (int) (lhs.getDateDue() - rhs.getDateDue());
+				long diff = lhs.getDateDue() - rhs.getDateDue();
+				
+				if (diff < 0)
+					return -1;
+				
+				if (diff > 0)
+					return 1;
+				
+				return 0;
 			}
 		}
 	}
