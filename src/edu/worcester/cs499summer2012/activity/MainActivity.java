@@ -169,7 +169,7 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 				view.setOnClickListener(this);
 
 				LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1);
-				params.setMargins(2, 2, 2, 2);
+				params.setMargins(4, 4, 4, 4);
 				category_bar.addView(view, params);
 			}
 		}
