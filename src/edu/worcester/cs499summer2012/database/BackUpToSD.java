@@ -23,7 +23,6 @@ public class BackUpToSD {
 	public BackUpToSD(Context context, SQLiteDatabase db) {
 		this.context = context;
 		this.db =  db;
-		db =  (DatabaseHandler) db;
 
 		try {
 			// create a file on the SD-Card to export the DB
@@ -46,7 +45,7 @@ public class BackUpToSD {
 	 */
 	public void exportData(Context context, TasksDataSource data_source) {
 		try {
-			exporter.startDbExport(db.getPath());
+			exporter.startDbExport(db.getPath()); //going to b
 
 			// get the tables out of the given sqlite database
 			String sql = "SELECT * FROM sqlite_master"; // TODO: This shouldn't
