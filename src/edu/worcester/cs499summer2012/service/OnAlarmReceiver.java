@@ -45,11 +45,11 @@ public class OnAlarmReceiver extends BroadcastReceiver {
 		TasksDataSource db = TasksDataSource.getInstance(context);
 		Task task = db.getTask(id);
 		
-		if(task.hasFinalDateDue() || task.getPriority() == Task.URGENT){
-			notification.sendPersistentNotification(context, task); // send basic notification
+		if(task.getPriority() == Task.URGENT){
+			notification.sendPersistentNotification(context, task); // send persistent notification
 		} else {
 			notification.sendBasicNotification(context, task); // send basic notification
-		}		
+		}
 		
 		context.startService(new Intent(context, TaskButlerService.class)); //start TaskButlerService
 	}
