@@ -78,7 +78,9 @@ public class TaskAutoComparator implements Comparator<Task> {
 					// Ex. LHS -> date 5000ms (earlier)
 					//     RHS -> date 6000ms (later)
 					//     LHS - RHS = 5000 - 6000 = -1000 = LHS ordered first
-					return (int) (lhs.getDateDue() - rhs.getDateDue());
+					long diff = lhs.getDateDue() - rhs.getDateDue();
+					
+					return diff < 0 ? -1 : 1;
 				}
 			}
 		}
@@ -93,8 +95,16 @@ public class TaskAutoComparator implements Comparator<Task> {
 		// Step 4: Compare by creation date
 		// Ex. LHS -> date 5000ms (earlier)
 		//     RHS -> date 6000ms (later)
-		//     LHS - RHS = 5000 - 6000 = -1000 = LHS ordered first
-		return (int) (lhs.getDateCreated() - rhs.getDateCreated());
+		//     LHS - RHS = 5000 - 6000 = -1000 = RHS ordered first
+		long diff = lhs.getDateCreated() - rhs.getDateCreated();
+		
+		if (diff < 0)
+			return 1;
+		
+		if (diff > 0)
+			return -1;
+		
+		return 0;
 	}
 
 }

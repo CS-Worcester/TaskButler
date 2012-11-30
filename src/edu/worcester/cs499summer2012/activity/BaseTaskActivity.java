@@ -113,6 +113,7 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
     protected DatePickerDialog date_dialog;
     protected TimePickerDialog time_dialog;
     protected AlertDialog category_dialog;
+    AmbilWarnaDialog color_dialog;
     protected EditText et_category;
     protected TextView tv_at;
     
@@ -121,9 +122,13 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
     protected int selected_dialog;
     protected Category default_category;
     
-    // Flags to prevent date-time picker dialogs popping up immediately on  	
+    // Flag to prevent date picker dialog popping up immediately on  	
     // entering EditTaskActivity
     protected boolean prevent_initial_due_date_popup = false;
+    
+    // Flag to kill new category dialog if screen is rotated
+    protected boolean new_category_dialog_active = false;
+    
     
     protected String repeat_interval_string = DEFAULT_INTERVAL;
     
@@ -212,9 +217,12 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
     protected void onSaveInstanceState(Bundle outState) {
     	outState.putBoolean(PREVENT_DUE_DATE, cb_due_date.isChecked() ? true : false);
     	
-    	if (category_dialog != null && category_dialog.isShowing())
-			category_dialog.cancel();
-    	
+    	if (new_category_dialog_active) {
+    		new_category_dialog_active = false;
+    		selected_dialog = NO_DIALOG;
+    		s_category.setSelection(category_adapter.getPosition(default_category));
+    	}
+			
     	super.onSaveInstanceState(outState);
     }
     
@@ -338,7 +346,7 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
         case R.id.text_add_task_due_time:
         	// Initialize picker dialog
     		time_dialog = new TimePickerDialog(this, this, 
-    				due_date_cal.get(Calendar.HOUR), 
+    				due_date_cal.get(Calendar.HOUR_OF_DAY), 
     				due_date_cal.get(Calendar.MINUTE), false) {
     			
     			@Override
@@ -369,6 +377,7 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
 					// No name, cancel dialog
 					Toast.makeText(this, "Category needs a name!", Toast.LENGTH_SHORT).show();
 					s_category.setSelection(category_adapter.getPosition(default_category));
+					new_category_dialog_active = false;
 					dialog.cancel();
 					return;
 				} 
@@ -379,13 +388,15 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
 					// Category name already exists, cancel dialog
 					Toast.makeText(this, "Category name already exists", Toast.LENGTH_SHORT).show();
 					s_category.setSelection(category_adapter.getPosition(existing_category));
+					new_category_dialog_active = false;
 					dialog.cancel();
 				} else  {
-					AmbilWarnaDialog color_dialog = new AmbilWarnaDialog(this, Color.RED, new OnAmbilWarnaListener() {
+					 color_dialog = new AmbilWarnaDialog(this, Color.RED, new OnAmbilWarnaListener() {
 	
 						@Override
 						public void onCancel(AmbilWarnaDialog dialog) {
 							s_category.setSelection(category_adapter.getPosition(default_category));
+							new_category_dialog_active = false;
 						}
 	
 						@Override
@@ -397,6 +408,7 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
 							data_source.addCategory(new_category);
 							category_adapter.insert(new_category, category_adapter.getCount() - 1);
 							category_adapter.notifyDataSetChanged();
+							new_category_dialog_active = false;
 						}
 					});
 					color_dialog.show();
@@ -428,6 +440,7 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
 			new_category_builder.setPositiveButton("Next", this);
 			new_category_builder.setNegativeButton("Cancel", this);
 			category_dialog = new_category_builder.create();
+			new_category_dialog_active = true;
 			category_dialog.show();
 		}
 	}

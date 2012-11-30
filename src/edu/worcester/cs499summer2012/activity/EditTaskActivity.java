@@ -68,7 +68,7 @@ public class EditTaskActivity extends BaseTaskActivity {
         	cb_due_date.setChecked(true);
         } else {
         	due_date_cal = GregorianCalendar.getInstance();
-            due_date_cal.add(Calendar.HOUR, 1);
+            due_date_cal.add(Calendar.HOUR_OF_DAY, 1);
             due_date_cal.set(Calendar.MINUTE, 0);
             due_date_cal.set(Calendar.SECOND, 0);
             due_date_cal.set(Calendar.MILLISECOND, 0);

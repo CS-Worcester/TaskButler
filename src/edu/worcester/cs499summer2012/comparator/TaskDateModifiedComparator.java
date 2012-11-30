@@ -30,7 +30,8 @@ import edu.worcester.cs499summer2012.task.Task;
 public class TaskDateModifiedComparator implements Comparator<Task> {
 	
 	/**
-	 * Compares two tasks by their date modified
+	 * Compares two tasks by their date modified. More recently modified tasks
+	 * come first.
 	 * @param lhs the first task
 	 * @param rhs the second task
 	 * @return A negative value if the first task was modified more recently, a 
@@ -41,7 +42,15 @@ public class TaskDateModifiedComparator implements Comparator<Task> {
 		// Compare by date
 		// Ex. LHS -> date 5000ms (earlier)
 		//     RHS -> date 6000ms (later)
-		//     LHS - RHS = 5000 - 6000 = -1000 = LHS ordered first
-		return (int) (lhs.getDateModified() - rhs.getDateModified());
+		//     LHS - RHS = 5000 - 6000 = -1000 = RHS ordered first
+		long diff = lhs.getDateModified() - rhs.getDateModified();
+		
+		if (diff < 0)
+			return 1;
+		
+		if (diff > 0)
+			return -1;
+		
+		return 0;
 	}
 }
