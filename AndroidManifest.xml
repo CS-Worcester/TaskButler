@@ -56,6 +56,13 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="edu.worcester.cs499summer2012.MainActivity" />
         </activity>
+        <activity
+            android:name=".activity.EditTaskActivity"
+            android:label="@string/title_activity_edit_task" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="edu.worcester.cs499summer2012.MainActivity" />
+        </activity>
         
         <activity
             android:name=".activity.ViewTaskActivity"

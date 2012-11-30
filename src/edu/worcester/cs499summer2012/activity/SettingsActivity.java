@@ -81,8 +81,9 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
     @SuppressWarnings("deprecation")
 	@Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+        super.onCreate(savedInstanceState);        
         addPreferencesFromResource(R.layout.preferences);
+
         
         // Allow Action bar icon to act as a button
         ActionBar action_bar = getSupportActionBar();
@@ -154,7 +155,6 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
     	} else
     		return super.onOptionsItemSelected(item);
     }
-
 	@Override
 	public boolean onPreferenceClick(Preference p) {
 		String key = p.getKey();

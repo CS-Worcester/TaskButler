@@ -60,8 +60,25 @@
     <string name="image_down">Down</string>
     
     <!-- Dialog items -->
-    <string name="dialog_about">Copyright 2012 Jonathan Hasenzahl, James Celona, Dhimitraq Jorgji.\n\nTask Butler is distributed under the GNU General Public License.</string>
+    <string name="dialog_about">Task Butler\n\nCopyright 2012 Jonathan Hasenzahl, James Celona, Dhimitraq Jorgji.\n\nTask Butler is distributed under the GNU General Public License.</string>
 	
+	<!-- Spinner items -->
+	<string-array name="spinner_repeat_types">
+	    <item>minutes</item>
+	    <item>hours</item>
+	    <item>days</item>
+	    <item>weeks</item>
+	    <item>months</item>
+	    <item>years</item>
+	</string-array>
+	<string name="title_activity_edit_task">edit the task</string>
+	
+	<string-array name="spinner_priorities">
+	    <item>Trivial</item>
+	    <item>Normal</item>
+	    <item>Urgent</item>
+	</string-array>
+		
     <!-- Preferences items -->
     <string name="pref_category_tasks">Tasks</string>
     <string name="pref_category_reminders">Reminders</string>
