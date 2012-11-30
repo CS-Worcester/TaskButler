@@ -45,7 +45,7 @@ public class AddTaskActivity extends BaseTaskActivity {
 		
         // Initialize calendars: Due date defaults to +1 hour
         due_date_cal = GregorianCalendar.getInstance();
-        due_date_cal.add(Calendar.HOUR, 1);
+        due_date_cal.add(Calendar.HOUR_OF_DAY, 1);
         due_date_cal.set(Calendar.MINUTE, 0);
         due_date_cal.set(Calendar.SECOND, 0);
         due_date_cal.set(Calendar.MILLISECOND, 0);

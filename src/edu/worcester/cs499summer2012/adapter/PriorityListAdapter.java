@@ -20,6 +20,8 @@
 package edu.worcester.cs499summer2012.adapter;
 
 import android.app.Activity;
+import android.graphics.Color;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -64,7 +66,11 @@ public class PriorityListAdapter extends ArrayAdapter<String> {
 		LayoutInflater inflater = activity.getLayoutInflater();
 		View view = inflater.inflate(textViewResourceId, null);
 
-		((TextView) view.findViewById(R.id.text_row_priority)).setText(priorities[position]);
+		TextView text = (TextView) view.findViewById(R.id.text_row_priority);
+		text.setText(priorities[position]);
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB)
+			text.setTextColor(Color.BLACK);
+		
 		ImageView icon = (ImageView) view.findViewById(R.id.image_row_priority);
 		
 		switch (position) {

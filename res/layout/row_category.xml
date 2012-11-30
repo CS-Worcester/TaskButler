@@ -22,6 +22,7 @@
         android:gravity="center_vertical"
         android:padding="4dp"
         android:textSize="18sp"
+        android:textColor="#ffffff"
         android:maxLines="1"
         android:ellipsize="end" />
 
