@@ -63,7 +63,8 @@
     <!-- Dialog items -->
     <string name="dialog_about">Copyright 2012 Jonathan Hasenzahl, James Celona, Dhimitraq Jorgji.\n\nTask Butler is distributed under the GNU General Public License.</string>
 	<string name="dialog_procrastinator_help">Task Butler will remind you periodically about tasks that are past due. If a task is time-sensitive, use the Procrastination Alarm to be reminded more frequently.</string>
-    
+    <string name="dialog_sorting_help">Tap on a sorting parameter to enable it. Tap the arrows of a parameter to change its rank in the list. Tasks will be sorted by the highest ranked parameter first, then by the second highest, and so on.</string>
+	
     <!-- Preferences items -->
     <string name="pref_category_tasks">Tasks</string>
     <string name="pref_category_reminders">Reminders</string>

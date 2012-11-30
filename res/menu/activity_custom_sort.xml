@@ -1,3 +1,10 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     
+    <item 
+        android:id="@+id/menu_custom_sort_help"
+        android:title="@string/menu_help"
+        android:icon="@drawable/ic_help"
+        android:showAsAction="never" 
+        android:orderInCategory="0"/>
+    
 </menu>
