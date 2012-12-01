@@ -46,6 +46,8 @@ public class TaskButlerService extends WakefulIntentService{
 
 		List<Task> tasks = db.getAllTasks(); //Get a list of all the tasks there
 		for (Task task : tasks) {
+			// Cancel existing alarm
+			alarm.cancelAlarm(this, task.getID());
 			
 			//Procrastinator and Reminder alarm
 			if(task.isPastDue()){

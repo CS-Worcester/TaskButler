@@ -96,51 +96,45 @@ public class TaskAlarm {
 	public Task setRepeatingAlarm(Context context, int id){
 		TasksDataSource db = TasksDataSource.getInstance(context);
 		Task task = db.getTask(id);    	
-		Calendar cal = Calendar.getInstance();
-		cal.setTimeInMillis(task.getDateDue());
-
-		long newDateDue = task.getDateDue();
+		Calendar newDateDue = (Calendar) task.getDateDueCal().clone();
+		int repeatType;
+		
 		switch(task.getRepeatType()){
 		case Task.MINUTES:
-			while(newDateDue <= System.currentTimeMillis()){
-				cal.add(Calendar.MINUTE, task.getRepeatInterval());
-				newDateDue = cal.getTimeInMillis();
-				Log.d("in IF ",""+ newDateDue + " < " + task.getDateDue());
-			}
+			repeatType = Calendar.MINUTE;
 			break;
 		case Task.HOURS:
-			while(newDateDue <= System.currentTimeMillis()){
-				cal.add(Calendar.HOUR, task.getRepeatInterval());
-				newDateDue = cal.getTimeInMillis();
-			}
+			repeatType = Calendar.HOUR_OF_DAY;
 			break;
 		case Task.DAYS:
-			while(newDateDue <= System.currentTimeMillis()){
-				cal.add(Calendar.DAY_OF_YEAR, task.getRepeatInterval());
-				newDateDue = cal.getTimeInMillis();
-			}
+			repeatType = Calendar.DAY_OF_YEAR;
 			break;
 		case Task.WEEKS:
-			while(newDateDue <= System.currentTimeMillis()){
-				cal.add(Calendar.WEEK_OF_YEAR, task.getRepeatInterval());
-				newDateDue = cal.getTimeInMillis();
-			}
+			repeatType = Calendar.WEEK_OF_YEAR;
 			break;
 		case Task.MONTHS:
-			while(newDateDue <= System.currentTimeMillis()){
-				cal.add(Calendar.MONTH, task.getRepeatInterval());
-				newDateDue = cal.getTimeInMillis();
-			}
+			repeatType = Calendar.MONTH;
 			break;
 		case Task.YEARS:
-			while(newDateDue <= System.currentTimeMillis()){
-				cal.add(Calendar.YEAR, task.getRepeatInterval());
-				newDateDue = cal.getTimeInMillis();
-			}
+			repeatType = Calendar.YEAR;
+			break;
+		default:
+			repeatType = Calendar.DAY_OF_YEAR;
 			break;
 		}
 		
-		task.setDateDue(newDateDue);
+		// Due date is behind current time, task was finished late
+		if (newDateDue.getTimeInMillis() <= System.currentTimeMillis()) {
+			while(newDateDue.getTimeInMillis() <= System.currentTimeMillis()){
+				newDateDue.add(repeatType, task.getRepeatInterval());
+				Log.d("in IF ",""+ newDateDue + " < " + task.getDateDue());
+			}
+		} else {
+			// Due date is ahead of current time, task was finished early
+			newDateDue.add(repeatType, task.getRepeatInterval());
+		}
+		
+		task.setDateDue(newDateDue.getTimeInMillis());
 		task.setIsCompleted(false);
 		db.updateTask(task);
 

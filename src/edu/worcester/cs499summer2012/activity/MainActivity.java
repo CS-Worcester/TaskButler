@@ -297,23 +297,18 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 	@Override
 	public void onActivityResult(int request_code, int result_code, 
 			Intent intent) {
-		Task task;
-		switch(request_code){
+
+		// There is currently no special handling for activity results
+		
+		/*switch(request_code){
 		case EDIT_TASK_REQUEST:
 		case VIEW_TASK_REQUEST:
 		case ADD_TASK_REQUEST:
 			if(result_code == RESULT_OK){
-				// Get the task from the db using the ID in the intent
-				task = data_source.getTask(intent.getIntExtra(Task.EXTRA_TASK_ID, 0));
 
-				if (!task.isCompleted() && task.hasDateDue() &&
-						(task.getDateDue() >= System.currentTimeMillis())) {
-					TaskAlarm alarm = new TaskAlarm();
-					alarm.setAlarm(this, task);
-				}
 			}
 			break;
-		}
+		}*/
 	}
 
 	/**************************************************************************
@@ -517,12 +512,14 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 	public void onClick(DialogInterface dialog, int which) {
 		if (delete_mode == DELETE_MODE_SINGLE) {
 			Task task = adapter.getItem(selected_task);
+			
+			// Alarm logic: Delete a task
+			// * Task must not be deleted from database yet!
+			// * Cancel alarm
+			(new TaskAlarm()).cancelAlarm(this, task.getID());
+			
 			data_source.deleteTask(task);
 			adapter.remove(task);
-			if (task.hasDateDue()) {
-				TaskAlarm alarm = new TaskAlarm();
-				alarm.cancelAlarm(getApplicationContext(), task.getID());
-			}
 			toast("Task deleted");
 		}
 				

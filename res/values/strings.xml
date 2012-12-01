@@ -13,6 +13,10 @@
     <string name="title_activity_edit_categories">Categories</string>
     <string name="title_activity_custom_sort">Custom Sort</string>
     
+    <!-- Toast notifications -->
+    <string name="toast_task_completed">Task finished! Congratulations!</string>
+    <string name="toast_task_repeated">This task will be due again on</string>
+    
     <!-- Menu items -->
     <string name="menu_save">Save</string>
     <string name="menu_cancel">Cancel</string>

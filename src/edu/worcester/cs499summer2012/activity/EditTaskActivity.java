@@ -28,6 +28,7 @@ import android.os.Bundle;
 import android.widget.EditText;
 import android.widget.Toast;
 import edu.worcester.cs499summer2012.R;
+import edu.worcester.cs499summer2012.service.TaskAlarm;
 import edu.worcester.cs499summer2012.task.Category;
 import edu.worcester.cs499summer2012.task.Task;
 
@@ -141,7 +142,7 @@ public class EditTaskActivity extends BaseTaskActivity {
     	// 11. Date created (not modified)
     	
     	// 12. Date modified
-    	task.setDateModified(GregorianCalendar.getInstance().getTimeInMillis());
+    	task.setDateModified(System.currentTimeMillis());
     	
     	// 13. Task due date
     	if (task.hasDateDue())
@@ -154,6 +155,19 @@ public class EditTaskActivity extends BaseTaskActivity {
     	
     	// Update the task in the database
     	data_source.updateTask(task);
+    	
+    	// Alarm logic: Edit a task [non-completion] (EditTaskActivity)
+    	// * Don't forget to update date modified!
+    	// * Task must be updated in database first
+    	// * User could have changed any setting, so checking booleans is not reliable
+    	// * Cancel alarm first to be safe
+    	// * If has due date:
+    	// *	Set alarm
+    	// * 	(Repeating due date will be handled by the service after alarm rings)
+    	TaskAlarm alarm = new TaskAlarm();
+    	alarm.cancelAlarm(this, task.getID());
+    	if (task.hasDateDue())
+    		alarm.setAlarm(this, task);
     	
     	// Create the return intent and add the task ID
     	intent = new Intent(this, MainActivity.class);    	

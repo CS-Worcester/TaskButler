@@ -225,11 +225,15 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
 
 		case DELETE_MODE_ALL:
 			ArrayList<Task> tasks = data_source.getTasks(true, null);
+			
+			// Alarm logic: Delete several tasks (SettingsActivity)
+			// * Tasks must not be deleted from database yet!
+			// * Iterate through list of tasks to be deleted:
+			// * 	Cancel alarm
 			TaskAlarm alarm = new TaskAlarm();
-			for (Task t : tasks) {
-				if (t.hasDateDue())
-					alarm.cancelAlarm(getApplicationContext(), t.getID());
-			}
+			for (Task task : tasks)
+				alarm.cancelAlarm(this, task.getID());
+			
 			deleted_tasks = data_source.deleteAllTasks();
 			toast(deleted_tasks + " tasks deleted");
 			finish();
