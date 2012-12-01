@@ -105,77 +105,48 @@ public class TaskAlarm {
 			while(newDateDue <= System.currentTimeMillis()){
 				cal.add(Calendar.MINUTE, task.getRepeatInterval());
 				newDateDue = cal.getTimeInMillis();
-				if((newDateDue - System.currentTimeMillis()) <= HOUR ){
-					Log.d("in IF ",""+ newDateDue + " < " + task.getDateDue());
-					task.setDateDue(newDateDue);
-					task.setIsCompleted(false); //this allows user to mark task complete until next time
-					db.updateTask(task);
-				}
+				Log.d("in IF ",""+ newDateDue + " < " + task.getDateDue());
 			}
 			break;
 		case Task.HOURS:
 			while(newDateDue <= System.currentTimeMillis()){
 				cal.add(Calendar.HOUR, task.getRepeatInterval());
 				newDateDue = cal.getTimeInMillis();
-				if((newDateDue - System.currentTimeMillis()) <= HOUR ){
-					Log.d("in IF ",""+ newDateDue + " < " + task.getDateDue());
-					task.setDateDue(newDateDue);
-					task.setIsCompleted(false); //this allows user to mark task complete until next time
-					db.updateTask(task);
-				}
 			}
 			break;
 		case Task.DAYS:
 			while(newDateDue <= System.currentTimeMillis()){
 				cal.add(Calendar.DAY_OF_YEAR, task.getRepeatInterval());
 				newDateDue = cal.getTimeInMillis();
-				if((newDateDue - System.currentTimeMillis()) <= HOUR ){
-					Log.d("in IF ",""+ newDateDue + " < " + task.getDateDue());
-					task.setDateDue(newDateDue);
-					task.setIsCompleted(false); //this allows user to mark task complete until next time
-					db.updateTask(task);
-				}
 			}
 			break;
 		case Task.WEEKS:
 			while(newDateDue <= System.currentTimeMillis()){
 				cal.add(Calendar.WEEK_OF_YEAR, task.getRepeatInterval());
 				newDateDue = cal.getTimeInMillis();
-				if((newDateDue - System.currentTimeMillis()) <= HOUR ){
-					Log.d("in IF ",""+ newDateDue + " < " + task.getDateDue());
-					task.setDateDue(newDateDue);
-					task.setIsCompleted(false); //this allows user to mark task complete until next time
-					db.updateTask(task);
-				}
 			}
 			break;
 		case Task.MONTHS:
 			while(newDateDue <= System.currentTimeMillis()){
 				cal.add(Calendar.MONTH, task.getRepeatInterval());
 				newDateDue = cal.getTimeInMillis();
-				if(( newDateDue - System.currentTimeMillis()) <= HOUR ){
-					Log.d("in IF ",""+ newDateDue + " < " + task.getDateDue());
-					task.setDateDue(newDateDue);
-					task.setIsCompleted(false); //this allows user to mark task complete until next time
-					db.updateTask(task);
-				}
 			}
 			break;
 		case Task.YEARS:
 			while(newDateDue <= System.currentTimeMillis()){
 				cal.add(Calendar.YEAR, task.getRepeatInterval());
 				newDateDue = cal.getTimeInMillis();
-				if((System.currentTimeMillis() - newDateDue) <= HOUR ){
-					Log.d("in IF ",""+ newDateDue + " < " + task.getDateDue());
-					task.setDateDue(newDateDue);
-					task.setIsCompleted(false); //this allows user to mark task complete until next time
-					db.updateTask(task);
-				}
 			}
 			break;
 		}
+		
+		task.setDateDue(newDateDue);
+		task.setIsCompleted(false);
+		db.updateTask(task);
+
 		return task;
 	}
+	
 	/**
 	 * Reads preferences, and schedule a procrastinator alarm.
 	 * @param context

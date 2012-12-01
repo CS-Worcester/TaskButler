@@ -203,7 +203,7 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 		getListView().setOnItemLongClickListener(this);
 		getListView().setOnTouchListener(this);
 
-		//Start service to check for alarms
+		//Start service to check for alarms TODO: after testing decide if this is needed
 		WakefulIntentService.acquireStaticLock(this);
 		this.startService(new Intent(this, TaskButlerService.class));
 	}
