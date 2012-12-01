@@ -19,6 +19,8 @@
 
 package edu.worcester.cs499summer2012.activity;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ListView;
@@ -92,6 +94,24 @@ public final class CustomSortActivity extends SherlockListActivity {
 		switch (item.getItemId()) {
 		case android.R.id.home:
 			finish();
+			return true;
+			
+		case R.id.menu_custom_sort_help:
+    		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+    		builder.setTitle("Custom sorting");
+    		builder.setIcon(R.drawable.ic_about);
+    		builder.setMessage(R.string.dialog_sorting_help);
+    		builder.setCancelable(true);
+    		builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+
+				@Override
+				public void onClick(DialogInterface dialog, int id) {
+					dialog.dismiss();
+				}
+				
+			});
+    		builder.create().show();
+			return true;
 
 		default:
 			return super.onOptionsItemSelected(item);

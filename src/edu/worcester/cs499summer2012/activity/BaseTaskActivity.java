@@ -250,6 +250,23 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
     		}
     		return true;
     		
+    	case R.id.menu_add_task_help:
+    		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+    		builder.setTitle("Procrastination Alarm");
+    		builder.setIcon(R.drawable.ic_about);
+    		builder.setMessage(R.string.dialog_procrastinator_help);
+    		builder.setCancelable(true);
+    		builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+
+				@Override
+				public void onClick(DialogInterface dialog, int id) {
+					dialog.dismiss();
+				}
+				
+			});
+    		builder.create().show();
+    		return true;
+    		
     	default:
     		return super.onOptionsItemSelected(item);
     	}

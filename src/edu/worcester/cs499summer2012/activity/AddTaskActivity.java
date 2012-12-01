@@ -22,15 +22,15 @@ package edu.worcester.cs499summer2012.activity;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
-import edu.worcester.cs499summer2012.R;
-import edu.worcester.cs499summer2012.database.DatabaseHandler;
-import edu.worcester.cs499summer2012.task.Category;
-import edu.worcester.cs499summer2012.task.Task;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.EditText;
 import android.widget.Toast;
+import edu.worcester.cs499summer2012.R;
+import edu.worcester.cs499summer2012.database.DatabaseHandler;
+import edu.worcester.cs499summer2012.service.TaskAlarm;
+import edu.worcester.cs499summer2012.task.Category;
+import edu.worcester.cs499summer2012.task.Task;
 
 /**
  * Activity for adding a new task.
@@ -94,7 +94,7 @@ public class AddTaskActivity extends BaseTaskActivity {
     	EditText notes = (EditText) findViewById(R.id.edit_add_task_notes);
     	    	
     	// Current time
-    	long current_time = GregorianCalendar.getInstance().getTimeInMillis();
+    	long current_time = System.currentTimeMillis();
     	
     	// Create the task
     	Task task = new Task(
@@ -117,6 +117,16 @@ public class AddTaskActivity extends BaseTaskActivity {
     	// Assign the task a unique ID and store it in the database
     	task.setID(data_source.getNextID(DatabaseHandler.TABLE_TASKS));
     	data_source.addTask(task);
+    	
+    	// Alarm logic: Add a task (AddTaskActivity)
+    	// * Task must be added to database first
+    	// * If has due date:
+    	// *	Set alarm
+    	// * 	(Repeating due date will be handled by the service after alarm rings)
+    	if (task.hasDateDue()) {
+    		TaskAlarm alarm = new TaskAlarm();
+    		alarm.setAlarm(this, task);
+    	}
     	
     	// Create the return intent and add the task ID
     	intent = new Intent(this, MainActivity.class);    	

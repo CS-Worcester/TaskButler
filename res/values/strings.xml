@@ -6,12 +6,16 @@
 
     <!-- Activity titles -->
     <string name="title_activity_main">Task Butler</string>
-    <string name="title_activity_add_task">Create New Task</string>
+    <string name="title_activity_add_task">Create Task</string>
     <string name="title_activity_edit_task">Edit Task</string>
     <string name="title_activity_view_task">View Task</string>
     <string name="title_activity_settings">Settings</string>
     <string name="title_activity_edit_categories">Categories</string>
     <string name="title_activity_custom_sort">Custom Sort</string>
+    
+    <!-- Toast notifications -->
+    <string name="toast_task_completed">Task finished! Congratulations!</string>
+    <string name="toast_task_repeated">This task will be due again on</string>
     
     <!-- Menu items -->
     <string name="menu_save">Save</string>
@@ -22,6 +26,7 @@
     <string name="menu_settings">Settings</string>
     <string name="menu_about">About</string>
     <string name="menu_accept">Accept</string>
+    <string name="menu_help">Help</string>
 
     <!-- TextView items -->
     <string name="text_empty_list">No tasks found.</string>
@@ -61,6 +66,8 @@
     
     <!-- Dialog items -->
     <string name="dialog_about">Copyright 2012 Jonathan Hasenzahl, James Celona, Dhimitraq Jorgji.\n\nTask Butler is distributed under the GNU General Public License.</string>
+	<string name="dialog_procrastinator_help">Task Butler will remind you periodically about tasks that are past due. If a task is time-sensitive, use the Procrastination Alarm to be reminded more frequently.</string>
+    <string name="dialog_sorting_help">Tap on a sorting parameter to enable it. Tap the arrows of a parameter to change its rank in the list. Tasks will be sorted by the highest ranked parameter first, then by the second highest, and so on.</string>
 	
     <!-- Preferences items -->
     <string name="pref_category_tasks">Tasks</string>
