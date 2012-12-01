@@ -20,9 +20,6 @@
 
 package edu.worcester.cs499summer2012.activity;
 
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.EditText;
@@ -67,12 +64,6 @@ public class EditTaskActivity extends BaseTaskActivity {
         	due_date_cal = task.getDateDueCal();
         	prevent_initial_due_date_popup = true;
         	cb_due_date.setChecked(true);
-        } else {
-        	due_date_cal = GregorianCalendar.getInstance();
-            due_date_cal.add(Calendar.HOUR_OF_DAY, 1);
-            due_date_cal.set(Calendar.MINUTE, 0);
-            due_date_cal.set(Calendar.SECOND, 0);
-            due_date_cal.set(Calendar.MILLISECOND, 0);
         }
         
         // Set final due date

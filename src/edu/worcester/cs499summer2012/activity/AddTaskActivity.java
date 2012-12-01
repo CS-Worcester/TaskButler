@@ -19,9 +19,6 @@
 
 package edu.worcester.cs499summer2012.activity;
 
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.EditText;
@@ -42,13 +39,6 @@ public class AddTaskActivity extends BaseTaskActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
-        // Initialize calendars: Due date defaults to +1 hour
-        due_date_cal = GregorianCalendar.getInstance();
-        due_date_cal.add(Calendar.HOUR_OF_DAY, 1);
-        due_date_cal.set(Calendar.MINUTE, 0);
-        due_date_cal.set(Calendar.SECOND, 0);
-        due_date_cal.set(Calendar.MILLISECOND, 0);
         
         // Initialize priority spinner
         s_priority.setSelection(Task.NORMAL);
