@@ -149,7 +149,7 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 					// *		Set alarm
 					// *	 	(Future repeating due date will be handled by the service after alarm rings)
 					// * Else user uncompleted the task:
-					// *	If has due date:
+					// *	If has due date and is not past due:
 					// *		Set alarm
 					TaskAlarm alarm = new TaskAlarm();
 					alarm.cancelAlarm(activity, task.getID());
@@ -167,7 +167,7 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 							alarm.setAlarm(activity, task);
 						}
 					} else {
-						if (task.hasDateDue())
+						if (task.hasDateDue() && !task.isPastDue())
 							alarm.setAlarm(activity, task);
 					}
 					
