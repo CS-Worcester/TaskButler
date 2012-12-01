@@ -94,12 +94,23 @@ public class TaskAlarm {
 	 * @param id
 	 */
 	public Task setRepeatingAlarm(Context context, int id){
+<<<<<<< HEAD
 		TasksDataSource db = TasksDataSource.getInstance(context);
 		Task task = db.getTask(id);    	
 		Calendar newDateDue = (Calendar) task.getDateDueCal().clone();
 		int repeatType;
 		
 		switch(task.getRepeatType()){
+=======
+    	TasksDataSource db = TasksDataSource.getInstance(context);
+    	Task task = db.getTask(id);    	
+    	Calendar cal = Calendar.getInstance();
+    	long months = DAYS * cal.getActualMaximum(Calendar.DAY_OF_MONTH); //TODO: fix and add the field in a loop
+    	long years = DAYS * cal.getActualMaximum(Calendar.DAY_OF_YEAR);
+    	
+    	long newDateDue;
+    	switch(task.getRepeatType()){
+>>>>>>> dhimitri-gtasks
 		case Task.MINUTES:
 			repeatType = Calendar.MINUTE;
 			break;
