@@ -19,8 +19,6 @@
 
 package edu.worcester.cs499summer2012.activity;
 
-import java.util.GregorianCalendar;
-
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -162,6 +160,14 @@ DialogInterface.OnClickListener {
 	{
 		Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
 	}
+	
+	/**
+	 * Displays a message in a Toast notification for a short duration.
+	 */
+	private void toast(int message)
+	{
+		Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+	}
 
 	/**************************************************************************
 	 * Overridden parent methods                                              *
@@ -179,10 +185,20 @@ DialogInterface.OnClickListener {
 
 		// Get instance of the db
 		data_source = TasksDataSource.getInstance(this);
-
+	}
+	
+	@Override
+	protected void onStart() {
+		super.onStart();
+		
 		// Get the task from the intent
-		task = data_source.getTask(getIntent().getIntExtra(Task.EXTRA_TASK_ID, 0));
-
+		int id = getIntent().getIntExtra(Task.EXTRA_TASK_ID, 0);
+		
+		if (id == 0)
+			finish();
+		
+		task = data_source.getTask(id);
+		
 		// Exit the task if it no longer exists (has been deleted)
 		if (task == null) {
 			toast("This task has been deleted!");
@@ -237,14 +253,47 @@ DialogInterface.OnClickListener {
 	public void onClick(View v) {	
 		if (v.getId() == R.id.checkbox_complete_task) {
 			task.toggleIsCompleted();
-			task.setDateModified(GregorianCalendar.getInstance().getTimeInMillis());
-			if (task.isCompleted())
-				toast("Task completed!");
-			else
-				toast("Task not completed");
+			task.setDateModified(System.currentTimeMillis());
+			data_source.updateTask(task);
+			
+			// Alarm logic: Complete/Uncomplete a task (ViewTaskActivity)
+			// * Don't forget to update date modified!
+			// * Task must be updated in database first
+			// * Cancel alarm first to be safe
+			// * If user completed the task:
+			// *	If is repeating:
+			// *		Set repeating alarm to get new due date (possibly uncompletes the task)
+			// *		Notify user that repeated task has been rescheduled
+			// *		Set alarm if task was uncompleted
+			// *	 	(Future repeating due date will be handled by the service after alarm rings)
+			// * Else user uncompleted the task:
+			// *	If has due date and is not past due:
+			// *		Set alarm
+			TaskAlarm alarm = new TaskAlarm();
+			alarm.cancelAlarm(this, task.getID());
+			if (task.isCompleted()) {
+				toast(R.string.toast_task_completed);
+				if (task.isRepeating()) {
+					task = alarm.setRepeatingAlarm(this, task.getID());
+										
+					if (!task.isCompleted()) {
+						alarm.setAlarm(this, task);
+						StringBuilder repeat_message = new StringBuilder(); 
+						repeat_message.append(this.getString(R.string.toast_task_repeated));
+						repeat_message.append(DateFormat.format(" MMM d", task.getDateDueCal()));
+						repeat_message.append('.');
+						toast(repeat_message.toString());
+					} else {
+						toast(R.string.toast_task_repeat_delayed);
+					}
+				}
+			} else {
+				if (task.hasDateDue() && !task.isPastDue())
+					alarm.setAlarm(this, task);
+			}
 		}
 
-		data_source.updateTask(task);
+		
 
 		intent = new Intent(this, MainActivity.class);
 		intent.putExtra(Task.EXTRA_TASK_ID, task.getID());
@@ -260,11 +309,12 @@ DialogInterface.OnClickListener {
 	public void onClick(DialogInterface dialog, int which) {
 		switch (which) {
 		case DialogInterface.BUTTON_POSITIVE:
+			// Alarm logic: Delete a task (ViewTaskActivity)
+			// * Task must not be deleted from database yet!
+			// * Cancel alarm
+			(new TaskAlarm()).cancelAlarm(this, task.getID());
+			
 			data_source.deleteTask(task);
-			if (task.hasDateDue()) {
-				TaskAlarm alarm = new TaskAlarm();
-				alarm.cancelAlarm(getApplicationContext(), task.getID());
-			}
 			toast("Task deleted");
 			finish();
 			break;
@@ -277,14 +327,9 @@ DialogInterface.OnClickListener {
 
 	@Override
 	public void onActivityResult(int request_code, int result_code, Intent intent) {		
-		if (request_code == MainActivity.EDIT_TASK_REQUEST && result_code == MainActivity.RESULT_OK) {
-			task = data_source.getTask(intent.getIntExtra(Task.EXTRA_TASK_ID, 0));
-			displayTask();
-			if (!task.isCompleted() && task.hasDateDue() &&
-					(task.getDateDue() >= System.currentTimeMillis())) {
-				TaskAlarm alarm = new TaskAlarm();
-				alarm.setAlarm(this, task);
-			}
-		}
+		// There is currently no special handling for activity results
+		/*if (request_code == MainActivity.EDIT_TASK_REQUEST && result_code == MainActivity.RESULT_OK) {
+			
+		}*/
 	}
 }

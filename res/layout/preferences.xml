@@ -26,13 +26,21 @@
 	    	    android:title="@string/pref_hide_completed"
 	    	    android:icon="@drawable/ic_notes"
 	    	    android:defaultValue="true" />
+       		
+       		<ListPreference
+	    	    android:key="default_hour"
+	    	    android:title="@string/pref_default_hour"
+	    	    android:dialogTitle="@string/pref_default_hour_dialog"
+	    	    android:icon="@drawable/ic_clock"
+	    	    android:entries="@array/pref_default_hour"
+	    	    android:entryValues="@array/pref_default_hour_values" />
 	    		    	    
 	   	    <PreferenceScreen
 	   	    	android:key="delete_finished_tasks"
 	   	    	android:title="@string/pref_delete_finished_tasks"
 	   	    	android:icon="@drawable/ic_delete"/>
 	   	    	
-	  	        <PreferenceScreen
+  	        <PreferenceScreen
 	   	    	android:key="delete_all_tasks"
 	   	    	android:title="@string/pref_delete_all_tasks"
 	   	    	android:icon="@drawable/ic_delete"/>	    

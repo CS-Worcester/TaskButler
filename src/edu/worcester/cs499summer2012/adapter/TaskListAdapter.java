@@ -36,6 +36,7 @@ import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 import edu.worcester.cs499summer2012.R;
 import edu.worcester.cs499summer2012.activity.SettingsActivity;
 import edu.worcester.cs499summer2012.comparator.TaskAutoComparator;
@@ -47,6 +48,7 @@ import edu.worcester.cs499summer2012.comparator.TaskDateModifiedComparator;
 import edu.worcester.cs499summer2012.comparator.TaskNameComparator;
 import edu.worcester.cs499summer2012.comparator.TaskPriorityComparator;
 import edu.worcester.cs499summer2012.database.TasksDataSource;
+import edu.worcester.cs499summer2012.service.TaskAlarm;
 import edu.worcester.cs499summer2012.task.Task;
 
 /**
@@ -131,13 +133,49 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 				public void onClick(View v) {
 					Task task = (Task) view_holder.is_completed.getTag();
 					task.toggleIsCompleted();
-					task.setDateModified(GregorianCalendar.getInstance().getTimeInMillis());
+					task.setDateModified(System.currentTimeMillis());
 					
 					// Update DB
 					data_source.updateTask(task);
 					
+					// Alarm logic: Complete/Uncomplete a task
+					// * Don't forget to update date modified!
+					// * Task must be updated in database first
+					// * Cancel alarm first to be safe
+					// * If user completed the task:
+					// *	If is repeating:
+					// *		Set repeating alarm to get new due date (possibly uncompletes the task)
+					// *		Notify user that repeated task has been rescheduled
+					// *		Set alarm
+					// *	 	(Future repeating due date will be handled by the service after alarm rings)
+					// * Else user uncompleted the task:
+					// *	If has due date and is not past due:
+					// *		Set alarm
+					TaskAlarm alarm = new TaskAlarm();
+					alarm.cancelAlarm(activity, task.getID());
+					if (task.isCompleted()) {
+						toast(R.string.toast_task_completed);
+						if (task.isRepeating()) {
+							task = alarm.setRepeatingAlarm(activity, task.getID());
+							
+							if (!task.isCompleted()) {
+								alarm.setAlarm(activity, task);
+								StringBuilder repeat_message = new StringBuilder(); 
+								repeat_message.append(activity.getString(R.string.toast_task_repeated));
+								repeat_message.append(DateFormat.format(" MMM d", task.getDateDueCal()));
+								repeat_message.append('.');
+								toast(repeat_message.toString());
+							} else {
+								toast(R.string.toast_task_repeat_delayed);
+							}
+						}
+					} else {
+						if (task.hasDateDue() && !task.isPastDue())
+							alarm.setAlarm(activity, task);
+					}
+					
 					// If "hide completed tasks" option, then remove the task from the adapter
-					if (prefs.getBoolean(SettingsActivity.HIDE_COMPLETED, true))
+					if (prefs.getBoolean(SettingsActivity.HIDE_COMPLETED, true) && task.isCompleted())
 							tasks.remove(task);
 					
 					sort();
@@ -209,7 +247,7 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 					holder.due_date.setText(DateFormat.format("E'\n'h:mmaa", due_date));
 				} else if (!task.isPastDue()) {
 					// Due date is today
-					holder.due_date.setText(DateFormat.format("h:mmaa", due_date));
+					holder.due_date.setText(DateFormat.format("'Today\n'h:mmaa", due_date));
 				} else {
 					// Due date is past
 					holder.due_date.setText("Past due");
@@ -282,4 +320,17 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 			this.sort_type = sort_type;
 	}
 	
+	/**
+	 * Displays a message in a Toast notification for a short duration.
+	 */
+	private void toast(String message) {
+		Toast.makeText(activity, message, Toast.LENGTH_SHORT).show();
+	}
+	
+	/**
+	 * Displays a message in a Toast notification for a short duration.
+	 */
+	private void toast(int message) {
+		Toast.makeText(activity, message, Toast.LENGTH_SHORT).show();
+	}
 }
