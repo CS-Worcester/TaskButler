@@ -241,6 +241,12 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getSupportMenuInflater();
 		inflater.inflate(R.menu.activity_main, menu);
+		
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
+			menu.findItem(R.id.menu_main_settings).setIcon(R.drawable.ic_settings_deprecated);
+			menu.findItem(R.id.menu_main_about).setIcon(R.drawable.ic_about_deprecated);
+		}
+		
 		return true;
 	}
 
