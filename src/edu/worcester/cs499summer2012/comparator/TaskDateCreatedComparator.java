@@ -30,18 +30,26 @@ import edu.worcester.cs499summer2012.task.Task;
 public class TaskDateCreatedComparator implements Comparator<Task> {
 	
 	/**
-	 * Compares two tasks by their creation date
+	 * Compares two tasks by their creation date. Newer tasks come first.
 	 * @param lhs the first task
 	 * @param rhs the second task
-	 * @return A negative value if the first task was created first, a positive
-	 *         value if the second task was created first, or 0 if they were 
+	 * @return A negative value if the first task was created later, a positive
+	 *         value if the second task was created later, or 0 if they were 
 	 *         created at the same time
 	 */	
 	public int compare(Task lhs, Task rhs) {
 		// Compare by date
 		// Ex. LHS -> date 5000ms (earlier)
 		//     RHS -> date 6000ms (later)
-		//     LHS - RHS = 5000 - 6000 = -1000 = LHS ordered first
-		return (int) (lhs.getDateCreated() - rhs.getDateCreated());
+		//     LHS - RHS = 5000 - 6000 = -1000 = RHS ordered first
+		long diff = lhs.getDateCreated() - rhs.getDateCreated();
+		
+		if (diff < 0)
+			return 1;
+		
+		if (diff > 0)
+			return -1;
+		
+		return 0;
 	}
 }

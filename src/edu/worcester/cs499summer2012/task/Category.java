@@ -24,6 +24,7 @@ import android.graphics.Color;
 public class Category {
 
 	public static final int NEW_CATEGORY = 0;
+	public static final int NO_CATEGORY = 1;
 
 	private int id;
 	private String name;
@@ -47,16 +48,31 @@ public class Category {
 	public Category(Category c) {
 		this(c.id, c.name, c.color, c.updated);
 	}
+	
+	public Category(int id, String name, int color, long updated, String gID) {
+		this(id,name,color,updated);
+		this.gID = gID;
+
+	}
 
 	@Override
 	public String toString() {
 		return name;
 	}
-
-	public Category(int id, String name, int color, long updated, String gID) {
-		this(id,name,color,updated);
-		this.gID = gID;
-
+	
+	/**
+	 * Categories are equal if they have the same ID.
+	 */
+	@Override
+	public boolean equals(Object o) {
+		if (o == this)
+			return true;
+		if (o == null)
+			return false;
+		if (o.getClass() != this.getClass())
+			return false;
+		
+		return ((Category) o).id == this.id;
 	}
 
 	public int getID() {

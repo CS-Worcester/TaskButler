@@ -19,7 +19,7 @@
 
 package edu.worcester.cs499summer2012.service;
 
-
+import edu.worcester.cs499summer2012.database.TasksDataSource;
 import edu.worcester.cs499summer2012.task.Task;
 
 import android.content.BroadcastReceiver;
@@ -42,7 +42,14 @@ public class OnAlarmReceiver extends BroadcastReceiver {
 		NotificationHelper notification = new NotificationHelper();
 		Bundle bundle = intent.getExtras();
 		int id = bundle.getInt(Task.EXTRA_TASK_ID);
-		notification.sendBasicNotification(context, id); // send basic notification
+		TasksDataSource db = TasksDataSource.getInstance(context);
+		Task task = db.getTask(id);
+		
+		if(task.getPriority() == Task.URGENT){
+			notification.sendPersistentNotification(context, task); // send persistent notification
+		} else {
+			notification.sendBasicNotification(context, task); // send basic notification
+		}
 		
 		context.startService(new Intent(context, TaskButlerService.class)); //start TaskButlerService
 	}

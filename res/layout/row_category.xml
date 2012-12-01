@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    
+    <!-- Category Color -->
+    <View
+    	android:id="@+id/view_row_category_color"
+    	android:layout_width="40dp"
+    	android:layout_height="40dp"
+    	android:layout_alignParentLeft="true"
+    	android:layout_centerVertical="true"
+    	android:layout_margin="4dp" />
+    
+    <!-- Category Name -->
+    <TextView 
+        android:id="@+id/text_row_category_name"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_toRightOf="@id/view_row_category_color"
+        android:gravity="center_vertical"
+        android:padding="4dp"
+        android:textSize="18sp"
+        android:textColor="#ffffff"
+        android:maxLines="1"
+        android:ellipsize="end" />
+
+</RelativeLayout>

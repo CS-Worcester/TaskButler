@@ -2,33 +2,28 @@
 * TASK BUTLER - A task organization app for Android                           *
 *******************************************************************************
 
-***************
-* Description *
-***************
+Task Butler is a personal assistant app that helps keep your life organized. 
+Use Task Butler to keep track of all of your shopping, errands, bills, to-do 
+lists, and more. You can group your tasks into categories to create sub-lists 
+of similar tasks. You can assign due dates to tasks, and Task Butler will 
+remind you when it's time to complete them. For an especially time-sensitive 
+task, use the procrastination alarm and Task Butler will make sure you finish 
+it!
 
-Task Butler is a task organization app for Android 2.2+. Using Task Butler, you
-can create tasks for your everyday life such as paying bills or picking up the
-dry-cleaning. Tasks can be customized by importance, due date, category, and
-more. Task Butler will notify you when a task is due, and will automatically
-repeat tasks that are recurring (such as bills payments). Keep your life
-organized and never miss an obligation or deadline again with Task Butler!
-
-Task Butler is being developed as part of CS 499 Summer 2012 at Worcester State
-University.
+Features
+* Create tasks as simply or as detailed as you want
+* Create color-coded categories to group tasks into separate lists
+* Let Task Butler automatically sort your task list, or define your own custom 
+  sorting parameters
+* Assign due dates, due date repetition, and procrastination alarms to tasks
+* Lightweight and low on system resources
 
 *******************************************************
 * Building from source - required 3rd party libraries *
 *******************************************************
 
 ActionBarSherlock - http://actionbarsherlock.com/
-    This software is Copyright Jake Wharton and is distributed under the Apache 
-    2.0 License.
-
 AndroidColorPicker - http://code.google.com/p/android-color-picker/
-    This software is Copyright yukuku@gmail.com and is distributed under the 
-    Apache 2.0 License.
-
-
 
 ***********************
 * Copyright & license *
@@ -48,3 +43,5 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+App and notification icons by Camille Hennessy - http://milliebotdesigns.com/

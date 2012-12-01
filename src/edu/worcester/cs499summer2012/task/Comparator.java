@@ -26,10 +26,9 @@ public class Comparator {
 	public final static int PRIORITY = 3;
 	public final static int CATEGORY = 4;
 	public final static int DATE_DUE = 5;
-	public final static int FINAL_DATE_DUE = 6;
-	public final static int DATE_CREATED = 7;
-	public final static int DATE_MODIFIED = 8;
-	public final static int NUM_COMPARATORS = 8;
+	public final static int DATE_CREATED = 6;
+	public final static int DATE_MODIFIED = 7;
+	public final static int NUM_COMPARATORS = 7;
 	
 	private int id;
 	private String name;
