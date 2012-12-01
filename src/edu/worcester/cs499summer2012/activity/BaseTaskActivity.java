@@ -158,6 +158,16 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
         data_source = TasksDataSource.getInstance(this);
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         
+        // Initialize calendar
+		String hour = prefs.getString(SettingsActivity.DEFAULT_HOUR, SettingsActivity.DEFAULT_HOUR_VALUE);
+        due_date_cal = GregorianCalendar.getInstance();
+        due_date_cal.set(Calendar.HOUR_OF_DAY, Integer.valueOf(hour));
+        due_date_cal.set(Calendar.MINUTE, 0);
+        due_date_cal.set(Calendar.SECOND, 0);
+        due_date_cal.set(Calendar.MILLISECOND, 0);
+        if (due_date_cal.getTimeInMillis() < System.currentTimeMillis())
+        	due_date_cal.add(Calendar.DAY_OF_YEAR, 1);
+        
         // Initialize the fields that can be enabled/disabled or listened to
         cb_due_date = (CheckBox) findViewById(R.id.checkbox_has_due_date);
         tv_due_date = (TextView) findViewById(R.id.text_add_task_due_date);

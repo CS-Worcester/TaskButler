@@ -55,6 +55,7 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
 	public static final String AUTO_SORT = "auto_sort";
 	public static final String CUSTOM_SORT = "custom_sort";
 	public static final String HIDE_COMPLETED = "hide_completed";
+	public static final String DEFAULT_HOUR = "default_hour";
 	public static final String DELETE_FINISHED_TASKS = "delete_finished_tasks";
 	public static final String DELETE_ALL_TASKS = "delete_all_tasks";
 	public static final String REMINDER_TIME = "reminder_time";
@@ -62,8 +63,9 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
 	public static final String SORT_TYPE = "sort_type";
 	public static final String DISPLAY_CATEGORY = "display_category";
 	
-	private static final String DEFAULT_REMINDER_TIME = "24";
-	private static final String DEFAULT_ALARM_TIME = "15";
+	public static final String DEFAULT_REMINDER_TIME = "24";
+	public static final String DEFAULT_ALARM_TIME = "15";
+	public static final String DEFAULT_HOUR_VALUE = "8";
 	private static final int DELETE_MODE_FINISHED = 0;
 	private static final int DELETE_MODE_ALL = 1;
 	
@@ -79,6 +81,7 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
 	private PreferenceScreen ps_delete_all_tasks;
 	private ListPreference lp_reminder_time;
 	private ListPreference lp_alarm_time;
+	private ListPreference lp_default_hour;
 	
     @SuppressWarnings("deprecation")
 	@Override
@@ -107,6 +110,7 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
         ps_delete_all_tasks = (PreferenceScreen) this.findPreference(DELETE_ALL_TASKS);
         lp_reminder_time = (ListPreference) this.findPreference(REMINDER_TIME);
         lp_alarm_time = (ListPreference) this.findPreference(ALARM_TIME);
+        lp_default_hour = (ListPreference) this.findPreference(DEFAULT_HOUR);
         
         // Set listeners
         ps_edit_categories.setOnPreferenceClickListener(this);
@@ -116,6 +120,7 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
         ps_delete_all_tasks.setOnPreferenceClickListener(this);
         lp_reminder_time.setOnPreferenceChangeListener(this);
         lp_alarm_time.setOnPreferenceChangeListener(this);
+        lp_default_hour.setOnPreferenceChangeListener(this);
         
         
         // Set checkbox states
@@ -132,6 +137,7 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
         		prefs.getString(REMINDER_TIME, DEFAULT_REMINDER_TIME)));
         lp_alarm_time.setSummary(getReminderSummary(ALARM_TIME, 
         		prefs.getString(ALARM_TIME, DEFAULT_ALARM_TIME)));
+        lp_default_hour.setSummary(getHourSummary(prefs.getString(DEFAULT_HOUR, DEFAULT_HOUR_VALUE)));
     }
     
     private String getReminderSummary(String key, String value) {
@@ -146,6 +152,19 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
     		builder.append(" minutes");
     		
     	return builder.toString();
+    }
+    
+    private String getHourSummary(String value) {
+		String summary;
+		
+		if (value.equals("0"))
+			summary = "Midnight";
+		else if (value.equals("12"))
+			summary = "Noon";
+		else
+			summary = value + ":00 am";
+		
+		return summary;
     }
  
     @Override
@@ -265,6 +284,13 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
 			this.startService(new Intent(this, TaskButlerService.class));
 			
 			return true;   
+		}
+		
+		if (key.equals(DEFAULT_HOUR)) {
+
+			
+			lp_default_hour.setSummary(getHourSummary((String) newValue));
+			return true;
 		}
 			
 		return false;

@@ -78,6 +78,8 @@
     <string name="pref_auto_sort">Auto-sort</string>
     <string name="pref_custom_sort">Custom sort</string>
     <string name="pref_hide_completed">Hide completed tasks</string>
+    <string name="pref_default_hour">Default time for due dates</string>
+    <string name="pref_default_hour_dialog">Set default time</string>
     <string name="pref_delete_finished_tasks">Delete finished tasks</string>
     <string name="pref_delete_all_tasks">Delete all tasks</string>
     <string name="pref_reminder_time">Normal reminder</string>
@@ -118,5 +120,21 @@
         <item>15</item>
         <item>30</item>
         <item>45</item>
+    </string-array>
+    
+    <string-array name="pref_default_hour">
+        <item>Midnight</item>
+        <item>6:00 am</item>
+        <item>8:00 am</item>
+        <item>10:00 am</item>
+        <item>Noon</item>
+    </string-array>
+    
+    <string-array name="pref_default_hour_values">
+        <item>0</item>
+        <item>6</item>
+        <item>8</item>
+        <item>10</item>
+        <item>12</item>
     </string-array>
 </resources>
