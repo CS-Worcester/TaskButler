@@ -44,6 +44,8 @@ import edu.worcester.cs499summer2012.R;
 import edu.worcester.cs499summer2012.adapter.TaskListAdapter;
 import edu.worcester.cs499summer2012.database.TasksDataSource;
 import edu.worcester.cs499summer2012.service.TaskAlarm;
+import edu.worcester.cs499summer2012.service.TaskButlerService;
+import edu.worcester.cs499summer2012.service.WakefulIntentService;
 import edu.worcester.cs499summer2012.task.Task;
 
 public class SettingsActivity extends SherlockPreferenceActivity implements 
@@ -252,13 +254,16 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
 	public boolean onPreferenceChange(Preference preference, Object newValue) {
 		String key = preference.getKey();
 		
-		if (key.equals(REMINDER_TIME)) {
-			lp_reminder_time.setSummary(getReminderSummary(REMINDER_TIME, (String) newValue));
-			return true;   
-		}
-		
-		if (key.equals(ALARM_TIME)) {
-			lp_alarm_time.setSummary(getReminderSummary(ALARM_TIME, (String) newValue));
+		if (key.equals(REMINDER_TIME) || key.equals(ALARM_TIME)) {
+			if (key.equals(REMINDER_TIME))
+				lp_reminder_time.setSummary(getReminderSummary(REMINDER_TIME, (String) newValue));
+			else
+				lp_alarm_time.setSummary(getReminderSummary(ALARM_TIME, (String) newValue));
+				
+			// Start service which will update all of the task alarms with the new reminder intervals
+			WakefulIntentService.acquireStaticLock(this);
+			this.startService(new Intent(this, TaskButlerService.class));
+			
 			return true;   
 		}
 			
