@@ -26,14 +26,6 @@
 	    	    android:title="@string/pref_hide_completed"
 	    	    android:icon="@drawable/ic_notes"
 	    	    android:defaultValue="true" />
-       		
-       		<ListPreference
-	    	    android:key="default_hour"
-	    	    android:title="@string/pref_default_hour"
-	    	    android:dialogTitle="@string/pref_default_hour_dialog"
-	    	    android:icon="@drawable/ic_clock"
-	    	    android:entries="@array/pref_default_hour"
-	    	    android:entryValues="@array/pref_default_hour_values" />
 	    		    	    
 	   	    <PreferenceScreen
 	   	    	android:key="delete_finished_tasks"
@@ -49,12 +41,18 @@
     	
     	<PreferenceCategory
     	    android:title="@string/pref_category_reminders">
+  	        
+    	    <CheckBoxPreference 
+	    	    android:key="vibrate_on_alarm"
+	    	    android:title="@string/pref_vibrate"
+	    	    android:icon="@drawable/ic_phone"
+	    	    android:defaultValue="true" />
     	    
 	     	<ListPreference
 	    	    android:key="reminder_time"
 	    	    android:title="@string/pref_reminder_time"
-	    	    android:dialogTitle="@string/pref_reminder_dialog"
-	    	    android:icon="@drawable/ic_date"
+	    	    android:dialogTitle="@string/pref_alarm_dialog"
+	    	    android:icon="@drawable/ic_alarm"
 	    	    android:entries="@array/pref_reminder_times"
 	    	    android:entryValues="@array/pref_reminder_values" />
 	    	
@@ -64,7 +62,15 @@
 	    	    android:dialogTitle="@string/pref_alarm_dialog"
 	    	    android:icon="@drawable/ic_alarm"
 	    	    android:entries="@array/pref_alarm_times"
-	    	    android:entryValues="@array/pref_alarm_values" />   	    
+	    	    android:entryValues="@array/pref_alarm_values" />
+	    	
+       		<ListPreference
+	    	    android:key="default_hour"
+	    	    android:title="@string/pref_default_hour"
+	    	    android:dialogTitle="@string/pref_default_hour_dialog"
+	    	    android:icon="@drawable/ic_clock"
+	    	    android:entries="@array/pref_default_hour"
+	    	    android:entryValues="@array/pref_default_hour_values" />	    
     	    
     	</PreferenceCategory>
  

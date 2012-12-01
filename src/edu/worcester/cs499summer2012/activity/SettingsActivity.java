@@ -58,14 +58,15 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
 	public static final String DEFAULT_HOUR = "default_hour";
 	public static final String DELETE_FINISHED_TASKS = "delete_finished_tasks";
 	public static final String DELETE_ALL_TASKS = "delete_all_tasks";
+	public static final String VIBRATE_ON_ALARM = "vibrate_on_alarm";
 	public static final String REMINDER_TIME = "reminder_time";
 	public static final String ALARM_TIME = "alarm_time";
 	public static final String SORT_TYPE = "sort_type";
 	public static final String DISPLAY_CATEGORY = "display_category";
 	
-	public static final String DEFAULT_REMINDER_TIME = "24";
+	public static final String DEFAULT_REMINDER_TIME = "6";
 	public static final String DEFAULT_ALARM_TIME = "15";
-	public static final String DEFAULT_HOUR_VALUE = "8";
+	public static final String DEFAULT_HOUR_VALUE = "12";
 	private static final int DELETE_MODE_FINISHED = 0;
 	private static final int DELETE_MODE_ALL = 1;
 	
@@ -161,9 +162,13 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
 			summary = "Midnight";
 		else if (value.equals("12"))
 			summary = "Noon";
-		else
+		else if (value.equals("6") || value.equals("9"))
 			summary = value + ":00 am";
-		
+		else if (value.equals("15"))
+			summary = "3:00 pm";
+		else
+			summary = "6:00 pm";
+							
 		return summary;
     }
  
