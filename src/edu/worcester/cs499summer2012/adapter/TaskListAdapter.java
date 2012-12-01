@@ -144,12 +144,12 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 					// * Cancel alarm first to be safe
 					// * If user completed the task:
 					// *	If is repeating:
-					// *		Set repeating alarm to get new due date (also uncompletes the task)
+					// *		Set repeating alarm to get new due date (possibly uncompletes the task)
 					// *		Notify user that repeated task has been rescheduled
 					// *		Set alarm
 					// *	 	(Future repeating due date will be handled by the service after alarm rings)
 					// * Else user uncompleted the task:
-					// *	If has due date:
+					// *	If has due date and is not past due:
 					// *		Set alarm
 					TaskAlarm alarm = new TaskAlarm();
 					alarm.cancelAlarm(activity, task.getID());
@@ -158,16 +158,19 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 						if (task.isRepeating()) {
 							task = alarm.setRepeatingAlarm(activity, task.getID());
 							
-							StringBuilder repeat_message = new StringBuilder(); 
-							repeat_message.append(activity.getString(R.string.toast_task_repeated));
-							repeat_message.append(DateFormat.format(" MMM d", task.getDateDueCal()));
-							repeat_message.append('.');
-							toast(repeat_message.toString());
-							
-							alarm.setAlarm(activity, task);
+							if (!task.isCompleted()) {
+								alarm.setAlarm(activity, task);
+								StringBuilder repeat_message = new StringBuilder(); 
+								repeat_message.append(activity.getString(R.string.toast_task_repeated));
+								repeat_message.append(DateFormat.format(" MMM d", task.getDateDueCal()));
+								repeat_message.append('.');
+								toast(repeat_message.toString());
+							} else {
+								toast(R.string.toast_task_repeat_delayed);
+							}
 						}
 					} else {
-						if (task.hasDateDue())
+						if (task.hasDateDue() && !task.isPastDue())
 							alarm.setAlarm(activity, task);
 					}
 					
