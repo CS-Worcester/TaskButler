@@ -132,9 +132,18 @@ public class TaskAlarm {
 		} else {
 			// Due date is ahead of current time, task was finished early
 			newDateDue.add(repeatType, task.getRepeatInterval());
+			
+			AlarmManager am=(AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
+			am.set(AlarmManager.RTC_WAKEUP, newDateDue.getTimeInMillis(), 
+					getPendingIntent(context, task.getID()));
+			
+			// Return task unchanged, it will uncomplete automatically when
+			// TaskAlarmService when current time >= date due
+			return task;
 		}
 		
 		task.setDateDue(newDateDue.getTimeInMillis());
+		task.setDateModified(System.currentTimeMillis());
 		task.setIsCompleted(false);
 		db.updateTask(task);
 
