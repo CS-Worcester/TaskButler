@@ -43,6 +43,7 @@ import edu.worcester.cs499summer2012.database.TasksDataSource;
 import edu.worcester.cs499summer2012.service.TaskAlarm;
 import edu.worcester.cs499summer2012.task.Category;
 import edu.worcester.cs499summer2012.task.Task;
+import edu.worcester.cs499summer2012.task.ToastMaker;
 
 /**
  * Activity for adding a new task.
@@ -278,13 +279,13 @@ DialogInterface.OnClickListener {
 										
 					if (!task.isCompleted()) {
 						alarm.setAlarm(this, task);
-						StringBuilder repeat_message = new StringBuilder(); 
-						repeat_message.append(this.getString(R.string.toast_task_repeated));
-						repeat_message.append(DateFormat.format(" MMM d", task.getDateDueCal()));
-						repeat_message.append('.');
-						toast(repeat_message.toString());
+						toast(ToastMaker.getRepeatMessage(this, 
+								R.string.toast_task_repeated, 
+								task.getDateDueCal()));
 					} else {
-						toast(R.string.toast_task_repeat_delayed);
+						toast(ToastMaker.getRepeatMessage(this, 
+								R.string.toast_task_repeat_delayed, 
+								task.getDateDueCal()));
 					}
 				}
 			} else {
