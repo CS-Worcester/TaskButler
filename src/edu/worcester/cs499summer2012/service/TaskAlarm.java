@@ -44,8 +44,6 @@ public class TaskAlarm {
 	public static final int PROCRASTINATOR_ALARM =2;
 	
 	private final long HOUR = 3600000;
-	private static final String DEFAULT_REMINDER_TIME = "24";
-	private static final String DEFAULT_ALARM_TIME = "15";
 
 	/**
 	 * Cancel alarm using the task id, PendingIntent is created using the Task id
@@ -157,7 +155,7 @@ public class TaskAlarm {
 	 */
 	public void setProcrastinatorAlarm(Context context, int id){
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-		String strAlarm = prefs.getString(SettingsActivity.ALARM_TIME, DEFAULT_ALARM_TIME);
+		String strAlarm = prefs.getString(SettingsActivity.ALARM_TIME, SettingsActivity.DEFAULT_ALARM_TIME);
 		Log.d("String value of settings", strAlarm);
 		Calendar cal = Calendar.getInstance();    	
 		int iAlarm = Integer.parseInt(strAlarm);
@@ -176,7 +174,7 @@ public class TaskAlarm {
 	public void setReminder(Context context, int id){
 		TasksDataSource db = TasksDataSource.getInstance(context);
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-		String strReminder = prefs.getString(SettingsActivity.REMINDER_TIME, DEFAULT_REMINDER_TIME); 
+		String strReminder = prefs.getString(SettingsActivity.REMINDER_TIME, SettingsActivity.DEFAULT_REMINDER_TIME); 
 		Log.d("String value of settings", strReminder);
 		Task task = db.getTask(id);
 		int iReminder = Integer.parseInt(strReminder);

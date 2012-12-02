@@ -240,6 +240,10 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
     public boolean onCreateOptionsMenu(Menu menu) {
     	MenuInflater inflater = getSupportMenuInflater();
     	inflater.inflate(R.menu.activity_add_task, menu);
+    	
+    	if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB)
+			menu.findItem(R.id.menu_add_task_help).setIcon(R.drawable.ic_help_deprecated);
+    	
     	return true;
     }
     

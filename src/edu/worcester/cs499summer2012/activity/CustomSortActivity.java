@@ -21,6 +21,7 @@ package edu.worcester.cs499summer2012.activity;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ListView;
@@ -86,6 +87,10 @@ public final class CustomSortActivity extends SherlockListActivity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getSupportMenuInflater();
 		inflater.inflate(R.menu.activity_custom_sort, menu);
+		
+    	if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB)
+			menu.findItem(R.id.menu_custom_sort_help).setIcon(R.drawable.ic_help_deprecated);
+		
 		return true;
 	}
 
