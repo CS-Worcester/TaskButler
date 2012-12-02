@@ -23,7 +23,6 @@ package edu.worcester.cs499summer2012.service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 
 /**
  * BroadCastReceiver for android.intent.action.BOOT_COMPLETED
@@ -34,10 +33,8 @@ import android.util.Log;
 public class OnBootReceiver extends BroadcastReceiver{
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		Log.d("onBootReciever", "beginning  onReceive");
 		WakefulIntentService.acquireStaticLock(context); //acquire a partial WakeLock
 		context.startService(new Intent(context, TaskButlerService.class)); //start TaskButlerService
-		Log.d("onBootReciever", "ending  onReceive");
 		
 	}
 }

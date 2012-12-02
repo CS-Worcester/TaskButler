@@ -26,7 +26,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.util.Log;
 
 import edu.worcester.cs499summer2012.activity.SettingsActivity;
 import edu.worcester.cs499summer2012.database.TasksDataSource;
@@ -125,7 +124,6 @@ public class TaskAlarm {
 		if (newDateDue.getTimeInMillis() <= System.currentTimeMillis()) {
 			while(newDateDue.getTimeInMillis() <= System.currentTimeMillis()){
 				newDateDue.add(repeatType, task.getRepeatInterval());
-				Log.d("in IF ",""+ newDateDue + " < " + task.getDateDue());
 			}
 		} else {
 			// Due date is ahead of current time, task was finished early
@@ -149,14 +147,13 @@ public class TaskAlarm {
 	}
 	
 	/**
-	 * Reads preferences, and schedule a procrastinator alarm.
+	 * Reads preferences, and schedule a procrastinator alarm for a past due task.
 	 * @param context
 	 * @param id
 	 */
 	public void setProcrastinatorAlarm(Context context, int id){
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 		String strAlarm = prefs.getString(SettingsActivity.ALARM_TIME, SettingsActivity.DEFAULT_ALARM_TIME);
-		Log.d("String value of settings", strAlarm);
 		Calendar cal = Calendar.getInstance();    	
 		int iAlarm = Integer.parseInt(strAlarm);
 		cal.add(Calendar.MINUTE, iAlarm);
@@ -170,12 +167,15 @@ public class TaskAlarm {
 		am.set(AlarmManager.RTC_WAKEUP, lAlarm, PendingIntent.getBroadcast(context, id, intent, PendingIntent.FLAG_UPDATE_CURRENT));
 	}
 	
-	//not done yet
+	/**
+	 * Reads preferences, and schedule a reminder alarm for a past due task
+	 * @param context
+	 * @param id
+	 */
 	public void setReminder(Context context, int id){
 		TasksDataSource db = TasksDataSource.getInstance(context);
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 		String strReminder = prefs.getString(SettingsActivity.REMINDER_TIME, SettingsActivity.DEFAULT_REMINDER_TIME); 
-		Log.d("String value of settings", strReminder);
 		Task task = db.getTask(id);
 		int iReminder = Integer.parseInt(strReminder);
 		long lReminder = task.getDateDue();
