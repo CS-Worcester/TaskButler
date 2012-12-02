@@ -78,6 +78,7 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
 	private PreferenceScreen ps_edit_categories;
 	private CheckBoxPreference cbp_auto_sort;
 	private CheckBoxPreference cbp_custom_sort;
+	private CheckBoxPreference cpb_vibrate;
 	private PreferenceScreen ps_delete_finished_tasks;
 	private PreferenceScreen ps_delete_all_tasks;
 	private ListPreference lp_reminder_time;
@@ -107,6 +108,7 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
         ps_edit_categories = (PreferenceScreen) this.findPreference(EDIT_CATEGORIES);
         cbp_auto_sort = (CheckBoxPreference) this.findPreference(AUTO_SORT);
         cbp_custom_sort = (CheckBoxPreference) this.findPreference(CUSTOM_SORT);
+        cpb_vibrate = (CheckBoxPreference) this.findPreference(VIBRATE_ON_ALARM);
         ps_delete_finished_tasks = (PreferenceScreen) this.findPreference(DELETE_FINISHED_TASKS);
         ps_delete_all_tasks = (PreferenceScreen) this.findPreference(DELETE_ALL_TASKS);
         lp_reminder_time = (ListPreference) this.findPreference(REMINDER_TIME);
@@ -122,6 +124,7 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
         lp_reminder_time.setOnPreferenceChangeListener(this);
         lp_alarm_time.setOnPreferenceChangeListener(this);
         lp_default_hour.setOnPreferenceChangeListener(this);
+        cpb_vibrate.setOnPreferenceChangeListener(this);
         
         
         // Set checkbox states
@@ -292,10 +295,10 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
 	public boolean onPreferenceChange(Preference preference, Object newValue) {
 		String key = preference.getKey();
 		
-		if (key.equals(REMINDER_TIME) || key.equals(ALARM_TIME)) {
+		if (key.equals(REMINDER_TIME) || key.equals(ALARM_TIME) || key.equals(VIBRATE_ON_ALARM)) {
 			if (key.equals(REMINDER_TIME))
 				lp_reminder_time.setSummary(getReminderSummary(REMINDER_TIME, (String) newValue));
-			else
+			else if (key.equals(ALARM_TIME))
 				lp_alarm_time.setSummary(getReminderSummary(ALARM_TIME, (String) newValue));
 				
 			// Start service which will update all of the task alarms with the new reminder intervals

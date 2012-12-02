@@ -188,7 +188,7 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 		setContentView(R.layout.activity_main);
 
 		// Open the database
-		data_source = TasksDataSource.getInstance(getApplicationContext());
+		data_source = TasksDataSource.getInstance(this);
 
 		// Read preferences from file
 		prefs = PreferenceManager.getDefaultSharedPreferences(this);

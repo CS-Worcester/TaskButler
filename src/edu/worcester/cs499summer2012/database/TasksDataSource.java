@@ -715,6 +715,7 @@ public class TasksDataSource {
 		// updating row
 		int i = db.update(DatabaseHandler.TABLE_CATEGORIES, values, 
 				DatabaseHandler.KEY_G_ID + " = " + "\"" + c.getgID() + "\"", null);
+		close();
 		return i;
 	}
 }
