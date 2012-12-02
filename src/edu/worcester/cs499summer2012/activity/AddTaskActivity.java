@@ -113,7 +113,7 @@ public class AddTaskActivity extends BaseTaskActivity {
     	// * If has due date:
     	// *	Set alarm
     	// * 	(Repeating due date will be handled by the service after alarm rings)
-    	if (task.hasDateDue()) {
+    	if (task.hasDateDue() && !task.isPastDue()) {
     		TaskAlarm alarm = new TaskAlarm();
     		alarm.setAlarm(this, task);
     	}

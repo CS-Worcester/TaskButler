@@ -157,7 +157,7 @@ public class EditTaskActivity extends BaseTaskActivity {
     	// * 	(Repeating due date will be handled by the service after alarm rings)
     	TaskAlarm alarm = new TaskAlarm();
     	alarm.cancelAlarm(this, task.getID());
-    	if (task.hasDateDue())
+    	if (task.hasDateDue() && !task.isPastDue())
     		alarm.setAlarm(this, task);
     	
     	// Create the return intent and add the task ID

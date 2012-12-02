@@ -78,6 +78,7 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
 	private PreferenceScreen ps_edit_categories;
 	private CheckBoxPreference cbp_auto_sort;
 	private CheckBoxPreference cbp_custom_sort;
+	private CheckBoxPreference cpb_vibrate;
 	private PreferenceScreen ps_delete_finished_tasks;
 	private PreferenceScreen ps_delete_all_tasks;
 	private ListPreference lp_reminder_time;
@@ -107,6 +108,7 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
         ps_edit_categories = (PreferenceScreen) this.findPreference(EDIT_CATEGORIES);
         cbp_auto_sort = (CheckBoxPreference) this.findPreference(AUTO_SORT);
         cbp_custom_sort = (CheckBoxPreference) this.findPreference(CUSTOM_SORT);
+        cpb_vibrate = (CheckBoxPreference) this.findPreference(VIBRATE_ON_ALARM);
         ps_delete_finished_tasks = (PreferenceScreen) this.findPreference(DELETE_FINISHED_TASKS);
         ps_delete_all_tasks = (PreferenceScreen) this.findPreference(DELETE_ALL_TASKS);
         lp_reminder_time = (ListPreference) this.findPreference(REMINDER_TIME);
@@ -122,6 +124,7 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
         lp_reminder_time.setOnPreferenceChangeListener(this);
         lp_alarm_time.setOnPreferenceChangeListener(this);
         lp_default_hour.setOnPreferenceChangeListener(this);
+        cpb_vibrate.setOnPreferenceChangeListener(this);
         
         
         // Set checkbox states
@@ -209,7 +212,7 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
 		}
 		
 		if (key.equals(DELETE_FINISHED_TASKS)) {
-			deleteAlert("Are you sure you want to delete all completed tasks? This cannot be undone.",
+			deleteAlert("Are you sure you want to delete all finished tasks? This cannot be undone. Repeating tasks will not be deleted.",
 					DELETE_MODE_FINISHED);
 			return true;
 		}
@@ -245,7 +248,7 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
 		switch (delete_mode) {
 		case DELETE_MODE_FINISHED:
 			deleted_tasks = data_source.deleteFinishedTasks();
-			toast(deleted_tasks + " tasks deleted");
+			toastDeletedTasks(deleted_tasks);
 			finish();
 			break;
 
@@ -261,10 +264,24 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
 				alarm.cancelAlarm(this, task.getID());
 			
 			deleted_tasks = data_source.deleteAllTasks();
-			toast(deleted_tasks + " tasks deleted");
+			toastDeletedTasks(deleted_tasks);
 			finish();
 			break;
 		}
+	}
+	
+	/**
+	 * Displays a Toast notification informing the user about the number of
+	 * tasks deleted.
+	 * @param val the number of tasks deleted
+	 */
+	private void toastDeletedTasks(int val) {
+		if (val == 0)
+			toast("No tasks were deleted.");
+		else if (val == 1)
+			toast(val + " task deleted");
+		else
+			toast(val + " tasks deleted");
 	}
 	
 	/**
@@ -278,10 +295,10 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
 	public boolean onPreferenceChange(Preference preference, Object newValue) {
 		String key = preference.getKey();
 		
-		if (key.equals(REMINDER_TIME) || key.equals(ALARM_TIME)) {
+		if (key.equals(REMINDER_TIME) || key.equals(ALARM_TIME) || key.equals(VIBRATE_ON_ALARM)) {
 			if (key.equals(REMINDER_TIME))
 				lp_reminder_time.setSummary(getReminderSummary(REMINDER_TIME, (String) newValue));
-			else
+			else if (key.equals(ALARM_TIME))
 				lp_alarm_time.setSummary(getReminderSummary(ALARM_TIME, (String) newValue));
 				
 			// Start service which will update all of the task alarms with the new reminder intervals

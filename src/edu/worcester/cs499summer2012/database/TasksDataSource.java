@@ -307,6 +307,10 @@ public class TasksDataSource {
 		return i;		
 	}
 
+	/**
+	 * Deletes a single task from the database
+	 * @param task
+	 */
 	public void deleteTask(Task task) {
 		open();
 		db.delete(DatabaseHandler.TABLE_TASKS, 
@@ -314,14 +318,24 @@ public class TasksDataSource {
 		close();
 	}
 
+	/**
+	 * Deletes all finished tasks from the database. Repeating tasks will not
+	 * be deleted.
+	 * @return the number of tasks deleted
+	 */
 	public int deleteFinishedTasks() {
 		open();
 		int i = db.delete(DatabaseHandler.TABLE_TASKS,
-				DatabaseHandler.KEY_COMPLETION + " = 1", null);
+				DatabaseHandler.KEY_COMPLETION + " = 1 AND " +
+				DatabaseHandler.KEY_IS_REPEATING + " = 0", null);
 		close();
 		return i;
 	}
 
+	/**
+	 * Deletes all tasks from the database.
+	 * @return the number of tasks deleted
+	 */
 	public int deleteAllTasks() {
 		open();
 		int i = db.delete(DatabaseHandler.TABLE_TASKS, null, null);
@@ -341,7 +355,6 @@ public class TasksDataSource {
 	/**
 	 * Insert Category in the categories table
 	 * @param c
-	 * @param color
 	 */
 	public void addCategory(Category c){
 		open();

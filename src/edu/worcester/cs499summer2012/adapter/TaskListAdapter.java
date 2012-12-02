@@ -50,6 +50,7 @@ import edu.worcester.cs499summer2012.comparator.TaskPriorityComparator;
 import edu.worcester.cs499summer2012.database.TasksDataSource;
 import edu.worcester.cs499summer2012.service.TaskAlarm;
 import edu.worcester.cs499summer2012.task.Task;
+import edu.worcester.cs499summer2012.task.ToastMaker;
 
 /**
  * ListView adapter for the TaskList container. Enables tasks in a TaskList
@@ -160,13 +161,13 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 							
 							if (!task.isCompleted()) {
 								alarm.setAlarm(activity, task);
-								StringBuilder repeat_message = new StringBuilder(); 
-								repeat_message.append(activity.getString(R.string.toast_task_repeated));
-								repeat_message.append(DateFormat.format(" MMM d", task.getDateDueCal()));
-								repeat_message.append('.');
-								toast(repeat_message.toString());
+								toast(ToastMaker.getRepeatMessage(activity, 
+										R.string.toast_task_repeated, 
+										task.getDateDueCal()));
 							} else {
-								toast(R.string.toast_task_repeat_delayed);
+								toast(ToastMaker.getRepeatMessage(activity, 
+										R.string.toast_task_repeat_delayed, 
+										task.getDateDueCal()));
 							}
 						}
 					} else {

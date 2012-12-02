@@ -51,12 +51,7 @@ public class TaskButlerService extends WakefulIntentService{
 			
 			//Procrastinator and Reminder alarm
 			if(task.isPastDue()){
-				//procrastinator
-				if(task.hasFinalDateDue())
-					alarm.setProcrastinatorAlarm(this, task.getID());
-				//reminder
-				else
-					alarm.setReminder(this, task.getID());
+				alarm.setReminder(this, task.getID());
 			}
 			
 			//handle repeat alarms

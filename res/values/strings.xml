@@ -15,8 +15,8 @@
     
     <!-- Toast notifications -->
     <string name="toast_task_completed">Task finished! Congratulations!</string>
-    <string name="toast_task_repeated">This task will be due again on</string>
-    <string name="toast_task_repeat_delayed">This repeating task will reappear closer to its due date.</string>
+    <string name="toast_task_repeated">This repeating task will be due again</string>
+    <string name="toast_task_repeat_delayed">This repeating task will reappear</string>
     
     <!-- Menu items -->
     <string name="menu_save">Save</string>
