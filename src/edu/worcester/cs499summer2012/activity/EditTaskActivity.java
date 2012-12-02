@@ -1,5 +1,4 @@
 /* 
-
  * EditTaskActivity.java
  * 
  * Copyright 2012 Jonathan Hasenzahl, James Celona, Dhimitraq Jorgji
@@ -39,7 +38,7 @@ public class EditTaskActivity extends BaseTaskActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+
 		// Get the task from the intent
 		int id = getIntent().getIntExtra(Task.EXTRA_TASK_ID, 0);
 		if (id == 0) {
