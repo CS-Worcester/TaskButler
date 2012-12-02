@@ -113,5 +113,16 @@ public class NotificationHelper{
 	NotificationManager getNotificationManager(Context context) {
 		return (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 	}
+	
+	/**
+	 * Cancels an existing notification, if user modified the task. Make the
+	 * actual call from TaskAlarm.cancelNotification(Context, int)
+	 * @param context
+	 * @param taskID
+	 */
+	public void cancelNotification(Context context, int taskID) {
+		NotificationManager notificationManager = getNotificationManager(context);
+		notificationManager.cancel(taskID);
+	}
 
 }

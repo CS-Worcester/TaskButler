@@ -259,9 +259,12 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
 			// * Tasks must not be deleted from database yet!
 			// * Iterate through list of tasks to be deleted:
 			// * 	Cancel alarm
+			// *    Cancel existing notifications
 			TaskAlarm alarm = new TaskAlarm();
-			for (Task task : tasks)
+			for (Task task : tasks) {
 				alarm.cancelAlarm(this, task.getID());
+				alarm.cancelNotification(this, task.getID());
+			}
 			
 			deleted_tasks = data_source.deleteAllTasks();
 			toastDeletedTasks(deleted_tasks);

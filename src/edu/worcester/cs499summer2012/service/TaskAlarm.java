@@ -71,6 +71,16 @@ public class TaskAlarm {
 		alarmManager.cancel(pi);
 		pi.cancel();
 	}
+	
+	/**
+	 * Use this call in activity code to cancel existing notifications
+	 * @param context
+	 * @param id The ID of the task
+	 */
+	public void cancelNotification(Context context, int id) {
+		NotificationHelper cancel = new NotificationHelper();
+		cancel.cancelNotification(context, id);
+	}
 
 	/**
 	 * Set a One Time Alarm using the taskID

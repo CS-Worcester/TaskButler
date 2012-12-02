@@ -522,7 +522,10 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 			// Alarm logic: Delete a task
 			// * Task must not be deleted from database yet!
 			// * Cancel alarm
-			(new TaskAlarm()).cancelAlarm(this, task.getID());
+			// * Cancel existing notification
+			TaskAlarm alarm = new TaskAlarm();
+			alarm.cancelAlarm(this, task.getID());
+			alarm.cancelNotification(this, task.getID());
 			
 			data_source.deleteTask(task);
 			adapter.remove(task);

@@ -143,6 +143,7 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 					// * Don't forget to update date modified!
 					// * Task must be updated in database first
 					// * Cancel alarm first to be safe
+					// * Cancel an existing notification
 					// * If user completed the task:
 					// *	If is repeating:
 					// *		Set repeating alarm to get new due date (possibly uncompletes the task)
@@ -154,6 +155,7 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 					// *		Set alarm
 					TaskAlarm alarm = new TaskAlarm();
 					alarm.cancelAlarm(activity, task.getID());
+					alarm.cancelNotification(activity, task.getID());
 					if (task.isCompleted()) {
 						toast(R.string.toast_task_completed);
 						if (task.isRepeating()) {

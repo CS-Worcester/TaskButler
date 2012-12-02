@@ -152,11 +152,13 @@ public class EditTaskActivity extends BaseTaskActivity {
     	// * Task must be updated in database first
     	// * User could have changed any setting, so checking booleans is not reliable
     	// * Cancel alarm first to be safe
+    	// * Cancel existing notification
     	// * If has due date:
     	// *	Set alarm
     	// * 	(Repeating due date will be handled by the service after alarm rings)
     	TaskAlarm alarm = new TaskAlarm();
     	alarm.cancelAlarm(this, task.getID());
+    	alarm.cancelNotification(this, task.getID());
     	if (task.hasDateDue() && !task.isPastDue())
     		alarm.setAlarm(this, task);
     	
