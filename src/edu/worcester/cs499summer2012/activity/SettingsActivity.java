@@ -209,7 +209,7 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
 		}
 		
 		if (key.equals(DELETE_FINISHED_TASKS)) {
-			deleteAlert("Are you sure you want to delete all completed tasks? This cannot be undone.",
+			deleteAlert("Are you sure you want to delete all finished tasks? This cannot be undone. Repeating tasks will not be deleted.",
 					DELETE_MODE_FINISHED);
 			return true;
 		}
