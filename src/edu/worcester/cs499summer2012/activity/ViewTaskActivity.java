@@ -27,8 +27,9 @@ import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.CheckBox;
+import android.widget.CheckedTextView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -63,6 +64,7 @@ DialogInterface.OnClickListener {
 	private TasksDataSource data_source;
 	private Task task;
 	private Intent intent;
+	private ActionBar action_bar;
 
 	/**************************************************************************
 	 * Class methods                                                          *
@@ -70,15 +72,11 @@ DialogInterface.OnClickListener {
 
 	private void displayTask() {
 		// Set name
-		((TextView) findViewById(R.id.text_view_task_name)).setText(task.getName());
-
-		// Set completion checkbox
-		CheckBox checkbox = (CheckBox) findViewById(R.id.checkbox_complete_task);
-		checkbox.setChecked(task.isCompleted());
-		checkbox.setOnClickListener(this);
-
-		// Set priority
-		((TextView) findViewById(R.id.text_priority)).setText(Task.PRIORITY_LABELS[task.getPriority()]);
+		CheckedTextView name = (CheckedTextView) findViewById(R.id.text_view_task_name);
+		name.setText(task.getName());
+		name.setChecked(task.isCompleted());
+		name.setOnClickListener(this);
+		name.setTextColor(name.isChecked() ? Color.GRAY : Color.WHITE);
 
 		// Set priority icon
 		switch (task.getPriority()) {
@@ -92,66 +90,55 @@ DialogInterface.OnClickListener {
 			((ImageView) findViewById(R.id.image_priority)).setImageResource(R.drawable.ic_trivial);
 			break;
 		}
-
-		// Set category (if category ID is not 1, i.e. no category)
-		View v_category_color = (View) findViewById(R.id.view_category);
-		TextView tv_category_name = (TextView) findViewById(R.id.text_category);
-		if (task.getCategory() != 1) {
-			v_category_color.setVisibility(View.VISIBLE);
-			tv_category_name.setVisibility(View.VISIBLE);
+		
+		// Set category
+		if (task.getCategory() != Category.NO_CATEGORY) {
 			Category category = data_source.getCategory(task.getCategory());
-			v_category_color.setBackgroundColor(category.getColor());
-			tv_category_name.setText(category.getName());
+			action_bar.setTitle(category.getName());
+			((View) findViewById(R.id.view_category)).setBackgroundColor(category.getColor());
 		} else {
-			v_category_color.setVisibility(View.GONE);
-			tv_category_name.setVisibility(View.GONE);
+			action_bar.setTitle(R.string.title_activity_view_task);
+			((View) findViewById(R.id.view_category)).setBackgroundColor(Color.parseColor("#33B5E5"));
 		}
 
 		// Set due date
 		if (task.hasDateDue()) {
-			((ImageView) findViewById(R.id.image_date)).setVisibility(View.VISIBLE);
-			TextView date_due = ((TextView) findViewById(R.id.text_date_due));
-			date_due.setVisibility(View.VISIBLE);
-			date_due.setText(DateFormat.format("'Due' MM/dd/yy 'at' h:mm AA", task.getDateDueCal()));
-
-			if (task.isPastDue())
-				date_due.setTextColor(Color.RED);
-			else
-				date_due.setTextColor(Color.LTGRAY);
-		} else {
-			((TextView) findViewById(R.id.text_date_due)).setVisibility(View.GONE);
-			((ImageView) findViewById(R.id.image_date)).setVisibility(View.GONE);
-		}
-
-		// Set final due date
-		if (task.hasFinalDateDue())
-			((ImageView) findViewById(R.id.image_alarm)).setVisibility(View.VISIBLE);
-		else
-			((ImageView) findViewById(R.id.image_alarm)).setVisibility(View.GONE);
-
-		// Set repetition
-		if (task.isRepeating()) {
-			((ImageView) findViewById(R.id.image_repeat)).setVisibility(View.VISIBLE);
-			TextView repeat_text = (TextView) findViewById(R.id.text_repeat);
-			repeat_text.setVisibility(View.VISIBLE);
+			((LinearLayout) findViewById(R.id.due_date_bar)).setVisibility(View.VISIBLE);
 			
-			repeat_text.setText("Repeat every " + task.getRepeatInterval() + ' ' + Task.REPEAT_LABELS[task.getRepeatType()]);
-		} else {
-			((TextView) findViewById(R.id.text_repeat)).setVisibility(View.GONE);
-			((ImageView) findViewById(R.id.image_repeat)).setVisibility(View.GONE);
-		}
+			TextView due_date = (TextView) findViewById(R.id.text_date_due);
+			
+			if (task.isPastDue())
+				due_date.setTextColor(Color.RED);
+			else
+				due_date.setTextColor(Color.LTGRAY);
+			
+			if (task.getDateDue() >= System.currentTimeMillis()) {
+				// Due date is in the future
+				due_date.setText(DateFormat.format("'Due' MMMM d, yyyy 'at' h:mmaa", task.getDateDueCal()));
+			} else {
+				// Due date is in the past
+				due_date.setText(DateFormat.format("'Was due' MMMM d, yyyy 'at' h:mmaa", task.getDateDueCal()));
+			}
+			
+			// Set repetition
+			if (task.isRepeating()) {
+				((ImageView) findViewById(R.id.image_repeat)).setVisibility(View.VISIBLE);
+			} else {
+				((ImageView) findViewById(R.id.image_repeat)).setVisibility(View.GONE);
+			}
+			
+			// Set procrastinator alarm
+			if (task.hasFinalDateDue()) {
+				((ImageView) findViewById(R.id.image_alarm)).setVisibility(View.VISIBLE);
+			} else {
+				((ImageView) findViewById(R.id.image_alarm)).setVisibility(View.GONE);
+			}
+
+		} else
+			((LinearLayout) findViewById(R.id.due_date_bar)).setVisibility(View.GONE);
 
 		// Set notes
-		String notes = task.getNotes();
-		if (!notes.equals("")) {
-			((ImageView) findViewById(R.id.image_notes)).setVisibility(View.VISIBLE);
-			TextView notes_text = (TextView) findViewById(R.id.text_notes);
-			notes_text.setVisibility(View.VISIBLE);
-			notes_text.setText(notes);
-		} else {
-			((TextView) findViewById(R.id.text_notes)).setVisibility(View.GONE);
-			((ImageView) findViewById(R.id.image_notes)).setVisibility(View.GONE);
-		}
+		((TextView) findViewById(R.id.text_notes)).setText(task.getNotes());
 	}
 
 	/**
@@ -180,7 +167,7 @@ DialogInterface.OnClickListener {
 		setContentView(R.layout.activity_view_task);
 
 		// Allow Action bar icon to act as a button
-		ActionBar action_bar = getSupportActionBar();
+		action_bar = getSupportActionBar();
 		action_bar.setHomeButtonEnabled(true);
 		action_bar.setDisplayHomeAsUpEnabled(true);
 
@@ -252,7 +239,7 @@ DialogInterface.OnClickListener {
 
 	@Override
 	public void onClick(View v) {	
-		if (v.getId() == R.id.checkbox_complete_task) {
+		if (v.getId() == R.id.text_view_task_name) {
 			task.toggleIsCompleted();
 			task.setDateModified(System.currentTimeMillis());
 			data_source.updateTask(task);
@@ -295,8 +282,6 @@ DialogInterface.OnClickListener {
 					alarm.setAlarm(this, task);
 			}
 		}
-
-		
 
 		intent = new Intent(this, MainActivity.class);
 		intent.putExtra(Task.EXTRA_TASK_ID, task.getID());

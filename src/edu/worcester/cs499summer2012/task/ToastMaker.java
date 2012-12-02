@@ -48,13 +48,13 @@ public class ToastMaker {
 		
 		if (cal.get(Calendar.YEAR) > current_date.get(Calendar.YEAR)) {
 			// Due date is in a future year
-			message.append(DateFormat.format(" 'on' MMMM d, yyyy'.'", cal));
+			message.append(DateFormat.format(" MMMM d, yyyy'.'", cal));
 		} else if (cal.get(Calendar.DAY_OF_YEAR) - current_date.get(Calendar.DAY_OF_YEAR) > 6) {
 			// Due date is more than a week away
-			message.append(DateFormat.format(" 'on' MMMM d'.'", cal));
+			message.append(DateFormat.format(" MMMM d'.'", cal));
 		} else if (cal.get(Calendar.DAY_OF_YEAR) > current_date.get(Calendar.DAY_OF_YEAR)) {
 			// Due date is after today
-			message.append(DateFormat.format(" 'on' EEEE 'at' h:mmaa'.'", cal));
+			message.append(DateFormat.format(" EEEE 'at' h:mmaa'.'", cal));
 		} else {
 			// Due date is today
 			message.append(DateFormat.format(" 'today at' h:mmaa'.'", cal));
