@@ -468,11 +468,11 @@ public class TasksDataSource {
 		// Select All Query
 		String selectQuery = "SELECT * FROM " + 
 				DatabaseHandler.TABLE_CATEGORIES + " WHERE " +
-				DatabaseHandler.KEY_NAME + " = '" + name + "'";
+				DatabaseHandler.KEY_NAME + " = ?";
 		
 		open();
 		Category category = null;
-		Cursor cursor = db.rawQuery(selectQuery, null);
+		Cursor cursor = db.rawQuery(selectQuery, new String[] {name});
 
 		if (cursor.moveToFirst()) {
 			category = new Category(

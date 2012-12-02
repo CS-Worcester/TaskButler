@@ -432,7 +432,7 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
 	
 						@Override
 						public void onOk(AmbilWarnaDialog dialog, int color) {
-							Category new_category = new Category(et_category.getText().toString(), 
+							Category new_category = new Category(et_category.getText().toString().trim(), 
 									color, 
 									GregorianCalendar.getInstance().getTimeInMillis());
 							new_category.setID(data_source.getNextID(DatabaseHandler.TABLE_CATEGORIES));
