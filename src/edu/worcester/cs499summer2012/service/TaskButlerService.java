@@ -46,23 +46,23 @@ public class TaskButlerService extends WakefulIntentService{
 
 		List<Task> tasks = db.getAllTasks(); //Get a list of all the tasks there
 		for (Task task : tasks) {
-			//handle edge case of phone being off during an alarm going off.
-			if(task.isRepeating()){
-				if(task.hasStopRepeatingDate() && task.getStopRepeatingDate() <= System.currentTimeMillis()){
-					/*Indented do nothing*/
-				} else {
-					while(task.getDateDue() <= System.currentTimeMillis())
-						task = alarm.setRepeatingAlarm(this, task.getID());
-						//TODO: maybe set a different flag for when a task is permanently complete
-				}
+			// Cancel existing alarm
+			alarm.cancelAlarm(this, task.getID());
+			
+			//Procrastinator and Reminder alarm
+			if(task.isPastDue()){
+				alarm.setReminder(this, task.getID());
 			}
 			
-			//set procrastinator alarm if the task has a finalDateDue
-			if(task.hasFinalDateDue() && !task.isCompleted())
-				alarm.setProcrastinatorAlarm(this, task.getID());
-
+			//handle repeat alarms
+			if(task.isRepeating() && task.isCompleted()){
+				task = alarm.setRepeatingAlarm(this, task.getID());
+			}
+			
+			//regular alarms
 			if(!task.isCompleted() && (task.getDateDue() >= System.currentTimeMillis())){
-				alarm.setAlarm(this, task.getID());	}
+				alarm.setAlarm(this, task);	
+			}
 		}
 		super.onHandleIntent(intent);
 	}

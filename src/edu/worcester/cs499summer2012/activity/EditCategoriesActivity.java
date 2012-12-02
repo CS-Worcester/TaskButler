@@ -61,6 +61,7 @@ public class EditCategoriesActivity extends SherlockListActivity implements Acti
 	private Category selected_category;
 	private int selected_dialog;
 	private EditText et_category_name;
+	private String old_name;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -73,11 +74,14 @@ public class EditCategoriesActivity extends SherlockListActivity implements Acti
 		data_source = TasksDataSource.getInstance(this);
 		
 		// Create an adapter for the category list
-		adapter = new CategoryListAdapter(this, data_source.getCategories());
+		ArrayList<Category> categories = data_source.getCategories();
+		categories.remove(0);
+		adapter = new CategoryListAdapter(this, R.layout.row_category, categories);
 		setListAdapter(adapter);
 		
 		// Allow Action bar icon to act as a button
         ActionBar action_bar = getSupportActionBar();
+        action_bar.setIcon(R.drawable.ic_category);
         action_bar.setHomeButtonEnabled(true);
         action_bar.setDisplayHomeAsUpEnabled(true);
 	}
@@ -154,10 +158,11 @@ public class EditCategoriesActivity extends SherlockListActivity implements Acti
 			View category_name_view = li.inflate(R.layout.dialog_category_name, null);
 			et_category_name = (EditText) category_name_view.findViewById(R.id.edit_category_name);
 			et_category_name.setText(selected_category.getName());
+			old_name = selected_category.getName();
 			
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			builder.setView(category_name_view);
-			builder.setTitle("Enter category name");
+			builder.setTitle("Set name");
 			builder.setPositiveButton("Next", this);
 			builder.setNegativeButton("Cancel", this);
     		builder.create().show();
@@ -196,13 +201,17 @@ public class EditCategoriesActivity extends SherlockListActivity implements Acti
 		case EDIT_DIALOG:
 			switch (which) {
 			case DialogInterface.BUTTON_POSITIVE:
-				String name = et_category_name.getText().toString();
+				String name = et_category_name.getText().toString().trim();
 				if (name.equals("")) {
 					// No name, cancel dialog
 					Toast.makeText(this, "Category needs a name!", Toast.LENGTH_SHORT).show();
 					dialog.cancel();
-				} else if (selected_dialog == CREATE_DIALOG && data_source.doesCategoryNameExist(name)) {
-					// Category name already exists, cancel dialog
+				} else if (data_source.getExistingCategory(name) != null &&
+						   (selected_dialog == CREATE_DIALOG || (selected_dialog == EDIT_DIALOG && !name.equals(old_name)))) {
+					// Category name already exists:
+					// If also is create dialog, cancel dialog
+					// Or if also is edit dialog and the name is not its own name, cancel dialog
+					
 					Toast.makeText(this, "Category name already exists", Toast.LENGTH_SHORT).show();
 					dialog.cancel();
 				} else {
@@ -218,14 +227,14 @@ public class EditCategoriesActivity extends SherlockListActivity implements Acti
 						@Override
 						public void onOk(AmbilWarnaDialog dialog, int color) {
 							if (selected_dialog == CREATE_DIALOG) {
-								Category new_category = new Category(et_category_name.getText().toString(), 
+								Category new_category = new Category(et_category_name.getText().toString().trim(), 
 										color, 
 										GregorianCalendar.getInstance().getTimeInMillis());
 								new_category.setID(data_source.getNextID(DatabaseHandler.TABLE_CATEGORIES));
 								data_source.addCategory(new_category);
 								adapter.add(new_category);
 							} else {
-								selected_category.setName(et_category_name.getText().toString());
+								selected_category.setName(et_category_name.getText().toString().trim());
 								selected_category.setColor(color);
 								selected_category.setUpdated(GregorianCalendar.getInstance().getTimeInMillis());
 								data_source.updateCategory(selected_category);

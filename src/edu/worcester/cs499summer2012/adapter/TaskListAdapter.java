@@ -20,6 +20,7 @@
 package edu.worcester.cs499summer2012.adapter;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import android.app.Activity;
@@ -35,19 +36,21 @@ import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 import edu.worcester.cs499summer2012.R;
-import edu.worcester.cs499summer2012.activity.MainActivity;
+import edu.worcester.cs499summer2012.activity.SettingsActivity;
 import edu.worcester.cs499summer2012.comparator.TaskAutoComparator;
 import edu.worcester.cs499summer2012.comparator.TaskCategoryComparator;
 import edu.worcester.cs499summer2012.comparator.TaskCompletionComparator;
 import edu.worcester.cs499summer2012.comparator.TaskDateCreatedComparator;
 import edu.worcester.cs499summer2012.comparator.TaskDateDueComparator;
 import edu.worcester.cs499summer2012.comparator.TaskDateModifiedComparator;
-import edu.worcester.cs499summer2012.comparator.TaskFinalDateDueComparator;
 import edu.worcester.cs499summer2012.comparator.TaskNameComparator;
 import edu.worcester.cs499summer2012.comparator.TaskPriorityComparator;
 import edu.worcester.cs499summer2012.database.TasksDataSource;
+import edu.worcester.cs499summer2012.service.TaskAlarm;
 import edu.worcester.cs499summer2012.task.Task;
+import edu.worcester.cs499summer2012.task.ToastMaker;
 
 /**
  * ListView adapter for the TaskList container. Enables tasks in a TaskList
@@ -60,7 +63,7 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 	/**************************************************************************
 	 * Static fields and methods                                              *
 	 **************************************************************************/
-
+	
 	public static final int AUTO_SORT = 0;
 	public static final int CUSTOM_SORT = 1;
 	
@@ -70,8 +73,6 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 		public View category;
 		public ImageView priority;
 		public TextView due_date;
-		public ImageView alarm;
-		public ImageView recurrence;
 	}
 	
 	/**************************************************************************
@@ -133,13 +134,51 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 				public void onClick(View v) {
 					Task task = (Task) view_holder.is_completed.getTag();
 					task.toggleIsCompleted();
-					task.setDateModified(GregorianCalendar.getInstance().getTimeInMillis());
+					task.setDateModified(System.currentTimeMillis());
 					
 					// Update DB
 					data_source.updateTask(task);
 					
+					// Alarm logic: Complete/Uncomplete a task
+					// * Don't forget to update date modified!
+					// * Task must be updated in database first
+					// * Cancel alarm first to be safe
+					// * Cancel an existing notification
+					// * If user completed the task:
+					// *	If is repeating:
+					// *		Set repeating alarm to get new due date (possibly uncompletes the task)
+					// *		Notify user that repeated task has been rescheduled
+					// *		Set alarm
+					// *	 	(Future repeating due date will be handled by the service after alarm rings)
+					// * Else user uncompleted the task:
+					// *	If has due date and is not past due:
+					// *		Set alarm
+					TaskAlarm alarm = new TaskAlarm();
+					alarm.cancelAlarm(activity, task.getID());
+					alarm.cancelNotification(activity, task.getID());
+					if (task.isCompleted()) {
+						toast(R.string.toast_task_completed);
+						if (task.isRepeating()) {
+							task = alarm.setRepeatingAlarm(activity, task.getID());
+							
+							if (!task.isCompleted()) {
+								alarm.setAlarm(activity, task);
+								toast(ToastMaker.getRepeatMessage(activity, 
+										R.string.toast_task_repeated, 
+										task.getDateDueCal()));
+							} else {
+								toast(ToastMaker.getRepeatMessage(activity, 
+										R.string.toast_task_repeat_delayed, 
+										task.getDateDueCal()));
+							}
+						}
+					} else {
+						if (task.hasDateDue() && !task.isPastDue())
+							alarm.setAlarm(activity, task);
+					}
+					
 					// If "hide completed tasks" option, then remove the task from the adapter
-					if (prefs.getBoolean(MainActivity.HIDE_COMPLETED, false))
+					if (prefs.getBoolean(SettingsActivity.HIDE_COMPLETED, true) && task.isCompleted())
 							tasks.remove(task);
 					
 					sort();
@@ -149,8 +188,6 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 			view_holder.category = (View) view.findViewById(R.id.view_row_category);
 			view_holder.priority = (ImageView) view.findViewById(R.id.image_row_priority);
 			view_holder.due_date = (TextView) view.findViewById(R.id.text_row_due_date);
-			view_holder.alarm = (ImageView) view.findViewById(R.id.image_row_alarm);
-			view_holder.recurrence = (ImageView) view.findViewById(R.id.image_row_recurrence);
 			
 			view.setTag(view_holder);
 			view_holder.is_completed.setTag(task);
@@ -165,19 +202,15 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 		
 		// Set name
 		holder.name.setText(task.getName());
-		holder.name.setTextColor(is_complete ? Color.DKGRAY : Color.WHITE);
+		holder.name.setTextColor(is_complete ? Color.GRAY : Color.WHITE);
 		
 		// Set category
-		if (is_complete)
-			holder.category.setVisibility(View.GONE);
-		else {
-			holder.category.setVisibility(View.VISIBLE);
-			holder.category.setBackgroundColor(data_source.getCategory(task.getCategory()).getColor());
-		}
+		holder.category.setVisibility(View.VISIBLE);
+		holder.category.setBackgroundColor(data_source.getCategory(task.getCategory()).getColor());
 		
 		// Set priority
 		if (is_complete)
-			holder.priority.setVisibility(View.GONE);
+			holder.priority.setVisibility(View.INVISIBLE);
 		else {
 			holder.priority.setVisibility(View.VISIBLE);
 			
@@ -197,36 +230,35 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 		
 		// Set due date
 		if (is_complete)
-			holder.due_date.setVisibility(View.GONE);
+			holder.due_date.setVisibility(View.INVISIBLE);
 		else {
 			holder.due_date.setVisibility(View.VISIBLE);
+			holder.due_date.setTextColor(Color.LTGRAY);
 			
 			if (task.hasDateDue()) {
-				holder.due_date.setText(DateFormat.format("'Due' MM/dd/yy h:mmAA", task.getDateDueCal()));
+				Calendar current_date = GregorianCalendar.getInstance();
+				Calendar due_date = task.getDateDueCal();
 				
-				if (task.isPastDue())
-	        		holder.due_date.setTextColor(Color.RED);
-				else
-					holder.due_date.setTextColor(Color.LTGRAY);
+				if (due_date.get(Calendar.YEAR) > current_date.get(Calendar.YEAR)) {
+					// Due date is in a future year
+					holder.due_date.setText(DateFormat.format("MMM d'\n'yyyy", due_date));
+				} else if (due_date.get(Calendar.DAY_OF_YEAR) - current_date.get(Calendar.DAY_OF_YEAR) > 6) {
+					// Due date is more than a week away
+					holder.due_date.setText(DateFormat.format("MMM d", due_date));
+				} else if (due_date.get(Calendar.DAY_OF_YEAR) > current_date.get(Calendar.DAY_OF_YEAR)) {
+					// Due date is after today
+					holder.due_date.setText(DateFormat.format("E'\n'h:mmaa", due_date));
+				} else if (!task.isPastDue()) {
+					// Due date is today
+					holder.due_date.setText(DateFormat.format("'Today\n'h:mmaa", due_date));
+				} else {
+					// Due date is past
+					holder.due_date.setText("Past due");
+					holder.due_date.setTextColor(Color.RED);
+				}	
 			} else
 				holder.due_date.setText("");
 		}
-		
-		// Set alarm
-		if (is_complete)
-			holder.alarm.setVisibility(View.GONE);
-		else if (task.hasFinalDateDue())
-			holder.alarm.setVisibility(View.VISIBLE);
-		else
-			holder.alarm.setVisibility(View.INVISIBLE);
-		
-		// Set recurrence
-		if (is_complete)
-			holder.recurrence.setVisibility(View.GONE);
-		else if (task.isRepeating())
-			holder.recurrence.setVisibility(View.VISIBLE);
-		else
-			holder.recurrence.setVisibility(View.INVISIBLE);
 		
 		return view;
 	}
@@ -261,10 +293,6 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 						this.sort(new TaskDateDueComparator());
 						break;
 						
-					case edu.worcester.cs499summer2012.task.Comparator.FINAL_DATE_DUE:
-						this.sort(new TaskFinalDateDueComparator());
-						break;
-						
 					case edu.worcester.cs499summer2012.task.Comparator.DATE_CREATED:
 						this.sort(new TaskDateCreatedComparator());
 						break;
@@ -295,4 +323,17 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 			this.sort_type = sort_type;
 	}
 	
+	/**
+	 * Displays a message in a Toast notification for a short duration.
+	 */
+	private void toast(String message) {
+		Toast.makeText(activity, message, Toast.LENGTH_SHORT).show();
+	}
+	
+	/**
+	 * Displays a message in a Toast notification for a short duration.
+	 */
+	private void toast(int message) {
+		Toast.makeText(activity, message, Toast.LENGTH_SHORT).show();
+	}
 }

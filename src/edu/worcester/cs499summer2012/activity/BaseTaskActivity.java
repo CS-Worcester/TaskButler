@@ -24,11 +24,17 @@ import java.util.GregorianCalendar;
 
 import yuku.ambilwarna.AmbilWarnaDialog;
 import yuku.ambilwarna.AmbilWarnaDialog.OnAmbilWarnaListener;
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
+import android.app.DatePickerDialog.OnDateSetListener;
+import android.app.TimePickerDialog;
+import android.app.TimePickerDialog.OnTimeSetListener;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.format.DateFormat;
@@ -36,18 +42,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
-import android.widget.AdapterView.OnItemSelectedListener;
-import android.widget.CompoundButton.OnCheckedChangeListener;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockActivity;
@@ -56,6 +61,8 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 
 import edu.worcester.cs499summer2012.R;
+import edu.worcester.cs499summer2012.adapter.CategoryListAdapter;
+import edu.worcester.cs499summer2012.adapter.PriorityListAdapter;
 import edu.worcester.cs499summer2012.database.DatabaseHandler;
 import edu.worcester.cs499summer2012.database.TasksDataSource;
 import edu.worcester.cs499summer2012.task.Category;
@@ -63,23 +70,16 @@ import edu.worcester.cs499summer2012.task.Task;
 
 public abstract class BaseTaskActivity extends SherlockActivity implements 
 	OnCheckedChangeListener, OnClickListener, DialogInterface.OnClickListener,
-	OnItemSelectedListener {
+	OnItemSelectedListener, OnDateSetListener, OnTimeSetListener {
 	
 	/**************************************************************************
 	 * Static fields and methods                                              *
 	 **************************************************************************/
 
-	public final static String DEFAULT_INTERVAL = "1";
-	public final static int DATETIME_DIALOG = 0;
-	public final static int CATEGORY_DIALOG = 1;
-	public final static long SECOND_MS = 1000;
-	public final static long MINUTE_MS = SECOND_MS * 60;
-	public final static long HOUR_MS = MINUTE_MS * 60;
-	public final static long DAY_MS = HOUR_MS * 24;
-	public final static long WEEK_MS = DAY_MS * 7;
-	public final static long MONTH_MS = DAY_MS * 30;
-	public final static long YEAR_MS = DAY_MS * 365;
-	public final static long[] REPEAT_TYPES_MS = { MINUTE_MS, HOUR_MS, DAY_MS, WEEK_MS, MONTH_MS, YEAR_MS };
+	private final static String DEFAULT_INTERVAL = "1";
+	private final static String PREVENT_DUE_DATE = "prevent_due_date";
+	private final static int NO_DIALOG = 0;
+	private final static int CATEGORY_DIALOG = 1;
     
     /**************************************************************************
      * Private fields                                                         *
@@ -95,33 +95,40 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
     protected SharedPreferences prefs;
     
     // Category spinner array adapter
-    protected ArrayAdapter<Category> category_adapter;
+    protected CategoryListAdapter category_adapter;
+    
+    // Priority spinner array adapter
+    protected PriorityListAdapter priority_adapter;
     
     // UI elements
-    protected CheckBox has_due_date;
-    protected Button edit_due_date;
-    protected TextView due_date;
-    protected CheckBox has_final_due_date;
-    protected Button edit_final_due_date;
-    protected TextView final_due_date;
-    protected CheckBox has_repetition;   
-    protected TextView repeats;
-    protected EditText repeat_interval;
-    protected Spinner category;
-    protected Spinner repeat_type;
-    protected CheckBox stop_repeating;
-    protected Button edit_stop_repeating_date;
-    protected TextView stop_repeating_date;
-    protected DatePicker date_picker;
-    protected TimePicker time_picker;
-    protected EditText category_name;
+    protected CheckBox cb_due_date;
+    protected TextView tv_due_date;
+    protected TextView tv_due_time;
+    protected CheckBox cb_final_due_date;
+    protected CheckBox cb_repeating;   
+    protected EditText et_repeat_interval;
+    protected Spinner s_category;
+    protected Spinner s_priority;
+    protected Spinner s_repeat_type;
+    protected DatePickerDialog date_dialog;
+    protected TimePickerDialog time_dialog;
+    protected AlertDialog category_dialog;
+    AmbilWarnaDialog color_dialog;
+    protected EditText et_category;
+    protected TextView tv_at;
     
     // Task properties that are modified by UI elements
     protected Calendar due_date_cal;
-    protected Calendar final_due_date_cal;
-    protected Calendar stop_repeating_date_cal;
-    protected int selected_calendar;
     protected int selected_dialog;
+    protected Category default_category;
+    
+    // Flag to prevent date picker dialog popping up immediately on  	
+    // entering EditTaskActivity
+    protected boolean prevent_initial_due_date_popup = false;
+    
+    // Flag to kill new category dialog if screen is rotated
+    protected boolean new_category_dialog_active = false;
+    
     
     protected String repeat_interval_string = DEFAULT_INTERVAL;
     
@@ -151,30 +158,33 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
         data_source = TasksDataSource.getInstance(this);
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         
+        // Initialize calendar
+		String hour = prefs.getString(SettingsActivity.DEFAULT_HOUR, SettingsActivity.DEFAULT_HOUR_VALUE);
+        due_date_cal = GregorianCalendar.getInstance();
+        due_date_cal.set(Calendar.HOUR_OF_DAY, Integer.valueOf(hour));
+        due_date_cal.set(Calendar.MINUTE, 0);
+        due_date_cal.set(Calendar.SECOND, 0);
+        due_date_cal.set(Calendar.MILLISECOND, 0);
+        if (due_date_cal.getTimeInMillis() < System.currentTimeMillis())
+        	due_date_cal.add(Calendar.DAY_OF_YEAR, 1);
+        
         // Initialize the fields that can be enabled/disabled or listened to
-        has_due_date = (CheckBox) findViewById(R.id.checkbox_has_due_date);
-        edit_due_date = (Button) findViewById(R.id.button_edit_due_date);
-        due_date = (TextView) findViewById(R.id.text_add_task_due_date);
-        has_final_due_date = (CheckBox) findViewById(R.id.checkbox_has_final_due_date);
-        edit_final_due_date = (Button) findViewById(R.id.button_edit_final_due_date);
-        final_due_date = (TextView) findViewById(R.id.text_add_task_final_due_date);
-        has_repetition = (CheckBox) findViewById(R.id.checkbox_has_repetition);   
-        repeats = (TextView) findViewById(R.id.text_add_task_repeats);
-        repeat_interval = (EditText) findViewById(R.id.edit_add_task_repeat_interval);
-        category = (Spinner) findViewById(R.id.spinner_add_task_category);
-        repeat_type = (Spinner) findViewById(R.id.spinner_add_task_repeat_type);
-        stop_repeating = (CheckBox) findViewById(R.id.checkbox_stop_repeating);
-        edit_stop_repeating_date = (Button) findViewById(R.id.button_edit_stop_repeating_date);
-        stop_repeating_date = (TextView) findViewById(R.id.text_add_task_stop_repeating_date);
+        cb_due_date = (CheckBox) findViewById(R.id.checkbox_has_due_date);
+        tv_due_date = (TextView) findViewById(R.id.text_add_task_due_date);
+        tv_due_time = (TextView) findViewById(R.id.text_add_task_due_time);
+        cb_final_due_date = (CheckBox) findViewById(R.id.checkbox_has_final_due_date);
+        cb_repeating = (CheckBox) findViewById(R.id.checkbox_has_repetition);   
+        et_repeat_interval = (EditText) findViewById(R.id.edit_add_task_repeat_interval);
+        s_category = (Spinner) findViewById(R.id.spinner_add_task_category);
+        s_priority = (Spinner) findViewById(R.id.spinner_add_task_priority);
+        s_repeat_type = (Spinner) findViewById(R.id.spinner_add_task_repeat_type);
+        tv_at = (TextView) findViewById(R.id.text_at);
                 
         // Set listeners
-        has_due_date.setOnCheckedChangeListener(this);
-        has_final_due_date.setOnCheckedChangeListener(this);
-        has_repetition.setOnCheckedChangeListener(this);
-        stop_repeating.setOnCheckedChangeListener(this);
-        edit_due_date.setOnClickListener(this);
-        edit_final_due_date.setOnClickListener(this);
-        edit_stop_repeating_date.setOnClickListener(this);
+        cb_due_date.setOnCheckedChangeListener(this);
+        cb_repeating.setOnCheckedChangeListener(this);
+        tv_due_date.setOnClickListener(this);
+        tv_due_time.setOnClickListener(this);
         
         // Allow Action bar icon to act as a button
         ActionBar action_bar = getSupportActionBar();
@@ -182,42 +192,58 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
         action_bar.setDisplayHomeAsUpEnabled(true);
         
         // Populate the category spinner
-        category_adapter = new ArrayAdapter<Category>(this, 
-        				android.R.layout.simple_spinner_item, 
-        				data_source.getCategories());
-        category_adapter.add(new Category(0, "New category...", 0, Category.NEW_CATEGORY));
-        category_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        category.setAdapter(category_adapter);
-        category.setOnItemSelectedListener(this);
+        category_adapter = new CategoryListAdapter(this, R.layout.row_category_small, data_source.getCategories());
+        category_adapter.add(new Category(0, "New category...", Color.TRANSPARENT, Category.NEW_CATEGORY));
+        s_category.setAdapter(category_adapter);
+        s_category.setOnItemSelectedListener(this);
+        
+        // Populate the priority spinner
+        priority_adapter = new PriorityListAdapter(this, R.layout.row_priority_small, Task.PRIORITY_LABELS);
+        priority_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        s_priority.setAdapter(priority_adapter);
         
         // Populate the repeat type spinner
-        ArrayAdapter<CharSequence> repeat_type_adapter = 
-        		ArrayAdapter.createFromResource(this, 
-        				R.array.spinner_repeat_types, 
-        				android.R.layout.simple_spinner_item);
+        ArrayAdapter<CharSequence> repeat_type_adapter = new ArrayAdapter<CharSequence>(this, android.R.layout.simple_spinner_item, Task.REPEAT_LABELS);
         repeat_type_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        repeat_type.setAdapter(repeat_type_adapter);
-        repeat_type.setSelection(Task.DAYS);
+        s_repeat_type.setAdapter(repeat_type_adapter);
         
         // Hide certain due date items to start
-        edit_due_date.setVisibility(View.GONE);
-        due_date.setVisibility(View.GONE);
-        has_final_due_date.setVisibility(View.GONE);
-        edit_final_due_date.setVisibility(View.GONE);
-        final_due_date.setVisibility(View.GONE);
-        has_repetition.setVisibility(View.GONE);
-        repeats.setVisibility(View.GONE);
-        repeat_interval.setVisibility(View.GONE);
-        repeat_type.setVisibility(View.GONE);
-        stop_repeating.setVisibility(View.GONE);
-        edit_stop_repeating_date.setVisibility(View.GONE);
-        stop_repeating_date.setVisibility(View.GONE);
+        tv_due_date.setVisibility(View.INVISIBLE);
+        tv_due_time.setVisibility(View.INVISIBLE);
+        cb_final_due_date.setVisibility(View.INVISIBLE);
+        cb_repeating.setVisibility(View.INVISIBLE);
+        et_repeat_interval.setVisibility(View.INVISIBLE);
+        s_repeat_type.setVisibility(View.INVISIBLE);
+        tv_at.setVisibility(View.INVISIBLE);
+        
+        // Check bundle for prevent popup flag
+        if (savedInstanceState != null)
+        	prevent_initial_due_date_popup = savedInstanceState.getBoolean(PREVENT_DUE_DATE);
+        
+        
+    }
+    
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+    	outState.putBoolean(PREVENT_DUE_DATE, cb_due_date.isChecked() ? true : false);
+    	
+    	if (new_category_dialog_active) {
+    		new_category_dialog_active = false;
+    		selected_dialog = NO_DIALOG;
+    		s_category.setSelection(category_adapter.getPosition(default_category));
+    	}
+			
+    	super.onSaveInstanceState(outState);
     }
     
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
     	MenuInflater inflater = getSupportMenuInflater();
     	inflater.inflate(R.menu.activity_add_task, menu);
+    	
+    	if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB)
+			menu.findItem(R.id.menu_add_task_help).setIcon(R.drawable.ic_help_deprecated);
+    	
     	return true;
     }
     
@@ -238,6 +264,23 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
     		}
     		return true;
     		
+    	case R.id.menu_add_task_help:
+    		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+    		builder.setTitle("Procrastination Alarm");
+    		builder.setIcon(R.drawable.ic_about);
+    		builder.setMessage(R.string.dialog_procrastinator_help);
+    		builder.setCancelable(true);
+    		builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+
+				@Override
+				public void onClick(DialogInterface dialog, int id) {
+					dialog.dismiss();
+				}
+				
+			});
+    		builder.create().show();
+    		return true;
+    		
     	default:
     		return super.onOptionsItemSelected(item);
     	}
@@ -253,74 +296,47 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
 		case R.id.checkbox_has_due_date:
 			if (isChecked) {
 				// Make edit button, textview, and other checkboxes visible
-				edit_due_date.setVisibility(View.VISIBLE);
-				due_date.setVisibility(View.VISIBLE);
-				due_date.setText(DateFormat.format("'Due:' MM/dd/yy 'at' h:mm AA", 
-						due_date_cal));
-				has_final_due_date.setVisibility(View.VISIBLE);
-				has_repetition.setVisibility(View.VISIBLE);
+				tv_due_date.setVisibility(View.VISIBLE);
+				tv_at.setVisibility(View.VISIBLE);
+				tv_due_time.setVisibility(View.VISIBLE);
+				tv_due_date.setText(DateFormat.format("MM/dd/yy", due_date_cal));
+				tv_due_time.setText(DateFormat.format("h:mm AA", due_date_cal));
+				cb_final_due_date.setVisibility(View.VISIBLE);
+				cb_repeating.setVisibility(View.VISIBLE);
+				
+				// Pop up date-time dialog as if user had clicked edit button
+				if (prevent_initial_due_date_popup)
+					prevent_initial_due_date_popup = false;
+				else
+					onClick(tv_due_date);
 			} else {
 				// Hide edit button, textview, and other checkboxes
-				edit_due_date.setVisibility(View.GONE);
-				due_date.setVisibility(View.GONE);
-				has_final_due_date.setVisibility(View.GONE);
-				has_repetition.setVisibility(View.GONE);
+				tv_due_date.setVisibility(View.INVISIBLE);
+				tv_at.setVisibility(View.INVISIBLE);
+				tv_due_time.setVisibility(View.INVISIBLE);
+				cb_final_due_date.setVisibility(View.INVISIBLE);
+				cb_repeating.setVisibility(View.INVISIBLE);
 				
 				// Uncheck final due date and repetition boxes
-				if (has_final_due_date.isChecked())
-					has_final_due_date.setChecked(false);
-				if (has_repetition.isChecked())
-					has_repetition.setChecked(false);
-			}
-			break;
-			
-		case R.id.checkbox_has_final_due_date:
-			if (isChecked) {
-				// Make edit button and textview visible
-				edit_final_due_date.setVisibility(View.VISIBLE);
-				final_due_date.setVisibility(View.VISIBLE);
-				final_due_date.setText(DateFormat.format("'Alarm:' MM/dd/yy 'at' h:mm AA", 
-						final_due_date_cal));
-			} else {
-				// Hide edit button and textview
-				edit_final_due_date.setVisibility(View.GONE);
-				final_due_date.setVisibility(View.GONE);
+				if (cb_final_due_date.isChecked())
+					cb_final_due_date.setChecked(false);
+				if (cb_repeating.isChecked())
+					cb_repeating.setChecked(false);
 			}
 			break;
 			
 		case R.id.checkbox_has_repetition:
 			if (isChecked) {
 				// Make textview, edittext, spinner, and checkbox visible
-				repeats.setVisibility(View.VISIBLE);
-				repeat_interval.setVisibility(View.VISIBLE);
-				repeat_interval.setText(repeat_interval_string);
-				repeat_type.setVisibility(View.VISIBLE);
-				stop_repeating.setVisibility(View.VISIBLE);
+				et_repeat_interval.setVisibility(View.VISIBLE);
+				et_repeat_interval.setText(repeat_interval_string);
+				s_repeat_type.setVisibility(View.VISIBLE);
 			} else {
-				// Hide textview, edittext, spinner, and checkbox
-				repeats.setVisibility(View.GONE);
-				repeat_interval.setVisibility(View.GONE);
-				repeat_type.setVisibility(View.GONE);
-				stop_repeating.setVisibility(View.GONE);
-				
-				// Uncheck stop repeating box
-				if (stop_repeating.isChecked())
-					stop_repeating.setChecked(false);
+				// Hide edittext, spinner
+				et_repeat_interval.setVisibility(View.INVISIBLE);
+				s_repeat_type.setVisibility(View.INVISIBLE);
 			}
 			break;
-			
-		case R.id.checkbox_stop_repeating:
-			if (isChecked) {
-				// Make edit button and textview visible
-				edit_stop_repeating_date.setVisibility(View.VISIBLE);
-				stop_repeating_date.setVisibility(View.VISIBLE);
-				stop_repeating_date.setText(DateFormat.format("'Ends:' MM/dd/yy 'at' h:mm AA", 
-						stop_repeating_date_cal));
-			} else {
-				// Hide edit button and textview
-				edit_stop_repeating_date.setVisibility(View.GONE);
-				stop_repeating_date.setVisibility(View.GONE);
-			}
 		}
 	}
 
@@ -328,50 +344,54 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
 	 * Methods implementing OnClickListener interface                         *
 	 **************************************************************************/
 	
+	@SuppressLint("NewApi")
 	@Override
 	public void onClick(View v) {	
-		LayoutInflater li = LayoutInflater.from(this);
-		View picker_view = li.inflate(R.layout.date_time_picker, null);
-		
-		date_picker = (DatePicker) picker_view.findViewById(R.id.dialog_date_picker);
-        time_picker = (TimePicker) picker_view.findViewById(R.id.dialog_time_picker);
-		
-		switch (v.getId()) {
-		case R.id.button_edit_due_date:
-			selected_calendar = R.id.button_edit_due_date;
-			date_picker.updateDate(due_date_cal.get(Calendar.YEAR), 
-					due_date_cal.get(Calendar.MONTH), 
-					due_date_cal.get(Calendar.DAY_OF_MONTH));
-			time_picker.setCurrentHour(due_date_cal.get(Calendar.HOUR_OF_DAY));
-			time_picker.setCurrentMinute(due_date_cal.get(Calendar.MINUTE));
-			break;
-			
-		case R.id.button_edit_final_due_date:
-			selected_calendar = R.id.button_edit_final_due_date;
-			date_picker.updateDate(final_due_date_cal.get(Calendar.YEAR), 
-					final_due_date_cal.get(Calendar.MONTH), 
-					final_due_date_cal.get(Calendar.DAY_OF_MONTH));
-			time_picker.setCurrentHour(final_due_date_cal.get(Calendar.HOUR_OF_DAY));
-			time_picker.setCurrentMinute(final_due_date_cal.get(Calendar.MINUTE));
-			break;
-			
-		case R.id.button_edit_stop_repeating_date:
-			selected_calendar = R.id.button_edit_stop_repeating_date;
-			date_picker.updateDate(stop_repeating_date_cal.get(Calendar.YEAR), 
-					stop_repeating_date_cal.get(Calendar.MONTH), 
-					stop_repeating_date_cal.get(Calendar.DAY_OF_MONTH));
-			time_picker.setCurrentHour(stop_repeating_date_cal.get(Calendar.HOUR_OF_DAY));
-			time_picker.setCurrentMinute(stop_repeating_date_cal.get(Calendar.MINUTE));
-		}
-		
-		selected_dialog = DATETIME_DIALOG;
-		AlertDialog.Builder picker_dialog = new AlertDialog.Builder(this);
-		picker_dialog.setView(picker_view)
-		             .setTitle("Set date and time")
-		             .setCancelable(true)
-		             .setPositiveButton("Accept", this)
-		             .setNegativeButton("Cancel", this);
-		picker_dialog.show();
+        switch (v.getId()) {
+        case R.id.text_add_task_due_date:
+        	// Initialize picker dialog
+    		date_dialog = new DatePickerDialog(this, this, 
+    				due_date_cal.get(Calendar.YEAR), 
+    				due_date_cal.get(Calendar.MONTH), 
+    				due_date_cal.get(Calendar.DAY_OF_MONTH)) {
+    			
+    			@Override
+    			public Bundle onSaveInstanceState() {
+    				if (date_dialog.isShowing())
+    					date_dialog.cancel();
+    				return super.onSaveInstanceState();
+    			}
+    			
+    		};
+    		
+    		// Show calendar view (only available for API 11+)
+    		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+    			DatePicker date_picker = date_dialog.getDatePicker();
+    			date_picker.setCalendarViewShown(true);
+    			date_picker.setSpinnersShown(false);
+    		}
+    		
+    		date_dialog.show();
+        	break;
+        	
+        case R.id.text_add_task_due_time:
+        	// Initialize picker dialog
+    		time_dialog = new TimePickerDialog(this, this, 
+    				due_date_cal.get(Calendar.HOUR_OF_DAY), 
+    				due_date_cal.get(Calendar.MINUTE), false) {
+    			
+    			@Override
+    			public Bundle onSaveInstanceState() {
+    				if (time_dialog.isShowing())
+    					time_dialog.cancel();
+    				return super.onSaveInstanceState();
+    			}
+    			
+    		};
+    		
+    		time_dialog.show();
+        	break;
+        }
 	}
 
 	/**************************************************************************
@@ -380,200 +400,54 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
 	
 	@Override
 	public void onClick(DialogInterface dialog, int id) {
-		switch (selected_dialog)
-		{
-		case DATETIME_DIALOG:
+		if (selected_dialog == CATEGORY_DIALOG) {
+			selected_dialog = NO_DIALOG;
 			if (id == DialogInterface.BUTTON_POSITIVE) {
-				switch (selected_calendar) {
-				case R.id.button_edit_due_date:
-					// User modified the due date. There are no restrictions on this action.
-					due_date_cal.set(Calendar.YEAR, date_picker.getYear());
-					due_date_cal.set(Calendar.MONTH, date_picker.getMonth());
-					due_date_cal.set(Calendar.DAY_OF_MONTH, date_picker.getDayOfMonth());
-					due_date_cal.set(Calendar.HOUR_OF_DAY, time_picker.getCurrentHour());
-					due_date_cal.set(Calendar.MINUTE, time_picker.getCurrentMinute());
-					due_date.setText(DateFormat.format("'Due:' MM/dd/yy 'at' h:mm AA", 
-							due_date_cal));
-					
-					// Check to ensure final due date > due date
-					if (due_date_cal.getTimeInMillis() > final_due_date_cal.getTimeInMillis()) {
-						final_due_date_cal.setTimeInMillis(due_date_cal.getTimeInMillis() + HOUR_MS);
-						
-						// Update the view and notify user, if final due date is active
-						if (has_final_due_date.isChecked()) {
-							final_due_date.setText(DateFormat.format("'Alarm:' MM/dd/yy 'at' h:mm AA", final_due_date_cal));
-							toast("Procrastination alarm has been modified to be compatible with your new selection");
-						}
-					}
-					
-					// Check to ensure repeat period > final due date - due date
-					if (has_final_due_date.isChecked()) {
-						long original_repeat_interval = Long.parseLong(repeat_interval.getText().toString());
-						long repeat_period =  original_repeat_interval * REPEAT_TYPES_MS[repeat_type.getSelectedItemPosition()];
-						long time_between_due_dates = final_due_date_cal.getTimeInMillis() - due_date_cal.getTimeInMillis();
-						if (time_between_due_dates > repeat_period) {
-							int new_repeat_type = repeat_type.getSelectedItemPosition();
-							long new_repeat_interval = time_between_due_dates / REPEAT_TYPES_MS[new_repeat_type] + 1;
-							
-							while (new_repeat_interval > 30 && new_repeat_type < REPEAT_TYPES_MS.length - 1) {
-								new_repeat_type += 1;
-								new_repeat_interval = time_between_due_dates / REPEAT_TYPES_MS[new_repeat_type] + 1;
-							}
-							
-							repeat_interval.setText(String.valueOf(new_repeat_interval));
-							repeat_type.setSelection(new_repeat_type);
-							
-							// Notify user, if is repeating is active
-							if (has_repetition.isChecked())
-								toast("Repeat interval has been modified to be compatible with your new selection");
-						}
-					}
-					
-					// Check to ensure stop repeating date > due_date (and final due date)
-					if (has_final_due_date.isChecked()) {
-						if (final_due_date_cal.getTimeInMillis() > stop_repeating_date_cal.getTimeInMillis()) {
-							final_due_date_cal.setTimeInMillis(final_due_date_cal.getTimeInMillis() + HOUR_MS);
-							
-							// Update the view and notify user, if stop repeating date is active
-							if (stop_repeating.isChecked()) {
-								stop_repeating_date.setText(DateFormat.format("'Ends:' MM/dd/yy 'at' h:mm AA", stop_repeating_date_cal));
-								toast("Stop repeating date has been modified to be compatible with your new selection");
-							}
-						}
-					} else if (due_date_cal.getTimeInMillis() > stop_repeating_date_cal.getTimeInMillis()) {
-						stop_repeating_date_cal.setTimeInMillis(due_date_cal.getTimeInMillis() + HOUR_MS);
-						
-						// Update the view and notify user, if stop repeating date is active
-						if (stop_repeating.isChecked()) {
-							stop_repeating_date.setText(DateFormat.format("'Ends:' MM/dd/yy 'at' h:mm AA", stop_repeating_date_cal));
-							toast("Stop repeating date has been modified to be compatible with your new selection");
-						}
-					}
-					
-					break;
-					
-				case R.id.button_edit_final_due_date:
-					// User modified the final due date. It cannot be earlier than due date.
-					Calendar new_final_due_date_cal = (Calendar) final_due_date_cal.clone();
-					new_final_due_date_cal.set(Calendar.YEAR, date_picker.getYear());
-					new_final_due_date_cal.set(Calendar.MONTH, date_picker.getMonth());
-					new_final_due_date_cal.set(Calendar.DAY_OF_MONTH, date_picker.getDayOfMonth());
-					new_final_due_date_cal.set(Calendar.HOUR_OF_DAY, time_picker.getCurrentHour());
-					new_final_due_date_cal.set(Calendar.MINUTE, time_picker.getCurrentMinute());
-					
-					// Check to ensure final due date > due date
-					if (due_date_cal.getTimeInMillis() > new_final_due_date_cal.getTimeInMillis()) {
-						// Notify user of  bad selection
-						toast("Procrastination alarm cannot occur before due date");
-						return;
-					}
-					
-					final_due_date_cal = new_final_due_date_cal;
-					final_due_date.setText(DateFormat.format("'Alarm:' MM/dd/yy 'at' h:mm AA", final_due_date_cal));
-					
-					// Check to ensure repeat period > final due date - due date
-					long original_repeat_interval = Long.parseLong(repeat_interval.getText().toString());
-					long repeat_period =  original_repeat_interval * REPEAT_TYPES_MS[repeat_type.getSelectedItemPosition()];
-					long time_between_due_dates = final_due_date_cal.getTimeInMillis() - due_date_cal.getTimeInMillis();
-					if (time_between_due_dates > repeat_period) {
-						int new_repeat_type = repeat_type.getSelectedItemPosition();
-						long new_repeat_interval = time_between_due_dates / REPEAT_TYPES_MS[new_repeat_type] + 1;
-						
-						while (new_repeat_interval > 30 && new_repeat_type < REPEAT_TYPES_MS.length - 1) {
-							new_repeat_type += 1;
-							new_repeat_interval = time_between_due_dates / REPEAT_TYPES_MS[new_repeat_type] + 1;
-						}
-						
-						repeat_interval.setText(String.valueOf(new_repeat_interval));
-						repeat_type.setSelection(new_repeat_type);
-						
-						// Notify user, if is repeating is active
-						if (has_repetition.isChecked())
-							toast("Repeat interval has been modified to be compatible with your new selection");
-					}
-					
-					// Check to ensure stop repeating date > final due date
-					if (final_due_date_cal.getTimeInMillis() > stop_repeating_date_cal.getTimeInMillis()) {
-						stop_repeating_date_cal.setTimeInMillis(final_due_date_cal.getTimeInMillis() + HOUR_MS);
-						
-						// Update the view and notify user, if stop repeating date is active
-						if (stop_repeating.isChecked()) {
-							stop_repeating_date.setText(DateFormat.format("'Ends:' MM/dd/yy 'at' h:mm AA", stop_repeating_date_cal));
-							toast("Stop repeating date has been modified to be compatible with your new selection");
-						}
-					}
-					break;
-				
-				case R.id.button_edit_stop_repeating_date:
-					// User modified the stop repeating date. It cannot be earlier than due date (and final due date).
-					Calendar new_stop_repeating_date_cal = (Calendar) stop_repeating_date_cal.clone();
-					new_stop_repeating_date_cal.set(Calendar.YEAR, date_picker.getYear());
-					new_stop_repeating_date_cal.set(Calendar.MONTH, date_picker.getMonth());
-					new_stop_repeating_date_cal.set(Calendar.DAY_OF_MONTH, date_picker.getDayOfMonth());
-					new_stop_repeating_date_cal.set(Calendar.HOUR_OF_DAY, time_picker.getCurrentHour());
-					new_stop_repeating_date_cal.set(Calendar.MINUTE, time_picker.getCurrentMinute());
-					
-					// Check to ensure stop repeating date > due_date (and final due date)
-					if (has_final_due_date.isChecked()) {
-						if (final_due_date_cal.getTimeInMillis() > new_stop_repeating_date_cal.getTimeInMillis()) {
-							// Notify user of  bad selection
-							toast("Stop repeating date cannot occur before procrastination alarm");
-							return;
-						}
-					} else if (due_date_cal.getTimeInMillis() > new_stop_repeating_date_cal.getTimeInMillis()) {
-						// Notify user of  bad selection
-						toast("Stop repeating date cannot occur before due date");
-						return;
-					}
-					
-					stop_repeating_date_cal = new_stop_repeating_date_cal;
-					stop_repeating_date.setText(DateFormat.format("'Ends:' MM/dd/yy 'at' h:mm AA", 
-							stop_repeating_date_cal));
-					break;
-				}
-			} else
-				dialog.cancel();
-			break;
-			
-		case CATEGORY_DIALOG:
-			if (id == DialogInterface.BUTTON_POSITIVE) {
-				String name = category_name.getText().toString();
+				String name = et_category.getText().toString().trim();
 				if (name.equals("")) {
 					// No name, cancel dialog
 					Toast.makeText(this, "Category needs a name!", Toast.LENGTH_SHORT).show();
-					category.setSelection(0);
+					s_category.setSelection(category_adapter.getPosition(default_category));
+					new_category_dialog_active = false;
 					dialog.cancel();
-				} else if (data_source.doesCategoryNameExist(name)) {
+					return;
+				} 
+				
+				Category existing_category = data_source.getExistingCategory(name);
+				
+				if (existing_category != null) {
 					// Category name already exists, cancel dialog
 					Toast.makeText(this, "Category name already exists", Toast.LENGTH_SHORT).show();
-					category.setSelection(0);
+					s_category.setSelection(category_adapter.getPosition(existing_category));
+					new_category_dialog_active = false;
 					dialog.cancel();
 				} else  {
-					AmbilWarnaDialog color_dialog = new AmbilWarnaDialog(this, Color.RED, new OnAmbilWarnaListener() {
+					 color_dialog = new AmbilWarnaDialog(this, Color.RED, new OnAmbilWarnaListener() {
 	
 						@Override
 						public void onCancel(AmbilWarnaDialog dialog) {
-							category.setSelection(0);
+							s_category.setSelection(category_adapter.getPosition(default_category));
+							new_category_dialog_active = false;
 						}
 	
 						@Override
 						public void onOk(AmbilWarnaDialog dialog, int color) {
-							Category new_category = new Category(category_name.getText().toString(), 
+							Category new_category = new Category(et_category.getText().toString().trim(), 
 									color, 
 									GregorianCalendar.getInstance().getTimeInMillis());
 							new_category.setID(data_source.getNextID(DatabaseHandler.TABLE_CATEGORIES));
 							data_source.addCategory(new_category);
 							category_adapter.insert(new_category, category_adapter.getCount() - 1);
 							category_adapter.notifyDataSetChanged();
+							new_category_dialog_active = false;
 						}
 					});
 					color_dialog.show();
 				}
 			} else {
-				category.setSelection(0);
+				s_category.setSelection(0);
 				dialog.cancel();
 			}
-			break;
 		}
 	}
 	
@@ -584,24 +458,47 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
 	@Override
 	public void onItemSelected(AdapterView<?> parent, View view, int position,
 			long id) {
-		if (((Category) category.getItemAtPosition(position)).getID() == Category.NEW_CATEGORY) {
+		if (((Category) s_category.getItemAtPosition(position)).getID() == Category.NEW_CATEGORY) {
 			selected_dialog = CATEGORY_DIALOG;
 			
 			LayoutInflater li = LayoutInflater.from(this);
 			View category_name_view = li.inflate(R.layout.dialog_category_name, null);
-			category_name = (EditText) category_name_view.findViewById(R.id.edit_category_name);
+			et_category = (EditText) category_name_view.findViewById(R.id.edit_category_name);
 			
 			AlertDialog.Builder new_category_builder = new AlertDialog.Builder(this);
 			new_category_builder.setView(category_name_view);
-			new_category_builder.setTitle("Enter category name");
+			new_category_builder.setTitle("Set name");
 			new_category_builder.setPositiveButton("Next", this);
 			new_category_builder.setNegativeButton("Cancel", this);
-			new_category_builder.create().show();
+			category_dialog = new_category_builder.create();
+			new_category_dialog_active = true;
+			category_dialog.show();
 		}
 	}
 
 	@Override
 	public void onNothingSelected(AdapterView<?> parent) {
 		// Do nothing
+	}
+	
+	/**************************************************************************
+	 * Methods implementing OnDateSetListener interface                       *
+	 **************************************************************************/
+	
+	@Override
+	public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+		due_date_cal.set(year, monthOfYear, dayOfMonth);
+		tv_due_date.setText(DateFormat.format("MM/dd/yy", due_date_cal));
+	}
+	
+	/**************************************************************************
+	 * Methods implementing OnTimeSetListener interface                       *
+	 **************************************************************************/
+	
+	@Override
+	public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+		due_date_cal.set(Calendar.HOUR_OF_DAY, hourOfDay);
+		due_date_cal.set(Calendar.MINUTE, minute);
+		tv_due_time.setText(DateFormat.format("h:mm AA", due_date_cal));
 	}
 }

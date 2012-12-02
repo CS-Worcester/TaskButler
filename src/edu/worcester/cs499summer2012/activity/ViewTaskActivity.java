@@ -19,8 +19,6 @@
 
 package edu.worcester.cs499summer2012.activity;
 
-import java.util.GregorianCalendar;
-
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -29,8 +27,9 @@ import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.Button;
+import android.widget.CheckedTextView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,6 +44,7 @@ import edu.worcester.cs499summer2012.database.TasksDataSource;
 import edu.worcester.cs499summer2012.service.TaskAlarm;
 import edu.worcester.cs499summer2012.task.Category;
 import edu.worcester.cs499summer2012.task.Task;
+import edu.worcester.cs499summer2012.task.ToastMaker;
 
 /**
  * Activity for adding a new task.
@@ -64,6 +64,7 @@ DialogInterface.OnClickListener {
 	private TasksDataSource data_source;
 	private Task task;
 	private Intent intent;
+	private ActionBar action_bar;
 
 	/**************************************************************************
 	 * Class methods                                                          *
@@ -71,18 +72,11 @@ DialogInterface.OnClickListener {
 
 	private void displayTask() {
 		// Set name
-		((TextView) findViewById(R.id.text_view_task_name)).setText(task.getName());
-
-		// Set completion button
-		Button button = (Button) findViewById(R.id.button_complete_task);
-		if (!task.isCompleted())
-			button.setText(R.string.button_not_completed);
-		else
-			button.setText(R.string.button_completed);
-		button.setOnClickListener(this);
-
-		// Set priority
-		((TextView) findViewById(R.id.text_priority)).setText(Task.LABELS[task.getPriority()]);
+		CheckedTextView name = (CheckedTextView) findViewById(R.id.text_view_task_name);
+		name.setText(task.getName());
+		name.setChecked(task.isCompleted());
+		name.setOnClickListener(this);
+		name.setTextColor(name.isChecked() ? Color.GRAY : Color.WHITE);
 
 		// Set priority icon
 		switch (task.getPriority()) {
@@ -96,64 +90,69 @@ DialogInterface.OnClickListener {
 			((ImageView) findViewById(R.id.image_priority)).setImageResource(R.drawable.ic_trivial);
 			break;
 		}
-
-		// Set category (if category ID is not 1, i.e. no category)
-		ImageView iv_category_color = (ImageView) findViewById(R.id.image_category);
-		TextView tv_category_name = (TextView) findViewById(R.id.text_category);
-		if (task.getCategory() != 1) {
+		
+		// Set category
+		if (task.getCategory() != Category.NO_CATEGORY) {
 			Category category = data_source.getCategory(task.getCategory());
-			iv_category_color.setBackgroundColor(category.getColor());
-			tv_category_name.setText(category.getName());
+			action_bar.setTitle(category.getName());
+			((View) findViewById(R.id.view_category)).setBackgroundColor(category.getColor());
 		} else {
-			iv_category_color.setBackgroundColor(Color.TRANSPARENT);
-			tv_category_name.setText("");
+			action_bar.setTitle(R.string.title_activity_view_task);
+			((View) findViewById(R.id.view_category)).setBackgroundColor(Color.parseColor("#33B5E5"));
 		}
 
 		// Set due date
 		if (task.hasDateDue()) {
-			TextView date_due = ((TextView) findViewById(R.id.text_date_due));
-			date_due.setText(DateFormat.format("MM/dd/yy 'at' h:mm AA", task.getDateDueCal()));
-
+			((LinearLayout) findViewById(R.id.due_date_bar)).setVisibility(View.VISIBLE);
+			
+			TextView due_date = (TextView) findViewById(R.id.text_date_due);
+			
 			if (task.isPastDue())
-				date_due.setTextColor(Color.RED);
+				due_date.setTextColor(Color.RED);
 			else
-				date_due.setTextColor(Color.LTGRAY);
+				due_date.setTextColor(Color.LTGRAY);
+			
+			if (task.getDateDue() >= System.currentTimeMillis()) {
+				// Due date is in the future
+				due_date.setText(DateFormat.format("'Due' MMMM d, yyyy 'at' h:mmaa", task.getDateDueCal()));
+			} else {
+				// Due date is in the past
+				due_date.setText(DateFormat.format("'Was due' MMMM d, yyyy 'at' h:mmaa", task.getDateDueCal()));
+			}
+			
+			// Set repetition
+			if (task.isRepeating()) {
+				((ImageView) findViewById(R.id.image_repeat)).setVisibility(View.VISIBLE);
+			} else {
+				((ImageView) findViewById(R.id.image_repeat)).setVisibility(View.GONE);
+			}
+			
+			// Set procrastinator alarm
+			if (task.hasFinalDateDue()) {
+				((ImageView) findViewById(R.id.image_alarm)).setVisibility(View.VISIBLE);
+			} else {
+				((ImageView) findViewById(R.id.image_alarm)).setVisibility(View.GONE);
+			}
+
 		} else
-			((TextView) findViewById(R.id.text_date_due)).setText(R.string.text_no_due_date);
-
-		// Set final due date
-		if (task.hasFinalDateDue())
-			((TextView) findViewById(R.id.text_alarm)).setText(DateFormat.format("MM/dd/yy 'at' h:mm AA", task.getFinalDateDueCal()));
-		else
-			((TextView) findViewById(R.id.text_alarm)).setText(R.string.text_no_final_due_date);
-
-		// Set repetition
-		if (task.isRepeating()) {
-			((TextView) findViewById(R.id.text_repeat)).setText("Repeat every " + task.getRepeatInterval() + ' ' + Task.REPEAT_LABELS[task.getRepeatType()]);
-
-			if (task.hasStopRepeatingDate())
-				((TextView) findViewById(R.id.text_repeat_2)).setText(DateFormat.format("'until' MM/dd/yy 'at' h:mm AA", task.getStopRepeatingDateCal()));
-			else
-				((TextView) findViewById(R.id.text_repeat_2)).setText(R.string.text_no_stop_repeating_date);
-		} else {
-			((TextView) findViewById(R.id.text_repeat)).setText(R.string.text_no_repetition);
-			((TextView) findViewById(R.id.text_repeat_2)).setVisibility(View.GONE);
-		}
+			((LinearLayout) findViewById(R.id.due_date_bar)).setVisibility(View.GONE);
 
 		// Set notes
 		((TextView) findViewById(R.id.text_notes)).setText(task.getNotes());
-
-		// Set date created
-		((TextView) findViewById(R.id.text_date_created)).setText(DateFormat.format("MM/dd/yy 'at' h:mm AA", task.getDateCreatedCal()));
-
-		// Set date modified
-		((TextView) findViewById(R.id.text_date_modified)).setText(DateFormat.format("MM/dd/yy 'at' h:mm AA", task.getDateModifiedCal()));
 	}
 
 	/**
 	 * Displays a message in a Toast notification for a short duration.
 	 */
 	private void toast(String message)
+	{
+		Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+	}
+	
+	/**
+	 * Displays a message in a Toast notification for a short duration.
+	 */
+	private void toast(int message)
 	{
 		Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
 	}
@@ -168,16 +167,26 @@ DialogInterface.OnClickListener {
 		setContentView(R.layout.activity_view_task);
 
 		// Allow Action bar icon to act as a button
-		ActionBar action_bar = getSupportActionBar();
+		action_bar = getSupportActionBar();
 		action_bar.setHomeButtonEnabled(true);
 		action_bar.setDisplayHomeAsUpEnabled(true);
 
 		// Get instance of the db
 		data_source = TasksDataSource.getInstance(this);
-
+	}
+	
+	@Override
+	protected void onStart() {
+		super.onStart();
+		
 		// Get the task from the intent
-		task = data_source.getTask(getIntent().getIntExtra(Task.EXTRA_TASK_ID, 0));
-
+		int id = getIntent().getIntExtra(Task.EXTRA_TASK_ID, 0);
+		
+		if (id == 0)
+			finish();
+		
+		task = data_source.getTask(id);
+		
 		// Exit the task if it no longer exists (has been deleted)
 		if (task == null) {
 			toast("This task has been deleted!");
@@ -230,16 +239,49 @@ DialogInterface.OnClickListener {
 
 	@Override
 	public void onClick(View v) {	
-		if (v.getId() == R.id.button_complete_task) {
+		if (v.getId() == R.id.text_view_task_name) {
 			task.toggleIsCompleted();
-			task.setDateModified(GregorianCalendar.getInstance().getTimeInMillis());
-			if (task.isCompleted())
-				toast("Task completed!");
-			else
-				toast("Task not completed");
+			task.setDateModified(System.currentTimeMillis());
+			data_source.updateTask(task);
+			
+			// Alarm logic: Complete/Uncomplete a task (ViewTaskActivity)
+			// * Don't forget to update date modified!
+			// * Task must be updated in database first
+			// * Cancel alarm first to be safe
+			// * Cancel an existing notification
+			// * If user completed the task:
+			// *	If is repeating:
+			// *		Set repeating alarm to get new due date (possibly uncompletes the task)
+			// *		Notify user that repeated task has been rescheduled
+			// *		Set alarm if task was uncompleted
+			// *	 	(Future repeating due date will be handled by the service after alarm rings)
+			// * Else user uncompleted the task:
+			// *	If has due date and is not past due:
+			// *		Set alarm
+			TaskAlarm alarm = new TaskAlarm();
+			alarm.cancelAlarm(this, task.getID());
+			alarm.cancelNotification(this, task.getID());
+			if (task.isCompleted()) {
+				toast(R.string.toast_task_completed);
+				if (task.isRepeating()) {
+					task = alarm.setRepeatingAlarm(this, task.getID());
+										
+					if (!task.isCompleted()) {
+						alarm.setAlarm(this, task);
+						toast(ToastMaker.getRepeatMessage(this, 
+								R.string.toast_task_repeated, 
+								task.getDateDueCal()));
+					} else {
+						toast(ToastMaker.getRepeatMessage(this, 
+								R.string.toast_task_repeat_delayed, 
+								task.getDateDueCal()));
+					}
+				}
+			} else {
+				if (task.hasDateDue() && !task.isPastDue())
+					alarm.setAlarm(this, task);
+			}
 		}
-
-		data_source.updateTask(task);
 
 		intent = new Intent(this, MainActivity.class);
 		intent.putExtra(Task.EXTRA_TASK_ID, task.getID());
@@ -255,11 +297,15 @@ DialogInterface.OnClickListener {
 	public void onClick(DialogInterface dialog, int which) {
 		switch (which) {
 		case DialogInterface.BUTTON_POSITIVE:
+			// Alarm logic: Delete a task (ViewTaskActivity)
+			// * Task must not be deleted from database yet!
+			// * Cancel alarm
+			// * Cancel an existing notification
+			TaskAlarm alarm = new TaskAlarm();
+			alarm.cancelAlarm(this, task.getID());
+			alarm.cancelNotification(this, task.getID());
+			
 			data_source.deleteTask(task);
-			if (task.hasDateDue()) {
-				TaskAlarm alarm = new TaskAlarm();
-				alarm.cancelAlarm(getApplicationContext(), task.getID());
-			}
 			toast("Task deleted");
 			finish();
 			break;
@@ -272,14 +318,9 @@ DialogInterface.OnClickListener {
 
 	@Override
 	public void onActivityResult(int request_code, int result_code, Intent intent) {		
-		if (request_code == MainActivity.EDIT_TASK_REQUEST && result_code == MainActivity.RESULT_OK) {
-			task = data_source.getTask(intent.getIntExtra(Task.EXTRA_TASK_ID, 0));
-			displayTask();
-			if (!task.isCompleted() && task.hasDateDue() &&
-					(task.getDateDue() >= System.currentTimeMillis())) {
-				TaskAlarm alarm = new TaskAlarm();
-				alarm.setAlarm(this, task.getID());
-			}
-		}
+		// There is currently no special handling for activity results
+		/*if (request_code == MainActivity.EDIT_TASK_REQUEST && result_code == MainActivity.RESULT_OK) {
+			
+		}*/
 	}
 }

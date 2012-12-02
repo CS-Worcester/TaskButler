@@ -19,20 +19,15 @@
 
 package edu.worcester.cs499summer2012.activity;
 
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-
-import edu.worcester.cs499summer2012.R;
-import edu.worcester.cs499summer2012.database.DatabaseHandler;
-import edu.worcester.cs499summer2012.task.Category;
-import edu.worcester.cs499summer2012.task.Task;
-
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.RadioGroup;
 import android.widget.Toast;
+import edu.worcester.cs499summer2012.R;
+import edu.worcester.cs499summer2012.database.DatabaseHandler;
+import edu.worcester.cs499summer2012.service.TaskAlarm;
+import edu.worcester.cs499summer2012.task.Category;
+import edu.worcester.cs499summer2012.task.Task;
 
 /**
  * Activity for adding a new task.
@@ -44,31 +39,22 @@ public class AddTaskActivity extends BaseTaskActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
-        // Initialize calendars: 
-		//     Due date defaults to +1 hour
-		//     Final due date defaults to +2 hours
-		//     Stop repeating date defaults to +4 hours
-        due_date_cal = GregorianCalendar.getInstance();
-        due_date_cal.add(Calendar.HOUR, 1);
-        due_date_cal.set(Calendar.SECOND, 0);
-        due_date_cal.set(Calendar.MILLISECOND, 0);
         
-        final_due_date_cal = (Calendar) due_date_cal.clone();
-        final_due_date_cal.add(Calendar.HOUR, 1);
+        // Initialize priority spinner
+        s_priority.setSelection(Task.NORMAL);
         
-        stop_repeating_date_cal = (Calendar) final_due_date_cal.clone();
-        stop_repeating_date_cal.add(Calendar.DAY_OF_MONTH, 1);
+        // Initialize repeat type spinner
+        s_repeat_type.setSelection(Task.DAYS);
         
         // Make the displayed category in MainActivity the default selection
-        int id = prefs.getInt(MainActivity.DISPLAY_CATEGORY, MainActivity.DISPLAY_ALL_CATEGORIES);
-        category.setSelection(category_adapter.getPosition(data_source.getCategory(id)));
+        default_category = data_source.getCategory(prefs.getInt(SettingsActivity.DISPLAY_CATEGORY, MainActivity.DISPLAY_ALL_CATEGORIES));
+        s_category.setSelection(category_adapter.getPosition(default_category));
 	}
 
 	protected boolean addTask() {
     	// Get task name
     	EditText et_name = (EditText) findViewById(R.id.edit_add_task_name);
-    	String name = et_name.getText().toString();
+    	String name = et_name.getText().toString().trim();
     	
     	// If there is no task name, don't create the task
     	if (name.equals(""))
@@ -77,32 +63,12 @@ public class AddTaskActivity extends BaseTaskActivity {
     		return false;
     	}
     	
-    	// Get completion status
-    	CheckBox is_completed = (CheckBox) findViewById(R.id.checkbox_already_completed);
-    	
-    	// Get task priority
-    	RadioGroup task_priority = (RadioGroup) findViewById(R.id.radiogroup_add_task_priority);
-    	int priority;
-    	
-    	switch (task_priority.getCheckedRadioButtonId()) {
-    	case R.id.radio_add_task_urgent:
-    		priority = Task.URGENT;
-    		break;
-    	case R.id.radio_add_task_trivial:
-    		priority = Task.TRIVIAL;
-    		break;
-    	case R.id.radio_add_task_normal:
-    	default:
-    		priority = Task.NORMAL;
-    		break;    		
-    	}
-    	
     	// Get task category
-    	int categoryID = ((Category) category.getSelectedItem()).getID();
+    	int categoryID = ((Category) s_category.getSelectedItem()).getID();
     	
     	// Get repeat interval
     	int interval = 1;
-    	String interval_string = repeat_interval.getText().toString();
+    	String interval_string = et_repeat_interval.getText().toString();
     	if (!interval_string.equals("")) {
     		interval =  Integer.parseInt(interval_string);
     		if (interval == 0)
@@ -111,43 +77,46 @@ public class AddTaskActivity extends BaseTaskActivity {
     	
     	// Get task due date
     	long due_date_ms = 0;
-    	if (has_due_date.isChecked())
+    	if (cb_due_date.isChecked())
     		due_date_ms = due_date_cal.getTimeInMillis();
-    	
-    	// Get task final due date
-    	long final_due_date_ms = 0;
-    	if (has_final_due_date.isChecked())
-    		final_due_date_ms = final_due_date_cal.getTimeInMillis();
-    	
-    	// Get stop repeating date
-    	long stop_repeating_date_ms = 0;
-    	if (stop_repeating.isChecked())
-    		stop_repeating_date_ms = stop_repeating_date_cal.getTimeInMillis();
     	
     	// Get task notes
     	EditText notes = (EditText) findViewById(R.id.edit_add_task_notes);
     	    	
+    	// Current time
+    	long current_time = System.currentTimeMillis();
+    	
     	// Create the task
     	Task task = new Task(
-    			name, 
-    			is_completed.isChecked(), 
-    			priority, 
+    			data_source.getNextID(DatabaseHandler.TABLE_TASKS),
+    			name,
+    			false, 
+    			s_priority.getSelectedItemPosition(), 
     			categoryID,
-    			has_due_date.isChecked(),
-    			has_final_due_date.isChecked(),
-    			has_repetition.isChecked(),
-    			stop_repeating.isChecked(),
-    			repeat_type.getSelectedItemPosition(),
+    			cb_due_date.isChecked(),
+    			cb_final_due_date.isChecked(),
+    			cb_repeating.isChecked(),
+    			s_repeat_type.getSelectedItemPosition(),
     			interval,
-    			GregorianCalendar.getInstance().getTimeInMillis(), 
-    			due_date_ms, 
-    			final_due_date_ms,
-    			stop_repeating_date_ms,
+    			current_time,
+    			current_time,
+    			due_date_ms,
+    			"",
     			notes.getText().toString());
     	
     	// Assign the task a unique ID and store it in the database
     	task.setID(data_source.getNextID(DatabaseHandler.TABLE_TASKS));
     	data_source.addTask(task);
+    	
+    	// Alarm logic: Add a task (AddTaskActivity)
+    	// * Task must be added to database first
+    	// * If has due date:
+    	// *	Set alarm
+    	// * 	(Repeating due date will be handled by the service after alarm rings)
+    	if (task.hasDateDue() && !task.isPastDue()) {
+    		TaskAlarm alarm = new TaskAlarm();
+    		alarm.setAlarm(this, task);
+    	}
     	
     	// Create the return intent and add the task ID
     	intent = new Intent(this, MainActivity.class);    	

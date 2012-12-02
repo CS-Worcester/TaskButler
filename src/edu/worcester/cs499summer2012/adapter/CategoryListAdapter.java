@@ -22,6 +22,8 @@ package edu.worcester.cs499summer2012.adapter;
 import java.util.ArrayList;
 
 import android.app.Activity;
+import android.graphics.Color;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,7 +33,6 @@ import edu.worcester.cs499summer2012.R;
 import edu.worcester.cs499summer2012.task.Category;
 
 public class CategoryListAdapter extends ArrayAdapter<Category> {
-
 	/**************************************************************************
 	 * Static fields and methods                                              *
 	 **************************************************************************/
@@ -47,6 +48,7 @@ public class CategoryListAdapter extends ArrayAdapter<Category> {
 	
 	private final Activity activity;
 	private final ArrayList<Category> categories;
+	private final int textViewResourceId;
 	
 	/**************************************************************************
 	 * Constructors                                                           *
@@ -57,35 +59,25 @@ public class CategoryListAdapter extends ArrayAdapter<Category> {
 	 * @param
 	 * @param
 	 */
-	public CategoryListAdapter(Activity activity, ArrayList<Category> categories) {
-		super(activity, R.layout.row_comparator, categories);
+	public CategoryListAdapter(Activity activity, int textViewResourceId, ArrayList<Category> categories) {
+		super(activity, textViewResourceId, categories);
 		this.activity = activity;
 		this.categories = categories;
-		this.categories.remove(0);
+		this.textViewResourceId = textViewResourceId;
 		setNotifyOnChange(true);
 	}
 	
 	/**************************************************************************
-	 * Overridden parent methods                                              *
+	 * Class methods                                                          *
 	 **************************************************************************/
 	
-	/**
-	 * This method is called automatically when the user scrolls the ListView.
-	 * Updates the View of a single visible row, reflecting the list being 
-	 * scrolled by the user.
-	 * @param position the index of the TaskList
-	 * @param convert_view the View to be updated
-	 * @param parent the parent ViewGroup of convert_view
-	 * @return the updated View
-	 */
-	@Override
-	public View getView(int position, View convert_view, ViewGroup parent) {
+	public View getCustomView(int position, View convert_view, ViewGroup parent) {
 		View view = convert_view;
 		Category category = categories.get(position);
 		
 		if (view == null) {		
 			LayoutInflater inflater = activity.getLayoutInflater();
-			view = inflater.inflate(R.layout.row_category, null);
+			view = inflater.inflate(textViewResourceId, null);
 			
 			final ViewHolder view_holder = new ViewHolder();
 			view_holder.color = (View) view.findViewById(R.id.view_row_category_color);
@@ -103,7 +95,25 @@ public class CategoryListAdapter extends ArrayAdapter<Category> {
 		
 		// Set name
 		holder.name.setText(category.getName());
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB && 
+				textViewResourceId == R.layout.row_category_small)
+				holder.name.setTextColor(Color.BLACK);
 		
 		return view;
+	}
+	
+	
+	/**************************************************************************
+	 * Overridden parent methods                                              *
+	 **************************************************************************/
+	
+	@Override
+	public View getView(int position, View convert_view, ViewGroup parent) {
+		return getCustomView(position, convert_view, parent);
+	}
+	
+	@Override
+	public View getDropDownView(int position, View convertView, ViewGroup parent) {
+	return getCustomView(position, convertView, parent);
 	}
 }
