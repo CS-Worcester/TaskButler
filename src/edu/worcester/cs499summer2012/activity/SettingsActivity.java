@@ -245,7 +245,7 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
 		switch (delete_mode) {
 		case DELETE_MODE_FINISHED:
 			deleted_tasks = data_source.deleteFinishedTasks();
-			toast(deleted_tasks + " tasks deleted");
+			toastDeletedTasks(deleted_tasks);
 			finish();
 			break;
 
@@ -261,10 +261,24 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
 				alarm.cancelAlarm(this, task.getID());
 			
 			deleted_tasks = data_source.deleteAllTasks();
-			toast(deleted_tasks + " tasks deleted");
+			toastDeletedTasks(deleted_tasks);
 			finish();
 			break;
 		}
+	}
+	
+	/**
+	 * Displays a Toast notification informing the user about the number of
+	 * tasks deleted.
+	 * @param val the number of tasks deleted
+	 */
+	private void toastDeletedTasks(int val) {
+		if (val == 0)
+			toast("No tasks were deleted.");
+		else if (val == 1)
+			toast(val + " task deleted");
+		else
+			toast(val + " tasks deleted");
 	}
 	
 	/**

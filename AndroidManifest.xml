@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="edu.worcester.cs499summer2012"
-    android:versionCode="1"
-    android:versionName="RC1" >
+    android:versionCode="2"
+    android:versionName="RC2" >
 
     <uses-sdk
         android:minSdkVersion="8"
