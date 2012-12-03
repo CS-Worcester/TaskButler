@@ -239,7 +239,12 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 				Calendar current_date = GregorianCalendar.getInstance();
 				Calendar due_date = task.getDateDueCal();
 				
-				if (due_date.get(Calendar.YEAR) > current_date.get(Calendar.YEAR)) {
+				if (due_date.before(current_date))
+				{
+					// Due date is past
+					holder.due_date.setText("Past due");
+					holder.due_date.setTextColor(Color.RED);
+				} else if (due_date.get(Calendar.YEAR) > current_date.get(Calendar.YEAR)) {
 					// Due date is in a future year
 					holder.due_date.setText(DateFormat.format("MMM d'\n'yyyy", due_date));
 				} else if (due_date.get(Calendar.DAY_OF_YEAR) - current_date.get(Calendar.DAY_OF_YEAR) > 6) {
@@ -248,14 +253,10 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 				} else if (due_date.get(Calendar.DAY_OF_YEAR) > current_date.get(Calendar.DAY_OF_YEAR)) {
 					// Due date is after today
 					holder.due_date.setText(DateFormat.format("E'\n'h:mmaa", due_date));
-				} else if (!task.isPastDue()) {
+				} else {
 					// Due date is today
 					holder.due_date.setText(DateFormat.format("'Today\n'h:mmaa", due_date));
-				} else {
-					// Due date is past
-					holder.due_date.setText("Past due");
-					holder.due_date.setTextColor(Color.RED);
-				}	
+				}
 			} else
 				holder.due_date.setText("");
 		}

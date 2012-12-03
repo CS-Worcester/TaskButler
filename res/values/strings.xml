@@ -70,6 +70,7 @@
     <!-- Preferences items -->
     <string name="pref_category_tasks">Tasks</string>
     <string name="pref_category_reminders">Due Dates</string>
+    <string name="pref_category_backup">Backup &amp; Restore</string>
     <string name="pref_edit_categories">Categories</string>
     <string name="pref_msg_edit_categories">Edit task categories</string>
     <string name="pref_auto_sort">Auto-sort</string>
@@ -83,6 +84,10 @@
     <string name="pref_reminder_time">Normal alarm</string>
     <string name="pref_alarm_time">Procrastination alarm</string>
     <string name="pref_alarm_dialog">Set alarm time</string>
+    <string name="pref_backup">Backup</string>
+    <string name="pref_backup_summary">Backup tasks &amp; categories to SD card</string>
+    <string name="pref_restore">Restore</string>
+    <string name="pref_restore_summary">Restore tasks &amp; categories to SD card</string>
     
     <!-- Preferences arrays -->
     <string-array name="pref_reminder_times">
