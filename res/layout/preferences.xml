@@ -5,7 +5,6 @@
     	<PreferenceScreen
     	    	android:key="edit_categories"
     	    	android:title="@string/pref_edit_categories"
-    	    	android:summary="@string/pref_msg_edit_categories"
     	    	android:icon="@drawable/ic_category" />
     
     	<PreferenceCategory
@@ -80,13 +79,11 @@
     	    <PreferenceScreen
 	   	    	android:key="backup"
 	   	    	android:title="@string/pref_backup"
-	   	    	android:summary="@string/pref_backup_summary"
 	   	    	android:icon="@drawable/ic_delete"/>
 	   	    	
     	    <PreferenceScreen
 	   	    	android:key="restore"
 	   	    	android:title="@string/pref_restore"
-	   	    	android:summary="@string/pref_restore_summary"
 	   	    	android:icon="@drawable/ic_delete"/>
     	    
     	</PreferenceCategory>

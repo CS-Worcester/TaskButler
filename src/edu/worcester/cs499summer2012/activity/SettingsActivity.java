@@ -34,6 +34,7 @@ import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
+import android.text.format.DateFormat;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.ActionBar;
@@ -46,6 +47,7 @@ import edu.worcester.cs499summer2012.database.TasksDataSource;
 import edu.worcester.cs499summer2012.service.TaskAlarm;
 import edu.worcester.cs499summer2012.service.TaskButlerService;
 import edu.worcester.cs499summer2012.service.WakefulIntentService;
+import edu.worcester.cs499summer2012.task.BackupManager;
 import edu.worcester.cs499summer2012.task.Task;
 
 public class SettingsActivity extends SherlockPreferenceActivity implements 
@@ -61,12 +63,16 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
 	public static final String VIBRATE_ON_ALARM = "vibrate_on_alarm";
 	public static final String REMINDER_TIME = "reminder_time";
 	public static final String ALARM_TIME = "alarm_time";
+	public static final String BACKUP = "backup";
+	public static final String LAST_BACKUP = "last_backup";
+	public static final String RESTORE = "restore";
 	public static final String SORT_TYPE = "sort_type";
 	public static final String DISPLAY_CATEGORY = "display_category";
 	
 	public static final String DEFAULT_REMINDER_TIME = "6";
 	public static final String DEFAULT_ALARM_TIME = "15";
 	public static final String DEFAULT_HOUR_VALUE = "12";
+	public static final long DEFAULT_LAST_BACKUP = 0;
 	private static final int DELETE_MODE_FINISHED = 0;
 	private static final int DELETE_MODE_ALL = 1;
 	
@@ -84,6 +90,8 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
 	private ListPreference lp_reminder_time;
 	private ListPreference lp_alarm_time;
 	private ListPreference lp_default_hour;
+	private PreferenceScreen ps_backup;
+	private PreferenceScreen ps_restore;
 	
     @SuppressWarnings("deprecation")
 	@Override
@@ -114,6 +122,8 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
         lp_reminder_time = (ListPreference) this.findPreference(REMINDER_TIME);
         lp_alarm_time = (ListPreference) this.findPreference(ALARM_TIME);
         lp_default_hour = (ListPreference) this.findPreference(DEFAULT_HOUR);
+        ps_backup = (PreferenceScreen) this.findPreference(BACKUP);
+        ps_restore = (PreferenceScreen) this.findPreference(RESTORE);
         
         // Set listeners
         ps_edit_categories.setOnPreferenceClickListener(this);
@@ -121,6 +131,8 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
         cbp_custom_sort.setOnPreferenceClickListener(this);
         ps_delete_finished_tasks.setOnPreferenceClickListener(this);
         ps_delete_all_tasks.setOnPreferenceClickListener(this);
+        ps_backup.setOnPreferenceClickListener(this);
+        ps_restore.setOnPreferenceClickListener(this);
         lp_reminder_time.setOnPreferenceChangeListener(this);
         lp_alarm_time.setOnPreferenceChangeListener(this);
         lp_default_hour.setOnPreferenceChangeListener(this);
@@ -142,6 +154,17 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
         lp_alarm_time.setSummary(getReminderSummary(ALARM_TIME, 
         		prefs.getString(ALARM_TIME, DEFAULT_ALARM_TIME)));
         lp_default_hour.setSummary(getHourSummary(prefs.getString(DEFAULT_HOUR, DEFAULT_HOUR_VALUE)));
+        
+        // Set last backup
+        setBackupSummary();
+    }
+    
+    private void setBackupSummary() {
+    	long date = prefs.getLong(LAST_BACKUP, DEFAULT_LAST_BACKUP);
+        if (date != DEFAULT_LAST_BACKUP) {
+        	ps_backup.setSummary(DateFormat.format("'Last backup:' M/d/yy h:mmaa", date));
+        } else
+        	ps_backup.setSummary("Last backup: Never");
     }
     
     private String getReminderSummary(String key, String value) {
@@ -220,6 +243,25 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
 		if (key.equals(DELETE_ALL_TASKS)) {
 			deleteAlert("Are you sure you want to delete all tasks? This cannot be undone.",
 					DELETE_MODE_ALL);
+			return true;
+		}
+		
+		if (key.equals(BACKUP)) {
+			BackupManager backup_manager = new BackupManager();
+			String result = backup_manager.backup(this);
+			
+			if (result.equals(BackupManager.BACKUP_OK)) {
+				prefs_editor.putLong(LAST_BACKUP, System.currentTimeMillis());
+				prefs_editor.commit();
+				setBackupSummary();
+			}
+			
+			toast(BackupManager.interpretStringCode(result));
+			return true;
+		}
+		
+		if (key.equals(RESTORE)) {
+			finish();
 			return true;
 		}
 		
@@ -312,8 +354,6 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
 		}
 		
 		if (key.equals(DEFAULT_HOUR)) {
-
-			
 			lp_default_hour.setSummary(getHourSummary((String) newValue));
 			return true;
 		}
