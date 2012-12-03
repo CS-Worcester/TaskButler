@@ -22,6 +22,7 @@ package edu.worcester.cs499summer2012.activity;
 import java.util.ArrayList;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
@@ -79,6 +80,7 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
 	private TasksDataSource data_source;
 	private SharedPreferences prefs;
 	private SharedPreferences.Editor prefs_editor;
+	private Context context;
 	private int delete_mode;
 	
 	private PreferenceScreen ps_edit_categories;
@@ -98,6 +100,7 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.layout.preferences);
+        context = this;
         
         // Allow Action bar icon to act as a button
         ActionBar action_bar = getSupportActionBar();
@@ -106,7 +109,7 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
         action_bar.setDisplayHomeAsUpEnabled(true);
         
 		// Open the database
-		data_source = TasksDataSource.getInstance(getApplicationContext());
+		data_source = TasksDataSource.getInstance(this);
 
 		// Read preferences from file
 		prefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -137,7 +140,6 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
         lp_alarm_time.setOnPreferenceChangeListener(this);
         lp_default_hour.setOnPreferenceChangeListener(this);
         cpb_vibrate.setOnPreferenceChangeListener(this);
-        
         
         // Set checkbox states
         if (prefs.getInt(SORT_TYPE, TaskListAdapter.AUTO_SORT) == TaskListAdapter.AUTO_SORT) {
@@ -248,7 +250,7 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
 		
 		if (key.equals(BACKUP)) {
 			BackupManager backup_manager = new BackupManager();
-			String result = backup_manager.backup(this);
+			String result = backup_manager.backup();
 			
 			if (result.equals(BackupManager.BACKUP_OK)) {
 				prefs_editor.putLong(LAST_BACKUP, System.currentTimeMillis());
@@ -261,7 +263,40 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
 		}
 		
 		if (key.equals(RESTORE)) {
-			finish();
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			builder.setMessage("Are you sure you want to restore your last backup? Restoring will replace your existing tasks.")
+			.setCancelable(true)
+			.setTitle(R.string.pref_restore)
+			.setPositiveButton("Restore", new DialogInterface.OnClickListener() {
+				
+				public void onClick(DialogInterface dialog, int id) {
+					BackupManager backup_manager = new BackupManager();
+					
+					if (backup_manager.doesBackupExist()) {
+						// Alarm logic: Restore database
+						// * Iterate through list of tasks
+						// * 	Cancel alarm
+						// *    Cancel existing notifications
+						ArrayList<Task> tasks = data_source.getTasks(true, null);
+						TaskAlarm alarm = new TaskAlarm();
+						for (Task task : tasks) {
+							alarm.cancelAlarm(context, task.getID());
+							alarm.cancelNotification(context, task.getID());
+						}
+					}
+					
+					String result = backup_manager.restore();
+					toast(BackupManager.interpretStringCode(result));
+					dialog.dismiss();
+				}
+				
+			})
+			.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int id) {
+					dialog.cancel();
+				}
+			});
+			builder.create().show();
 			return true;
 		}
 		
@@ -291,7 +326,6 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
 		case DELETE_MODE_FINISHED:
 			deleted_tasks = data_source.deleteFinishedTasks();
 			toastDeletedTasks(deleted_tasks);
-			finish();
 			break;
 
 		case DELETE_MODE_ALL:
@@ -310,7 +344,6 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
 			
 			deleted_tasks = data_source.deleteAllTasks();
 			toastDeletedTasks(deleted_tasks);
-			finish();
 			break;
 		}
 	}

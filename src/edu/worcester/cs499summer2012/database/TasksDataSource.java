@@ -42,7 +42,7 @@ public class TasksDataSource {
 	private SQLiteDatabase db;
 	private DatabaseHandler handler;
 	private static TasksDataSource instance;
-
+	
 	private TasksDataSource(){
 
 	}

@@ -24,9 +24,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.nio.channels.FileChannel;
 
-import android.content.Context;
 import android.os.Environment;
-import android.widget.Toast;
 import edu.worcester.cs499summer2012.database.DatabaseHandler;
 
 /**
@@ -45,20 +43,17 @@ public class BackupManager {
 	private static final String PACKAGE_NAME = "edu.worcester.cs499summer2012";
 	private static final String DB_FILENAME = DatabaseHandler.DATABASE_NAME;
 	private static final String DB_INTERNAL_PATH = "//data//" + PACKAGE_NAME + "//databases//";
-	private static final String DB_EXTERNAL_PATH = "//Android//data//" + PACKAGE_NAME + "//databases//";
-	private static final String PREFS_FILENAME = PACKAGE_NAME + "_preferences.xml";
-	private static final String PREFS_INTERNAL_PATH = "//data//" + PACKAGE_NAME + "//shared_prefs//";
-	private static final String PREFS_EXTERNAL_PATH = "//Android//data//" + PACKAGE_NAME + "//shared_prefs//";
+	private static final String DB_EXTERNAL_PATH = "//TaskButler//backup//";
 	
 	public static String interpretStringCode(String code) {
 		if (code.equals(BACKUP_OK))
-			return "The backup was successful";
+			return "Backup successfull!";
 		
 		if (code.equals(RESTORE_OK))
-			return "The restore was successful";
+			return "Restore successfull!";
 		
 		if (code.equals(NO_RESTORE_EXISTS))
-			return "There is no backup to restore from";
+			return "No backup exists!";
 		
 		if (code.equals(BACKUP_EXCEPTION))
 			return "The backup failed unexpectedly";
@@ -96,11 +91,38 @@ public class BackupManager {
 	public BackupManager() {}
 	
 	/**
+	 * Checks if a backup file exists.
+	 * @return true if a backup exists, false otherwise
+	 */
+	public boolean doesBackupExist() {
+		String media_state = Environment.getExternalStorageState();
+		
+		// Check for read access
+		if (!media_state.equals(Environment.MEDIA_MOUNTED) && 
+				!media_state.equals(Environment.MEDIA_MOUNTED_READ_ONLY))
+			return false;
+		
+		try {
+			File sd_card = Environment.getExternalStorageDirectory();
+			
+			if (sd_card.canRead()) {
+				// Restore database
+				File backup = new File(sd_card, DB_EXTERNAL_PATH + DB_FILENAME);
+				return backup.exists();
+			} else
+				return false;
+			
+		} catch (Exception e) {
+			return false;
+		}
+	}
+	
+	/**
 	 * Backs up the app database and preferences file to SD card.
 	 * @return BACKUP_OK if successful, else a MEDIA code describing why the
 	 *                   backup was not possible
 	 */
-	public String backup(Context context) {
+	public String backup() {
 		String media_state = Environment.getExternalStorageState();
 		
 		// Check for write access
@@ -128,29 +150,11 @@ public class BackupManager {
 				dest.close();
 				input_stream.close();
 				output_stream.close();
-				
-				// Backup preferences
-				backup_dir = new File(sd_card, PREFS_EXTERNAL_PATH);
-				backup_dir.mkdirs();
-				backup = new File(backup_dir, PREFS_FILENAME);
-				current = new File(internal_storage, PREFS_INTERNAL_PATH + PREFS_FILENAME);
-				
-				input_stream = new FileInputStream(current);
-				output_stream = new FileOutputStream(backup);
-				source = input_stream.getChannel();
-				dest = output_stream.getChannel();
-				
-				dest.transferFrom(source, 0, source.size());
-				source.close();
-				dest.close();
-				input_stream.close();
-				output_stream.close();
 			} else {
 				return BACKUP_EXCEPTION;
 			}
 				
 		} catch (Exception e) {
-			Toast.makeText(context, e.toString(), Toast.LENGTH_LONG).show();
 			return BACKUP_EXCEPTION;
 		}
 		
@@ -172,10 +176,25 @@ public class BackupManager {
 		
 		try {
 			File sd_card = Environment.getExternalStorageDirectory();
-			File internal = Environment.getDataDirectory();
+			File internal_storage = Environment.getDataDirectory();
 			
 			if (sd_card.canRead()) {
+				// Restore database
+				File backup = new File(sd_card, DB_EXTERNAL_PATH + DB_FILENAME);
+				if (!backup.exists())
+					return NO_RESTORE_EXISTS;
+				File restored = new File(internal_storage, DB_INTERNAL_PATH + DB_FILENAME);
 				
+				FileInputStream input_stream = new FileInputStream(backup);
+				FileOutputStream output_stream = new FileOutputStream(restored);
+				FileChannel source = input_stream.getChannel();
+				FileChannel dest = output_stream.getChannel();
+				
+				dest.transferFrom(source, 0, source.size());
+				source.close();
+				dest.close();
+				input_stream.close();
+				output_stream.close();
 			} else
 				return RESTORE_EXCEPTION;
 			
