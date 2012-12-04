@@ -57,6 +57,7 @@
     
     <!-- ImageView items -->
     <string name="image_priority">Priority</string>
+    <string name="image_category">Category</string>
     <string name="image_alarm">Procrastination Alarm</string>
     <string name="image_repeat">Repetition</string>
     <string name="image_up">Up</string>
