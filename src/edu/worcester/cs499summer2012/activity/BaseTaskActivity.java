@@ -101,6 +101,8 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
     protected PriorityListAdapter priority_adapter;
     
     // UI elements
+    protected EditText et_name;
+    protected EditText et_notes;
     protected CheckBox cb_due_date;
     protected TextView tv_due_date;
     protected TextView tv_due_time;
@@ -169,6 +171,8 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
         	due_date_cal.add(Calendar.DAY_OF_YEAR, 1);
         
         // Initialize the fields that can be enabled/disabled or listened to
+        et_name = (EditText) findViewById(R.id.edit_add_task_name);
+        et_notes = (EditText) findViewById(R.id.edit_add_task_notes);
         cb_due_date = (CheckBox) findViewById(R.id.checkbox_has_due_date);
         tv_due_date = (TextView) findViewById(R.id.text_add_task_due_date);
         tv_due_time = (TextView) findViewById(R.id.text_add_task_due_time);
@@ -179,6 +183,14 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
         s_priority = (Spinner) findViewById(R.id.spinner_add_task_priority);
         s_repeat_type = (Spinner) findViewById(R.id.spinner_add_task_repeat_type);
         tv_at = (TextView) findViewById(R.id.text_at);
+        
+        // Fix white line bug in Gingerbread
+		if (Build.VERSION.SDK_INT == Build.VERSION_CODES.GINGERBREAD ||
+				Build.VERSION.SDK_INT == Build.VERSION_CODES.GINGERBREAD_MR1) {
+			et_name.setBackgroundColor(Color.parseColor("#F0F0F0"));
+			et_notes.setBackgroundColor(Color.parseColor("#F0F0F0"));
+			et_repeat_interval.setBackgroundColor(Color.parseColor("#F0F0F0"));
+		}        
                 
         // Set listeners
         cb_due_date.setOnCheckedChangeListener(this);
@@ -463,6 +475,12 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
 			LayoutInflater li = LayoutInflater.from(this);
 			View category_name_view = li.inflate(R.layout.dialog_category_name, null);
 			et_category = (EditText) category_name_view.findViewById(R.id.edit_category_name);
+			
+			// Fix white line bug in Gingerbread
+			if (Build.VERSION.SDK_INT == Build.VERSION_CODES.GINGERBREAD ||
+					Build.VERSION.SDK_INT == Build.VERSION_CODES.GINGERBREAD_MR1) {
+				et_category.setBackgroundColor(Color.parseColor("#F0F0F0"));
+			}
 			
 			AlertDialog.Builder new_category_builder = new AlertDialog.Builder(this);
 			new_category_builder.setView(category_name_view);

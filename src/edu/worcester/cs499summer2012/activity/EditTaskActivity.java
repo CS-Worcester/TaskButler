@@ -22,9 +22,7 @@ package edu.worcester.cs499summer2012.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.EditText;
 import android.widget.Toast;
-import edu.worcester.cs499summer2012.R;
 import edu.worcester.cs499summer2012.service.TaskAlarm;
 import edu.worcester.cs499summer2012.task.Category;
 import edu.worcester.cs499summer2012.task.Task;
@@ -32,9 +30,6 @@ import edu.worcester.cs499summer2012.task.Task;
 public class EditTaskActivity extends BaseTaskActivity {
 
 	private Task task;
-	
-	private EditText et_name;
-	private EditText et_notes;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -49,7 +44,6 @@ public class EditTaskActivity extends BaseTaskActivity {
         task = data_source.getTask(id);
         
         // Set task name
-        et_name = (EditText) findViewById(R.id.edit_add_task_name);
         et_name.setText(task.getName());
         
         // Set priority
@@ -79,7 +73,6 @@ public class EditTaskActivity extends BaseTaskActivity {
         }
           
         // Set notes
-        et_notes = (EditText) findViewById(R.id.edit_add_task_notes);
         et_notes.setText(task.getNotes());
 	}
 	
