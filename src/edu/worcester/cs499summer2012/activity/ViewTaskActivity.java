@@ -68,6 +68,8 @@ DialogInterface.OnClickListener {
 	private Task task;
 	private Intent intent;
 	private ActionBar action_bar;
+	
+	private CheckedTextView name;
 
 	/**************************************************************************
 	 * Class methods                                                          *
@@ -75,7 +77,7 @@ DialogInterface.OnClickListener {
 
 	private void displayTask() {
 		// Set name
-		CheckedTextView name = (CheckedTextView) findViewById(R.id.text_view_task_name);
+		name = (CheckedTextView) findViewById(R.id.text_view_task_name);
 		name.setText(task.getName());
 		name.setChecked(task.isCompleted());
 		name.setOnClickListener(this);
@@ -254,6 +256,7 @@ DialogInterface.OnClickListener {
 	public void onClick(View v) {	
 		if (v.getId() == R.id.text_view_task_name) {
 			task.toggleIsCompleted();
+			name.setChecked(task.isCompleted());
 			task.setDateModified(System.currentTimeMillis());
 			data_source.updateTask(task);
 			
