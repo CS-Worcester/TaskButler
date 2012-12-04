@@ -19,6 +19,9 @@
 
 package edu.worcester.cs499summer2012.activity;
 
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -65,6 +68,8 @@ DialogInterface.OnClickListener {
 	private Task task;
 	private Intent intent;
 	private ActionBar action_bar;
+	
+	private CheckedTextView name;
 
 	/**************************************************************************
 	 * Class methods                                                          *
@@ -72,7 +77,7 @@ DialogInterface.OnClickListener {
 
 	private void displayTask() {
 		// Set name
-		CheckedTextView name = (CheckedTextView) findViewById(R.id.text_view_task_name);
+		name = (CheckedTextView) findViewById(R.id.text_view_task_name);
 		name.setText(task.getName());
 		name.setChecked(task.isCompleted());
 		name.setOnClickListener(this);
@@ -112,12 +117,22 @@ DialogInterface.OnClickListener {
 			else
 				due_date.setTextColor(Color.LTGRAY);
 			
-			if (task.getDateDue() >= System.currentTimeMillis()) {
+			Calendar current_cal = GregorianCalendar.getInstance();
+			Calendar due_cal = task.getDateDueCal();
+			if (due_cal.getTimeInMillis() >= current_cal.getTimeInMillis()) {
 				// Due date is in the future
-				due_date.setText(DateFormat.format("'Due' MMMM d, yyyy 'at' h:mmaa", task.getDateDueCal()));
+				// Same year?
+				if (due_cal.get(Calendar.YEAR) == current_cal.get(Calendar.YEAR))
+					due_date.setText(DateFormat.format("'Due' MMMM d 'at' h:mmaa", due_cal));
+				else
+					due_date.setText(DateFormat.format("'Due' MMMM d, yyyy 'at' h:mmaa", due_cal));
 			} else {
 				// Due date is in the past
-				due_date.setText(DateFormat.format("'Was due' MMMM d, yyyy 'at' h:mmaa", task.getDateDueCal()));
+				// Same year?
+				if (due_cal.get(Calendar.YEAR) == current_cal.get(Calendar.YEAR))
+					due_date.setText(DateFormat.format("'Was due' MMMM d 'at' h:mmaa", due_cal));
+				else
+					due_date.setText(DateFormat.format("'Was due' MMMM d, yyyy 'at' h:mmaa", due_cal));
 			}
 			
 			// Set repetition
@@ -241,6 +256,7 @@ DialogInterface.OnClickListener {
 	public void onClick(View v) {	
 		if (v.getId() == R.id.text_view_task_name) {
 			task.toggleIsCompleted();
+			name.setChecked(task.isCompleted());
 			task.setDateModified(System.currentTimeMillis());
 			data_source.updateTask(task);
 			
