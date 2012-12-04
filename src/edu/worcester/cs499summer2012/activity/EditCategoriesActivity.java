@@ -28,6 +28,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -81,7 +82,7 @@ public class EditCategoriesActivity extends SherlockListActivity implements Acti
 		
 		// Allow Action bar icon to act as a button
         ActionBar action_bar = getSupportActionBar();
-        action_bar.setIcon(R.drawable.ic_category);
+        action_bar.setIcon(R.drawable.ic_settings);
         action_bar.setHomeButtonEnabled(true);
         action_bar.setDisplayHomeAsUpEnabled(true);
 	}
@@ -106,6 +107,12 @@ public class EditCategoriesActivity extends SherlockListActivity implements Acti
 			LayoutInflater li = LayoutInflater.from(this);
 			View category_name_view = li.inflate(R.layout.dialog_category_name, null);
 			et_category_name = (EditText) category_name_view.findViewById(R.id.edit_category_name);
+			
+			// Fix white line bug in Gingerbread
+			if (Build.VERSION.SDK_INT == Build.VERSION_CODES.GINGERBREAD ||
+					Build.VERSION.SDK_INT == Build.VERSION_CODES.GINGERBREAD_MR1) {
+				et_category_name.setBackgroundColor(Color.parseColor("#F0F0F0"));
+			}
 			
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			builder.setView(category_name_view);

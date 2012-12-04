@@ -4,38 +4,31 @@
     
     	<PreferenceScreen
     	    	android:key="edit_categories"
-    	    	android:title="@string/pref_edit_categories"
-    	    	android:summary="@string/pref_msg_edit_categories"
-    	    	android:icon="@drawable/ic_category" />
+    	    	android:title="@string/pref_edit_categories" />
     
     	<PreferenceCategory
     	    android:title="@string/pref_category_tasks">
     	    
     	    <CheckBoxPreference 
     	        android:key="auto_sort"
-    	        android:title="@string/pref_auto_sort"
-    	        android:icon="@drawable/ic_sort" />
+    	        android:title="@string/pref_auto_sort" />
     	    
     	    <CheckBoxPreference 
     	        android:key="custom_sort"
-    	        android:title="@string/pref_custom_sort"
-    	        android:icon="@drawable/ic_sort" /> 
+    	        android:title="@string/pref_custom_sort" /> 
     	        
        		<CheckBoxPreference 
 	    	    android:key="hide_completed"
 	    	    android:title="@string/pref_hide_completed"
-	    	    android:icon="@drawable/ic_notes"
 	    	    android:defaultValue="true" />
 	    		    	    
 	   	    <PreferenceScreen
 	   	    	android:key="delete_finished_tasks"
-	   	    	android:title="@string/pref_delete_finished_tasks"
-	   	    	android:icon="@drawable/ic_delete"/>
+	   	    	android:title="@string/pref_delete_finished_tasks"/>
 	   	    	
   	        <PreferenceScreen
 	   	    	android:key="delete_all_tasks"
-	   	    	android:title="@string/pref_delete_all_tasks"
-	   	    	android:icon="@drawable/ic_delete"/>	    
+	   	    	android:title="@string/pref_delete_all_tasks"/>	    
     	    
     	</PreferenceCategory>
     	
@@ -45,14 +38,12 @@
     	    <CheckBoxPreference 
 	    	    android:key="vibrate_on_alarm"
 	    	    android:title="@string/pref_vibrate"
-	    	    android:icon="@drawable/ic_phone"
 	    	    android:defaultValue="true" />
     	    
 	     	<ListPreference
 	    	    android:key="reminder_time"
 	    	    android:title="@string/pref_reminder_time"
 	    	    android:dialogTitle="@string/pref_alarm_dialog"
-	    	    android:icon="@drawable/ic_alarm"
 	    	    android:entries="@array/pref_reminder_times"
 	    	    android:entryValues="@array/pref_reminder_values" />
 	    	
@@ -60,7 +51,6 @@
 	    	    android:key="alarm_time"
 	    	    android:title="@string/pref_alarm_time"
 	    	    android:dialogTitle="@string/pref_alarm_dialog"
-	    	    android:icon="@drawable/ic_alarm"
 	    	    android:entries="@array/pref_alarm_times"
 	    	    android:entryValues="@array/pref_alarm_values" />
 	    	
@@ -68,9 +58,21 @@
 	    	    android:key="default_hour"
 	    	    android:title="@string/pref_default_hour"
 	    	    android:dialogTitle="@string/pref_default_hour_dialog"
-	    	    android:icon="@drawable/ic_clock"
 	    	    android:entries="@array/pref_default_hour"
 	    	    android:entryValues="@array/pref_default_hour_values" />	    
+    	    
+    	</PreferenceCategory>
+    	
+    	<PreferenceCategory
+    	    android:title="@string/pref_category_backup">
+    	    
+    	    <PreferenceScreen
+	   	    	android:key="backup"
+	   	    	android:title="@string/pref_backup"/>
+	   	    	
+    	    <PreferenceScreen
+	   	    	android:key="restore"
+	   	    	android:title="@string/pref_restore"/>
     	    
     	</PreferenceCategory>
  
