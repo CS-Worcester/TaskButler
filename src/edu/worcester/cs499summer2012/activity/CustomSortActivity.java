@@ -78,7 +78,7 @@ public final class CustomSortActivity extends SherlockListActivity {
 		
 		// Allow Action bar icon to act as a button
         ActionBar action_bar = getSupportActionBar();
-        action_bar.setIcon(R.drawable.ic_sort);
+        action_bar.setIcon(R.drawable.ic_settings);
         action_bar.setHomeButtonEnabled(true);
         action_bar.setDisplayHomeAsUpEnabled(true);
 	}
@@ -104,7 +104,6 @@ public final class CustomSortActivity extends SherlockListActivity {
 		case R.id.menu_custom_sort_help:
     		AlertDialog.Builder builder = new AlertDialog.Builder(this);
     		builder.setTitle("Custom sorting");
-    		builder.setIcon(R.drawable.ic_about);
     		builder.setMessage(R.string.dialog_sorting_help);
     		builder.setCancelable(true);
     		builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {

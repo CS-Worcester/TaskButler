@@ -266,8 +266,7 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
     		
     	case R.id.menu_add_task_help:
     		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-    		builder.setTitle("Procrastination Alarm");
-    		builder.setIcon(R.drawable.ic_about);
+    		builder.setTitle("Procrastination alarm");
     		builder.setMessage(R.string.dialog_procrastinator_help);
     		builder.setCancelable(true);
     		builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {

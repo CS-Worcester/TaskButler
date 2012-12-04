@@ -73,7 +73,7 @@
     <string name="pref_category_reminders">Due Dates</string>
     <string name="pref_category_backup">Backup &amp; Restore</string>
     <string name="pref_edit_categories">Edit categories</string>
-    <string name="pref_auto_sort">Auto-sort</string>
+    <string name="pref_auto_sort">Auto sort</string>
     <string name="pref_custom_sort">Custom sort</string>
     <string name="pref_hide_completed">Hide completed tasks</string>
     <string name="pref_default_hour">Default time of day</string>
