@@ -18,6 +18,7 @@
     <string name="toast_task_repeated">This repeating task will be due again</string>
     <string name="toast_task_repeat_delayed">This repeating task will reappear</string>
     <string name="toast_task_deleted">Task deleted</string>
+    <string name="toast_category_deleted">Category deleted</string>
     <string name="toast_task_no_name">Task needs a name!</string>
     <string name="toast_category_no_name">Category needs a name!</string>
     <string name="toast_category_exists">Category name already exists</string>
@@ -77,8 +78,10 @@
     <string name="dialog_about">Copyright 2012 Jonathan Hasenzahl, James Celona, Dhimitraq Jorgji.\n\nTask Butler is distributed under the GNU General Public License.</string>
 	<string name="dialog_procrastinator_title">Procrastination alarm</string>
 	<string name="dialog_procrastinator_help">Task Butler will remind you periodically about tasks that are past due. If a task is time-sensitive, use the Procrastination Alarm to be reminded more frequently.</string>
+    <string name="dialog_sorting_title">Custom sorting</string>
     <string name="dialog_sorting_help">Tap on a sorting parameter to enable it. Tap the arrows of a parameter to change its rank in the list. Tasks will be sorted by the highest ranked parameter first, then by the second highest, and so on.</string>
     <string name="dialog_delete_single">Are you sure you want to delete this task?</string>
+    <string name="dialog_category_delete">Are you sure you want to delete this category?</string>
 	
     <!-- Preferences items -->
     <string name="pref_category_tasks">Tasks</string>

@@ -108,7 +108,7 @@ public final class CustomSortActivity extends SherlockListActivity {
 			
 		case R.id.menu_custom_sort_help:
     		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-    		builder.setTitle("Custom sorting");
+    		builder.setTitle(R.string.dialog_sorting_title);
     		builder.setIcon(R.drawable.ic_help);
     		builder.setMessage(R.string.dialog_sorting_help);
     		builder.setCancelable(true);

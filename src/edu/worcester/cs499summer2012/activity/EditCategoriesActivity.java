@@ -35,7 +35,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockListActivity;
@@ -51,6 +50,7 @@ import edu.worcester.cs499summer2012.database.TasksDataSource;
 import edu.worcester.cs499summer2012.service.TaskButlerWidgetProvider;
 import edu.worcester.cs499summer2012.task.Category;
 import edu.worcester.cs499summer2012.task.Task;
+import edu.worcester.cs499summer2012.task.ToastMaker;
 
 public class EditCategoriesActivity extends SherlockListActivity implements ActionMode.Callback, OnClickListener {
 
@@ -120,9 +120,9 @@ public class EditCategoriesActivity extends SherlockListActivity implements Acti
 			
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			builder.setView(category_name_view);
-			builder.setTitle("Enter category name");
-			builder.setPositiveButton("Next", this);
-			builder.setNegativeButton("Cancel", this);
+			builder.setTitle(R.string.dialog_new_category_title);
+			builder.setPositiveButton(R.string.menu_next, this);
+			builder.setNegativeButton(R.string.menu_cancel, this);
     		builder.create().show();
 			return true;
     		
@@ -173,9 +173,9 @@ public class EditCategoriesActivity extends SherlockListActivity implements Acti
 			
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			builder.setView(category_name_view);
-			builder.setTitle("Set name");
-			builder.setPositiveButton("Next", this);
-			builder.setNegativeButton("Cancel", this);
+			builder.setTitle(R.string.dialog_new_category_title);
+			builder.setPositiveButton(R.string.menu_next, this);
+			builder.setNegativeButton(R.string.menu_cancel, this);
     		builder.create().show();
 			mode.finish();
 			return true;
@@ -183,10 +183,10 @@ public class EditCategoriesActivity extends SherlockListActivity implements Acti
 		case R.id.menu_delete_category:
 			selected_dialog = DELETE_DIALOG;
 			AlertDialog.Builder builder2 = new AlertDialog.Builder(this);
-    		builder2.setMessage("Are you sure you want to delete this category?");
+    		builder2.setMessage(R.string.dialog_category_delete);
     		builder2.setCancelable(true);
-    		builder2.setPositiveButton("Yes", this);
-    		builder2.setNegativeButton("No", this);
+    		builder2.setPositiveButton(R.string.menu_delete_task, this);
+    		builder2.setNegativeButton(R.string.menu_cancel, this);
     		builder2.create().show();
     		mode.finish();
 			return true;
@@ -215,7 +215,7 @@ public class EditCategoriesActivity extends SherlockListActivity implements Acti
 				String name = et_category_name.getText().toString().trim();
 				if (name.equals("")) {
 					// No name, cancel dialog
-					Toast.makeText(this, "Category needs a name!", Toast.LENGTH_SHORT).show();
+					ToastMaker.toast(this, R.string.toast_category_no_name);
 					dialog.cancel();
 				} else if (data_source.getExistingCategory(name) != null &&
 						   (selected_dialog == CREATE_DIALOG || (selected_dialog == EDIT_DIALOG && !name.equals(old_name)))) {
@@ -223,7 +223,7 @@ public class EditCategoriesActivity extends SherlockListActivity implements Acti
 					// If also is create dialog, cancel dialog
 					// Or if also is edit dialog and the name is not its own name, cancel dialog
 					
-					Toast.makeText(this, "Category name already exists", Toast.LENGTH_SHORT).show();
+					ToastMaker.toast(this, R.string.toast_category_exists);
 					dialog.cancel();
 				} else {
 					int color = selected_dialog == EDIT_DIALOG ? selected_category.getColor() : Color.RED;
@@ -285,7 +285,7 @@ public class EditCategoriesActivity extends SherlockListActivity implements Acti
 				// Update homescreen widget (after change has been saved to DB)
 				TaskButlerWidgetProvider.updateWidget(activity);
 				
-				Toast.makeText(this, "Category deleted", Toast.LENGTH_SHORT).show();
+				ToastMaker.toast(this, R.string.toast_category_deleted);
 				
 				dialog.dismiss();
 				break;
