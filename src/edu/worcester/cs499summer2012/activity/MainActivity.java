@@ -456,6 +456,8 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
 			float velocityY) {
 
+		// TODO: This logic doesn't work that well. Find a better way to swipe.
+		/*
 		// Swiping won't work unless there are categories
 		if (categories.size() == 1)
 			return true;
@@ -491,6 +493,7 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 		View view = new View(this);
 		view.setTag(categories.get(new_index));
 		onClick(view);
+		*/
 
 		return true;
 	}
