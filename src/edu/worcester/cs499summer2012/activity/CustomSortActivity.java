@@ -21,7 +21,6 @@ package edu.worcester.cs499summer2012.activity;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ListView;
@@ -35,6 +34,7 @@ import com.actionbarsherlock.view.MenuItem;
 import edu.worcester.cs499summer2012.R;
 import edu.worcester.cs499summer2012.adapter.ComparatorListAdapter;
 import edu.worcester.cs499summer2012.database.TasksDataSource;
+import edu.worcester.cs499summer2012.service.TaskButlerWidgetProvider;
 import edu.worcester.cs499summer2012.task.Comparator;
 
 /**
@@ -82,14 +82,19 @@ public final class CustomSortActivity extends SherlockListActivity {
         action_bar.setHomeButtonEnabled(true);
         action_bar.setDisplayHomeAsUpEnabled(true);
 	}
+	
+	@Override
+	public void onStop() {
+		// Update homescreen widget (after change has been saved to DB)
+		TaskButlerWidgetProvider.updateWidget(this);
+		
+		super.onStop();
+	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getSupportMenuInflater();
 		inflater.inflate(R.menu.activity_custom_sort, menu);
-		
-    	if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB)
-			menu.findItem(R.id.menu_custom_sort_help).setIcon(R.drawable.ic_help_deprecated);
 		
 		return true;
 	}
@@ -103,7 +108,8 @@ public final class CustomSortActivity extends SherlockListActivity {
 			
 		case R.id.menu_custom_sort_help:
     		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-    		builder.setTitle("Custom sorting");
+    		builder.setTitle(R.string.dialog_sorting_title);
+    		builder.setIcon(R.drawable.ic_help);
     		builder.setMessage(R.string.dialog_sorting_help);
     		builder.setCancelable(true);
     		builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {

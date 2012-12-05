@@ -34,7 +34,6 @@ import android.widget.CheckedTextView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockActivity;
@@ -45,6 +44,7 @@ import com.actionbarsherlock.view.MenuItem;
 import edu.worcester.cs499summer2012.R;
 import edu.worcester.cs499summer2012.database.TasksDataSource;
 import edu.worcester.cs499summer2012.service.TaskAlarm;
+import edu.worcester.cs499summer2012.service.TaskButlerWidgetProvider;
 import edu.worcester.cs499summer2012.task.Category;
 import edu.worcester.cs499summer2012.task.Task;
 import edu.worcester.cs499summer2012.task.ToastMaker;
@@ -156,22 +156,6 @@ DialogInterface.OnClickListener {
 		((TextView) findViewById(R.id.text_notes)).setText(task.getNotes());
 	}
 
-	/**
-	 * Displays a message in a Toast notification for a short duration.
-	 */
-	private void toast(String message)
-	{
-		Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-	}
-	
-	/**
-	 * Displays a message in a Toast notification for a short duration.
-	 */
-	private void toast(int message)
-	{
-		Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-	}
-
 	/**************************************************************************
 	 * Overridden parent methods                                              *
 	 **************************************************************************/
@@ -204,7 +188,7 @@ DialogInterface.OnClickListener {
 		
 		// Exit the task if it no longer exists (has been deleted)
 		if (task == null) {
-			toast("This task has been deleted!");
+			ToastMaker.toast(this, R.string.toast_error_no_task);
 			finish();
 			return;
 		}
@@ -236,10 +220,10 @@ DialogInterface.OnClickListener {
 
 		case R.id.menu_view_task_delete:
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			builder.setMessage("Are you sure you want to delete this task?");
+			builder.setMessage(R.string.dialog_delete_single);
 			builder.setCancelable(true);
-			builder.setPositiveButton("Yes", this);
-			builder.setNegativeButton("No", this);
+			builder.setPositiveButton(R.string.menu_delete_task, this);
+			builder.setNegativeButton(R.string.menu_cancel, this);
 			builder.create().show();
 			return true;
 
@@ -278,17 +262,17 @@ DialogInterface.OnClickListener {
 			alarm.cancelAlarm(this, task.getID());
 			alarm.cancelNotification(this, task.getID());
 			if (task.isCompleted()) {
-				toast(R.string.toast_task_completed);
+				ToastMaker.toast(this, R.string.toast_task_completed);
 				if (task.isRepeating()) {
 					task = alarm.setRepeatingAlarm(this, task.getID());
 										
 					if (!task.isCompleted()) {
 						alarm.setAlarm(this, task);
-						toast(ToastMaker.getRepeatMessage(this, 
+						ToastMaker.toast(this, ToastMaker.getRepeatMessage(this, 
 								R.string.toast_task_repeated, 
 								task.getDateDueCal()));
 					} else {
-						toast(ToastMaker.getRepeatMessage(this, 
+						ToastMaker.toast(this, ToastMaker.getRepeatMessage(this, 
 								R.string.toast_task_repeat_delayed, 
 								task.getDateDueCal()));
 					}
@@ -297,6 +281,9 @@ DialogInterface.OnClickListener {
 				if (task.hasDateDue() && !task.isPastDue())
 					alarm.setAlarm(this, task);
 			}
+			
+			// Update homescreen widget (after change has been saved to DB)
+			TaskButlerWidgetProvider.updateWidget(this);
 		}
 
 		intent = new Intent(this, MainActivity.class);
@@ -322,7 +309,11 @@ DialogInterface.OnClickListener {
 			alarm.cancelNotification(this, task.getID());
 			
 			data_source.deleteTask(task);
-			toast("Task deleted");
+			
+			// Update homescreen widget (after change has been saved to DB)
+			TaskButlerWidgetProvider.updateWidget(this);
+			
+			ToastMaker.toast(this, R.string.toast_task_deleted);
 			finish();
 			break;
 
