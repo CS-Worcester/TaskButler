@@ -21,7 +21,9 @@ package edu.worcester.cs499summer2012.activity;
 
 import java.util.ArrayList;
 
+import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -31,6 +33,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.text.format.DateFormat;
 import android.view.GestureDetector;
 import android.view.GestureDetector.OnGestureListener;
 import android.view.LayoutInflater;
@@ -44,7 +47,6 @@ import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockListActivity;
 import com.actionbarsherlock.view.ActionMode;
@@ -57,9 +59,12 @@ import edu.worcester.cs499summer2012.adapter.TaskListAdapter;
 import edu.worcester.cs499summer2012.database.TasksDataSource;
 import edu.worcester.cs499summer2012.service.TaskAlarm;
 import edu.worcester.cs499summer2012.service.TaskButlerService;
+import edu.worcester.cs499summer2012.service.TaskButlerWidgetProvider;
 import edu.worcester.cs499summer2012.service.WakefulIntentService;
+import edu.worcester.cs499summer2012.task.BackupManager;
 import edu.worcester.cs499summer2012.task.Category;
 import edu.worcester.cs499summer2012.task.Task;
+import edu.worcester.cs499summer2012.task.ToastMaker;
 
 /**
  * Main app activity. Displays current task list and allows user to access
@@ -78,8 +83,11 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 	public static final int ADD_TASK_REQUEST = 0;
 	public static final int VIEW_TASK_REQUEST = 1;
 	public static final int EDIT_TASK_REQUEST = 2;
-	public static final int DELETE_MODE_SINGLE = 0;
 	public static final int DISPLAY_ALL_CATEGORIES = 1;
+	
+	private static final int DELETE_MODE_SINGLE = 0;
+	private static final int DELETE_MODE_FINISHED = 1;
+	private static final int DELETE_MODE_ALL = 2;
 
 	/**************************************************************************
 	 * Private fields                                                         *
@@ -89,35 +97,45 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 	private SharedPreferences prefs;
 	private SharedPreferences.Editor prefs_editor;
 	private static TaskListAdapter adapter;
+	private BackupManager backup_manager;
 	private GestureDetector gesture_detector;
 	private Object action_mode;
 	private int selected_task;
 	private int delete_mode;
 	private ArrayList<Category> categories;
+	private Context context;
+	private Activity activity;
 
 	/**************************************************************************
 	 * Class methods                                                          *
 	 **************************************************************************/
 
-	/**
-	 * Displays a message in a Toast notification for a short duration.
-	 */
-	private void toast(String message) {
-		Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-	}
-
-	private void deleteAlert(String question, final int mode) {
+	private void deleteAlert(int resId, final int mode) {
 		delete_mode = mode;
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setMessage(question)
+		builder.setMessage(resId)
 		.setCancelable(true)
-		.setPositiveButton("Yes", this)
-		.setNegativeButton("No", new DialogInterface.OnClickListener() {
+		.setPositiveButton(R.string.menu_delete_task, this)
+		.setNegativeButton(R.string.menu_cancel, new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int id) {
 				dialog.cancel();
 			}
 		});
 		builder.create().show();
+	}
+	
+	/**
+	 * Displays a Toast notification informing the user about the number of
+	 * tasks deleted.
+	 * @param val the number of tasks deleted
+	 */
+	private void toastDeletedTasks(int val) {
+		if (val == 0)
+			ToastMaker.toast(this, R.string.toast_no_tasks_deleted);
+		else if (val == 1)
+			ToastMaker.toast(this, val + " task deleted");
+		else
+			ToastMaker.toast(this, val + " tasks deleted");
 	}
 
 	public static synchronized TaskListAdapter getAdapter(){
@@ -186,6 +204,8 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 
 		// Assign the layout to this activity
 		setContentView(R.layout.activity_main);
+		activity = this;
+		context = this;
 
 		// Open the database
 		data_source = TasksDataSource.getInstance(this);
@@ -203,7 +223,7 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 		getListView().setOnItemLongClickListener(this);
 		getListView().setOnTouchListener(this);
 
-		//Start service to check for alarms TODO: after testing decide if this is needed
+		//Start service to check for alarms
 		WakefulIntentService.acquireStaticLock(this);
 		this.startService(new Intent(this, TaskButlerService.class));
 	}
@@ -225,6 +245,8 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 		// Set sort type and sort the list
 		adapter.setSortType(prefs.getInt(SettingsActivity.SORT_TYPE, TaskListAdapter.AUTO_SORT));
 		adapter.sort();
+		
+		adapter.setActivity(this);
 
 		createCategoryBar(display_category);
 	}
@@ -242,11 +264,6 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 		MenuInflater inflater = getSupportMenuInflater();
 		inflater.inflate(R.menu.activity_main, menu);
 		
-		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
-			menu.findItem(R.id.menu_main_settings).setIcon(R.drawable.ic_settings_deprecated);
-			menu.findItem(R.id.menu_main_about).setIcon(R.drawable.ic_about_deprecated);
-		}
-		
 		return true;
 	}
 
@@ -257,6 +274,125 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 			startActivityForResult(new Intent(this, AddTaskActivity.class), 
 					ADD_TASK_REQUEST);
 			return true;
+			
+		case R.id.menu_main_categories:
+			startActivity(new Intent(this, EditCategoriesActivity.class));
+			return true;
+			
+		case R.id.menu_delete_finished:
+			deleteAlert(R.string.dialog_delete_completed, DELETE_MODE_FINISHED);
+			return true;
+			
+		case R.id.menu_delete_all:
+			deleteAlert(R.string.dialog_delete_all, DELETE_MODE_ALL);
+			return true;
+			
+		case R.id.menu_backup_restore:
+			backup_manager = new BackupManager();
+			StringBuilder message = new StringBuilder();
+			
+			message.append(getString(R.string.dialog_last_backup));
+			message.append(' ');
+			long date = backup_manager.getBackupDate();
+			message.append(date == BackupManager.NO_BACKUP_EXISTS ? 
+					getString(R.string.dialog_no_backup) :
+					DateFormat.format("M/d/yy h:mmaa", date));
+			
+			AlertDialog.Builder backup_builder = new AlertDialog.Builder(this);
+			backup_builder.setTitle(R.string.menu_backup_restore)
+					.setMessage(message.toString())
+					.setCancelable(true)
+					.setPositiveButton(R.string.menu_backup, new DialogInterface.OnClickListener() {
+						
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							ToastMaker.toast(context, BackupManager.interpretStringCode(backup_manager.backup()));
+							dialog.dismiss();
+						}
+					})
+					.setNeutralButton(R.string.menu_restore, new DialogInterface.OnClickListener() {
+						
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							if (backup_manager.getBackupDate() == BackupManager.NO_BACKUP_EXISTS) {
+								ToastMaker.toast(context, BackupManager.interpretStringCode(BackupManager.NO_RESTORE_EXISTS));
+								dialog.dismiss();
+								return;
+							}
+							
+							AlertDialog.Builder restore_builder = new AlertDialog.Builder(context);
+							restore_builder.setMessage(R.string.dialog_restore_backup)
+									.setCancelable(true)
+									.setPositiveButton(R.string.menu_restore, new DialogInterface.OnClickListener() {
+										
+										@Override
+										public void onClick(DialogInterface dialog, int which) {
+											// Alarm logic: Restore database
+											// * Iterate through list of tasks
+											// * 	Cancel alarm
+											// *    Cancel existing notifications
+											ArrayList<Task> tasks = data_source.getTasks(true, null);
+											TaskAlarm alarm = new TaskAlarm();
+											for (Task task : tasks) {
+												alarm.cancelAlarm(context, task.getID());
+												alarm.cancelNotification(context, task.getID());
+											}
+											
+											// Disconnect database
+											data_source = null;
+											
+											// Restore tasks and inform the user
+											String result = backup_manager.restore();
+											ToastMaker.toast(context, BackupManager.interpretStringCode(result));
+											
+											// Reconnect database
+											data_source = TasksDataSource.getInstance(context);
+											
+											// Remake the task list
+											adapter.clear();
+											boolean hide_completed = prefs.getBoolean(SettingsActivity.HIDE_COMPLETED, true);
+											if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+												adapter.addAll(data_source.getTasks(!hide_completed, null));
+											} else {
+												// addAll is not supported in under API 11
+												for (Task task : data_source.getTasks(!hide_completed, null))
+														adapter.add(task);
+											}
+											adapter.sort();
+											
+											// Remake categories bar and set "all categories" to be the default
+											createCategoryBar(DISPLAY_ALL_CATEGORIES);
+											prefs_editor.putInt(SettingsActivity.DISPLAY_CATEGORY, DISPLAY_ALL_CATEGORIES);
+											prefs_editor.commit();
+											
+											// Update widget
+											if (result.equals(BackupManager.RESTORE_OK)) {
+												// Update homescreen widget (after change has been saved to DB)
+												TaskButlerWidgetProvider.updateWidget(activity);
+											}
+										}
+									})
+									.setNegativeButton(R.string.menu_cancel, new DialogInterface.OnClickListener() {
+										
+										@Override
+										public void onClick(DialogInterface dialog, int which) {
+											dialog.cancel();
+										}
+									});
+							
+							restore_builder.create().show();
+							dialog.dismiss();
+						}
+					})
+					.setNegativeButton(R.string.menu_cancel, new DialogInterface.OnClickListener() {
+						
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							dialog.cancel();
+						}
+					});
+			backup_builder.show();
+			return true;
 
 		case R.id.menu_main_settings:
 			startActivity(new Intent(this, SettingsActivity.class));
@@ -264,18 +400,18 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 
 		case R.id.menu_main_about:
 			AlertDialog.Builder about_builder = new AlertDialog.Builder(this);
-			about_builder.setTitle("About Task Butler");
+			about_builder.setTitle(R.string.dialog_about_title);
 			about_builder.setIcon(R.drawable.ic_about);
 			about_builder.setMessage(R.string.dialog_about);
 			about_builder.setCancelable(true);
-			about_builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+			about_builder.setPositiveButton(R.string.menu_ok, new DialogInterface.OnClickListener() {
 
 				@Override
 				public void onClick(DialogInterface dialog, int id) {
 					dialog.dismiss();
 				}
 			});
-			about_builder.setNeutralButton("Source", new DialogInterface.OnClickListener() {
+			about_builder.setNeutralButton(R.string.menu_source, new DialogInterface.OnClickListener() {
 
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
@@ -362,8 +498,7 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 			return true;
 
 		case R.id.menu_main_delete_task:
-			deleteAlert("Are you sure you want to delete this task?",
-					DELETE_MODE_SINGLE);
+			deleteAlert(R.string.dialog_delete_single, DELETE_MODE_SINGLE);
 			mode.finish();
 			return true;
 
@@ -437,6 +572,8 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
 			float velocityY) {
 
+		// TODO: This logic doesn't work that well. Find a better way to swipe.
+		/*
 		// Swiping won't work unless there are categories
 		if (categories.size() == 1)
 			return true;
@@ -472,6 +609,7 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 		View view = new View(this);
 		view.setTag(categories.get(new_index));
 		onClick(view);
+		*/
 
 		return true;
 	}
@@ -516,20 +654,63 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 
 	@Override
 	public void onClick(DialogInterface dialog, int which) {
-		if (delete_mode == DELETE_MODE_SINGLE) {
+		TaskAlarm alarm;
+		int deleted_tasks;
+		switch (delete_mode) {
+		case DELETE_MODE_SINGLE:
 			Task task = adapter.getItem(selected_task);
 			
 			// Alarm logic: Delete a task
 			// * Task must not be deleted from database yet!
 			// * Cancel alarm
 			// * Cancel existing notification
-			TaskAlarm alarm = new TaskAlarm();
+			alarm = new TaskAlarm();
 			alarm.cancelAlarm(this, task.getID());
 			alarm.cancelNotification(this, task.getID());
 			
 			data_source.deleteTask(task);
 			adapter.remove(task);
-			toast("Task deleted");
+			ToastMaker.toast(this, R.string.toast_task_deleted);
+			
+			// Update homescreen widget (after change has been saved to DB)
+			TaskButlerWidgetProvider.updateWidget(this);
+			break;
+			
+		case DELETE_MODE_FINISHED:
+			deleted_tasks = data_source.deleteFinishedTasks();
+			
+			for (int i = 0; i < adapter.getCount(); i++) {
+				if (adapter.getItem(i).isCompleted()) {
+					adapter.remove(adapter.getItem(i));
+					i--;
+				}
+			}
+			
+			ToastMaker.toast(this, R.string.toast_task_deleted);
+			toastDeletedTasks(deleted_tasks);
+			break;
+			
+		case DELETE_MODE_ALL:
+			ArrayList<Task> tasks = data_source.getTasks(true, null);
+			
+			// Alarm logic: Delete several tasks (SettingsActivity)
+			// * Tasks must not be deleted from database yet!
+			// * Iterate through list of tasks to be deleted:
+			// * 	Cancel alarm
+			// *    Cancel existing notifications
+			alarm = new TaskAlarm();
+			for (Task t : tasks) {
+				alarm.cancelAlarm(this, t.getID());
+				alarm.cancelNotification(this, t.getID());
+			}
+			
+			deleted_tasks = data_source.deleteAllTasks();
+			adapter.clear();
+			toastDeletedTasks(deleted_tasks);
+			
+			// Update homescreen widget (after change has been saved to DB)
+			TaskButlerWidgetProvider.updateWidget(this);
+			break;
 		}
 				
 		int display_category = prefs.getInt(SettingsActivity.DISPLAY_CATEGORY, DISPLAY_ALL_CATEGORIES);

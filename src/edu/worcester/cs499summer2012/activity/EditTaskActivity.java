@@ -22,10 +22,12 @@ package edu.worcester.cs499summer2012.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.Toast;
+import edu.worcester.cs499summer2012.R;
 import edu.worcester.cs499summer2012.service.TaskAlarm;
+import edu.worcester.cs499summer2012.service.TaskButlerWidgetProvider;
 import edu.worcester.cs499summer2012.task.Category;
 import edu.worcester.cs499summer2012.task.Task;
+import edu.worcester.cs499summer2012.task.ToastMaker;
 
 public class EditTaskActivity extends BaseTaskActivity {
 
@@ -38,7 +40,7 @@ public class EditTaskActivity extends BaseTaskActivity {
 		// Get the task from the intent
 		int id = getIntent().getIntExtra(Task.EXTRA_TASK_ID, 0);
 		if (id == 0) {
-			toast("Error retrieving task");
+			ToastMaker.toast(this, R.string.toast_error_no_task);
 			finish();
 		}
         task = data_source.getTask(id);
@@ -84,7 +86,7 @@ public class EditTaskActivity extends BaseTaskActivity {
     	// If there is no task name, don't create the task
     	if (name.equals(""))
     	{
-    		Toast.makeText(this, "Task needs a name!", Toast.LENGTH_SHORT).show();
+    		ToastMaker.toast(this, R.string.toast_task_no_name);
     		return false;
     	}
     	task.setName(name);
@@ -154,6 +156,9 @@ public class EditTaskActivity extends BaseTaskActivity {
     	alarm.cancelNotification(this, task.getID());
     	if (task.hasDateDue() && !task.isPastDue())
     		alarm.setAlarm(this, task);
+    	
+		// Update homescreen widget (after change has been saved to DB)
+		TaskButlerWidgetProvider.updateWidget(this);
     	
     	// Create the return intent and add the task ID
     	intent = new Intent(this, MainActivity.class);    	

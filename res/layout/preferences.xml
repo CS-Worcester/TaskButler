@@ -2,10 +2,6 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
     
-    	<PreferenceScreen
-    	    	android:key="edit_categories"
-    	    	android:title="@string/pref_edit_categories" />
-    
     	<PreferenceCategory
     	    android:title="@string/pref_category_tasks">
     	    
@@ -20,15 +16,7 @@
        		<CheckBoxPreference 
 	    	    android:key="hide_completed"
 	    	    android:title="@string/pref_hide_completed"
-	    	    android:defaultValue="true" />
-	    		    	    
-	   	    <PreferenceScreen
-	   	    	android:key="delete_finished_tasks"
-	   	    	android:title="@string/pref_delete_finished_tasks"/>
-	   	    	
-  	        <PreferenceScreen
-	   	    	android:key="delete_all_tasks"
-	   	    	android:title="@string/pref_delete_all_tasks"/>	    
+	    	    android:defaultValue="true" />    
     	    
     	</PreferenceCategory>
     	
@@ -60,19 +48,6 @@
 	    	    android:dialogTitle="@string/pref_default_hour_dialog"
 	    	    android:entries="@array/pref_default_hour"
 	    	    android:entryValues="@array/pref_default_hour_values" />	    
-    	    
-    	</PreferenceCategory>
-    	
-    	<PreferenceCategory
-    	    android:title="@string/pref_category_backup">
-    	    
-    	    <PreferenceScreen
-	   	    	android:key="backup"
-	   	    	android:title="@string/pref_backup"/>
-	   	    	
-    	    <PreferenceScreen
-	   	    	android:key="restore"
-	   	    	android:title="@string/pref_restore"/>
     	    
     	</PreferenceCategory>
  

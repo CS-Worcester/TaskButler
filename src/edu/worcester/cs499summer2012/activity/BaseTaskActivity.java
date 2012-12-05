@@ -52,7 +52,6 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
-import android.widget.Toast;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockActivity;
@@ -67,6 +66,7 @@ import edu.worcester.cs499summer2012.database.DatabaseHandler;
 import edu.worcester.cs499summer2012.database.TasksDataSource;
 import edu.worcester.cs499summer2012.task.Category;
 import edu.worcester.cs499summer2012.task.Task;
+import edu.worcester.cs499summer2012.task.ToastMaker;
 
 public abstract class BaseTaskActivity extends SherlockActivity implements 
 	OnCheckedChangeListener, OnClickListener, DialogInterface.OnClickListener,
@@ -139,14 +139,6 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
 	 **************************************************************************/
     
     protected abstract boolean addTask();
-    
-    /**
-	 * Displays a message in a Toast notification for a short duration.
-	 */
-	protected void toast(String message)
-	{
-		Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-	}
     
 	/**************************************************************************
 	 * Overridden parent methods                                              *
@@ -253,9 +245,6 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
     	MenuInflater inflater = getSupportMenuInflater();
     	inflater.inflate(R.menu.activity_add_task, menu);
     	
-    	if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB)
-			menu.findItem(R.id.menu_add_task_help).setIcon(R.drawable.ic_help_deprecated);
-    	
     	return true;
     }
     
@@ -278,10 +267,11 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
     		
     	case R.id.menu_add_task_help:
     		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-    		builder.setTitle("Procrastination alarm");
+    		builder.setTitle(R.string.dialog_procrastinator_title);
+    		builder.setIcon(R.drawable.ic_help);
     		builder.setMessage(R.string.dialog_procrastinator_help);
     		builder.setCancelable(true);
-    		builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+    		builder.setPositiveButton(R.string.menu_ok, new DialogInterface.OnClickListener() {
 
 				@Override
 				public void onClick(DialogInterface dialog, int id) {
@@ -417,7 +407,7 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
 				String name = et_category.getText().toString().trim();
 				if (name.equals("")) {
 					// No name, cancel dialog
-					Toast.makeText(this, "Category needs a name!", Toast.LENGTH_SHORT).show();
+					ToastMaker.toast(this, R.string.toast_category_no_name);
 					s_category.setSelection(category_adapter.getPosition(default_category));
 					new_category_dialog_active = false;
 					dialog.cancel();
@@ -428,7 +418,7 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
 				
 				if (existing_category != null) {
 					// Category name already exists, cancel dialog
-					Toast.makeText(this, "Category name already exists", Toast.LENGTH_SHORT).show();
+					ToastMaker.toast(this, R.string.toast_category_exists);
 					s_category.setSelection(category_adapter.getPosition(existing_category));
 					new_category_dialog_active = false;
 					dialog.cancel();
@@ -484,9 +474,9 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
 			
 			AlertDialog.Builder new_category_builder = new AlertDialog.Builder(this);
 			new_category_builder.setView(category_name_view);
-			new_category_builder.setTitle("Set name");
-			new_category_builder.setPositiveButton("Next", this);
-			new_category_builder.setNegativeButton("Cancel", this);
+			new_category_builder.setTitle(R.string.dialog_new_category_title);
+			new_category_builder.setPositiveButton(R.string.menu_next, this);
+			new_category_builder.setNegativeButton(R.string.menu_cancel, this);
 			category_dialog = new_category_builder.create();
 			new_category_dialog_active = true;
 			category_dialog.show();
