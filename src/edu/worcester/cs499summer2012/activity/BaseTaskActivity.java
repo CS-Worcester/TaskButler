@@ -253,9 +253,6 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
     	MenuInflater inflater = getSupportMenuInflater();
     	inflater.inflate(R.menu.activity_add_task, menu);
     	
-    	if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB)
-			menu.findItem(R.id.menu_add_task_help).setIcon(R.drawable.ic_help_deprecated);
-    	
     	return true;
     }
     
@@ -279,6 +276,7 @@ public abstract class BaseTaskActivity extends SherlockActivity implements
     	case R.id.menu_add_task_help:
     		AlertDialog.Builder builder = new AlertDialog.Builder(this);
     		builder.setTitle("Procrastination alarm");
+    		builder.setIcon(R.drawable.ic_help);
     		builder.setMessage(R.string.dialog_procrastinator_help);
     		builder.setCancelable(true);
     		builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
