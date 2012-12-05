@@ -14,9 +14,10 @@
     <string name="title_activity_custom_sort">Custom Sort</string>
     
     <!-- Toast notifications -->
-    <string name="toast_task_completed">Task finished! Congratulations!</string>
+    <string name="toast_task_completed">Task completed! Congratulations!</string>
     <string name="toast_task_repeated">This repeating task will be due again</string>
     <string name="toast_task_repeat_delayed">This repeating task will reappear</string>
+    <string name="toast_task_deleted">Task deleted</string>
     
     <!-- Menu items -->
     <string name="menu_save">Save</string>
@@ -28,6 +29,8 @@
     <string name="menu_about">About</string>
     <string name="menu_accept">Accept</string>
     <string name="menu_help">Help</string>
+    <string name="menu_ok">OK</string>
+    <string name="menu_source">Source</string>
 
     <!-- TextView items -->
     <string name="text_empty_list">No tasks found.</string>
@@ -64,9 +67,11 @@
     <string name="image_down">Down</string>
     
     <!-- Dialog items -->
+    <string name="dialog_about_title">About Task Butler</string>
     <string name="dialog_about">Copyright 2012 Jonathan Hasenzahl, James Celona, Dhimitraq Jorgji.\n\nTask Butler is distributed under the GNU General Public License.</string>
 	<string name="dialog_procrastinator_help">Task Butler will remind you periodically about tasks that are past due. If a task is time-sensitive, use the Procrastination Alarm to be reminded more frequently.</string>
     <string name="dialog_sorting_help">Tap on a sorting parameter to enable it. Tap the arrows of a parameter to change its rank in the list. Tasks will be sorted by the highest ranked parameter first, then by the second highest, and so on.</string>
+    <string name="dialog_delete_single">Are you sure you want to delete this task?</string>
 	
     <!-- Preferences items -->
     <string name="pref_category_tasks">Tasks</string>

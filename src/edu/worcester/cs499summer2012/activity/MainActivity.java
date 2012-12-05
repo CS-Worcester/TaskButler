@@ -44,7 +44,6 @@ import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockListActivity;
 import com.actionbarsherlock.view.ActionMode;
@@ -61,6 +60,7 @@ import edu.worcester.cs499summer2012.service.TaskButlerWidgetProvider;
 import edu.worcester.cs499summer2012.service.WakefulIntentService;
 import edu.worcester.cs499summer2012.task.Category;
 import edu.worcester.cs499summer2012.task.Task;
+import edu.worcester.cs499summer2012.task.ToastMaker;
 
 /**
  * Main app activity. Displays current task list and allows user to access
@@ -100,20 +100,13 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 	 * Class methods                                                          *
 	 **************************************************************************/
 
-	/**
-	 * Displays a message in a Toast notification for a short duration.
-	 */
-	private void toast(String message) {
-		Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-	}
-
-	private void deleteAlert(String question, final int mode) {
+	private void deleteAlert(int resId, final int mode) {
 		delete_mode = mode;
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setMessage(question)
+		builder.setMessage(resId)
 		.setCancelable(true)
-		.setPositiveButton("Yes", this)
-		.setNegativeButton("No", new DialogInterface.OnClickListener() {
+		.setPositiveButton(R.string.menu_delete_task, this)
+		.setNegativeButton(R.string.menu_cancel, new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int id) {
 				dialog.cancel();
 			}
@@ -262,18 +255,18 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 
 		case R.id.menu_main_about:
 			AlertDialog.Builder about_builder = new AlertDialog.Builder(this);
-			about_builder.setTitle("About Task Butler");
+			about_builder.setTitle(R.string.dialog_about_title);
 			about_builder.setIcon(R.drawable.ic_about);
 			about_builder.setMessage(R.string.dialog_about);
 			about_builder.setCancelable(true);
-			about_builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+			about_builder.setPositiveButton(R.string.menu_ok, new DialogInterface.OnClickListener() {
 
 				@Override
 				public void onClick(DialogInterface dialog, int id) {
 					dialog.dismiss();
 				}
 			});
-			about_builder.setNeutralButton("Source", new DialogInterface.OnClickListener() {
+			about_builder.setNeutralButton(R.string.menu_source, new DialogInterface.OnClickListener() {
 
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
@@ -360,8 +353,7 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 			return true;
 
 		case R.id.menu_main_delete_task:
-			deleteAlert("Are you sure you want to delete this task?",
-					DELETE_MODE_SINGLE);
+			deleteAlert(R.string.dialog_delete_single, DELETE_MODE_SINGLE);
 			mode.finish();
 			return true;
 
@@ -445,7 +437,7 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 		int current_index = categories.indexOf(current_category);
 		int new_index;
 
-		if (velocityX <= -500 && velocityY > -200 && velocityY < 200) {
+		if (velocityX <= -500) {
 			// Swipe left: increase index by 1
 
 			// Check if we are at the end of the list
@@ -453,7 +445,7 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 				return true;
 
 			new_index = current_index + 1;
-		} else if (velocityX >= 500 && velocityY > -200 && velocityY < 200) {
+		} else if (velocityX >= 500) {
 			// Swipe right: decrease index by 1
 
 			// Check if we are at the beginning of the list
@@ -527,7 +519,7 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 			
 			data_source.deleteTask(task);
 			adapter.remove(task);
-			toast("Task deleted");
+			ToastMaker.toast(this, R.string.toast_task_deleted);
 			
 			// Update homescreen widget (after change has been saved to DB)
 			TaskButlerWidgetProvider.updateWidget(this);
