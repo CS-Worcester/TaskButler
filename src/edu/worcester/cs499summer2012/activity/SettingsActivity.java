@@ -37,7 +37,6 @@ import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.text.format.DateFormat;
-import android.widget.Toast;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockPreferenceActivity;
@@ -52,6 +51,7 @@ import edu.worcester.cs499summer2012.service.TaskButlerWidgetProvider;
 import edu.worcester.cs499summer2012.service.WakefulIntentService;
 import edu.worcester.cs499summer2012.task.BackupManager;
 import edu.worcester.cs499summer2012.task.Task;
+import edu.worcester.cs499summer2012.task.ToastMaker;
 
 public class SettingsActivity extends SherlockPreferenceActivity implements 
 	OnPreferenceClickListener, OnClickListener, OnPreferenceChangeListener {
@@ -244,14 +244,12 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
 		}
 		
 		if (key.equals(DELETE_FINISHED_TASKS)) {
-			deleteAlert("Are you sure you want to delete all finished tasks? This cannot be undone. Repeating tasks will not be deleted.",
-					DELETE_MODE_FINISHED);
+			deleteAlert(R.string.dialog_delete_completed, DELETE_MODE_FINISHED);
 			return true;
 		}
 		
 		if (key.equals(DELETE_ALL_TASKS)) {
-			deleteAlert("Are you sure you want to delete all tasks? This cannot be undone.",
-					DELETE_MODE_ALL);
+			deleteAlert(R.string.dialog_delete_all, DELETE_MODE_ALL);
 			return true;
 		}
 		
@@ -265,16 +263,16 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
 				setBackupSummary();
 			}
 			
-			toast(BackupManager.interpretStringCode(result));
+			ToastMaker.toast(this, BackupManager.interpretStringCode(result));
 			return true;
 		}
 		
 		if (key.equals(RESTORE)) {
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			builder.setMessage("Are you sure you want to restore your last backup? Restoring will replace your existing tasks.")
+			builder.setMessage(R.string.dialog_restore_backup)
 			.setCancelable(true)
 			.setTitle(R.string.pref_restore)
-			.setPositiveButton("Restore", new DialogInterface.OnClickListener() {
+			.setPositiveButton(R.string.menu_restore, new DialogInterface.OnClickListener() {
 				
 				public void onClick(DialogInterface dialog, int id) {
 					BackupManager backup_manager = new BackupManager();
@@ -293,7 +291,7 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
 					}
 					
 					String result = backup_manager.restore();
-					toast(BackupManager.interpretStringCode(result));
+					ToastMaker.toast(context, BackupManager.interpretStringCode(result));
 					
 					if (result.equals(BackupManager.RESTORE_OK)) {
 						// Update homescreen widget (after change has been saved to DB)
@@ -304,7 +302,7 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
 				}
 				
 			})
-			.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+			.setNegativeButton(R.string.menu_cancel, new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int id) {
 					dialog.cancel();
 				}
@@ -316,14 +314,13 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
 		return false;
 	}
 	
-	private void deleteAlert(String question, final int mode) {
+	private void deleteAlert(int resId, final int mode) {
 		delete_mode = mode;
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setMessage(question)
+		builder.setMessage(resId)
 		.setCancelable(true)
-		.setTitle("Delete tasks")
-		.setPositiveButton("Yes", this)
-		.setNegativeButton("No", new DialogInterface.OnClickListener() {
+		.setPositiveButton(R.string.menu_delete_task, this)
+		.setNegativeButton(R.string.menu_cancel, new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int id) {
 				dialog.cancel();
 			}
@@ -370,18 +367,11 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
 	 */
 	private void toastDeletedTasks(int val) {
 		if (val == 0)
-			toast("No tasks were deleted.");
+			ToastMaker.toast(this, R.string.toast_no_tasks_deleted);
 		else if (val == 1)
-			toast(val + " task deleted");
+			ToastMaker.toast(this, val + " task deleted");
 		else
-			toast(val + " tasks deleted");
-	}
-	
-	/**
-	 * Displays a message in a Toast notification for a short duration.
-	 */
-	private void toast(String message) {
-		Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+			ToastMaker.toast(this, val + " tasks deleted");
 	}
 
 	@Override
