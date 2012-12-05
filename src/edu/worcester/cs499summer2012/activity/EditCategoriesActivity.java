@@ -24,6 +24,7 @@ import java.util.GregorianCalendar;
 
 import yuku.ambilwarna.AmbilWarnaDialog;
 import yuku.ambilwarna.AmbilWarnaDialog.OnAmbilWarnaListener;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
@@ -47,6 +48,7 @@ import edu.worcester.cs499summer2012.R;
 import edu.worcester.cs499summer2012.adapter.CategoryListAdapter;
 import edu.worcester.cs499summer2012.database.DatabaseHandler;
 import edu.worcester.cs499summer2012.database.TasksDataSource;
+import edu.worcester.cs499summer2012.service.TaskButlerWidgetProvider;
 import edu.worcester.cs499summer2012.task.Category;
 import edu.worcester.cs499summer2012.task.Task;
 
@@ -56,6 +58,7 @@ public class EditCategoriesActivity extends SherlockListActivity implements Acti
 	public static final int EDIT_DIALOG = 1;
 	public static final int DELETE_DIALOG = 2;
 	
+	private Activity activity;
 	private TasksDataSource data_source;
 	private static CategoryListAdapter adapter;
 	private ActionMode action_mode;
@@ -67,6 +70,7 @@ public class EditCategoriesActivity extends SherlockListActivity implements Acti
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		activity = this;
 		
 		// Assign the layout to this activity
 		setContentView(R.layout.activity_edit_categories);
@@ -247,6 +251,9 @@ public class EditCategoriesActivity extends SherlockListActivity implements Acti
 								data_source.updateCategory(selected_category);
 							}
 							adapter.notifyDataSetChanged();
+							
+							// Update homescreen widget (after change has been saved to DB)
+							TaskButlerWidgetProvider.updateWidget(activity);
 						}
 					});
 					color_dialog.show();					
@@ -274,6 +281,9 @@ public class EditCategoriesActivity extends SherlockListActivity implements Acti
 					task.setCategory(Category.NO_CATEGORY);
 					data_source.updateTask(task);
 				}
+				
+				// Update homescreen widget (after change has been saved to DB)
+				TaskButlerWidgetProvider.updateWidget(activity);
 				
 				Toast.makeText(this, "Category deleted", Toast.LENGTH_SHORT).show();
 				

@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -49,6 +50,7 @@ import edu.worcester.cs499summer2012.comparator.TaskNameComparator;
 import edu.worcester.cs499summer2012.comparator.TaskPriorityComparator;
 import edu.worcester.cs499summer2012.database.TasksDataSource;
 import edu.worcester.cs499summer2012.service.TaskAlarm;
+import edu.worcester.cs499summer2012.service.TaskButlerWidgetProvider;
 import edu.worcester.cs499summer2012.task.Task;
 import edu.worcester.cs499summer2012.task.ToastMaker;
 
@@ -79,6 +81,7 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 	 * Private fields                                                         *
 	 **************************************************************************/
 	
+	private Activity activity = null;
 	private final Context context;
 	private final ArrayList<Task> tasks;
 	private TasksDataSource data_source;
@@ -95,9 +98,9 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 	 * @param activity the Activity that owns this adapter
 	 * @param tasks the TaskList handled by this adapter
 	 */
-	public TaskListAdapter(Context activity, ArrayList<Task> tasks) {
-		super(activity, R.layout.row_task, tasks);
-		this.context = activity;
+	public TaskListAdapter(Context context, ArrayList<Task> tasks) {
+		super(context, R.layout.row_task, tasks);
+		this.context = context;
 		this.tasks = tasks;
 		data_source = TasksDataSource.getInstance(this.context);
 		prefs = PreferenceManager.getDefaultSharedPreferences(this.context);
@@ -180,6 +183,10 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 					// If "hide completed tasks" option, then remove the task from the adapter
 					if (prefs.getBoolean(SettingsActivity.HIDE_COMPLETED, true) && task.isCompleted())
 							tasks.remove(task);
+					
+					// Update homescreen widget (after change has been saved to DB)
+					// This currently doesn't work for non-activities
+					TaskButlerWidgetProvider.updateWidget(activity);
 					
 					sort();
 				}
@@ -322,6 +329,10 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 	public void setSortType(int sort_type) {
 		if (sort_type == AUTO_SORT || sort_type == CUSTOM_SORT)
 			this.sort_type = sort_type;
+	}
+	
+	public void setActivity(Activity activity) {
+		this.activity = activity;
 	}
 	
 	/**

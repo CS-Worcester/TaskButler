@@ -57,6 +57,7 @@ import edu.worcester.cs499summer2012.adapter.TaskListAdapter;
 import edu.worcester.cs499summer2012.database.TasksDataSource;
 import edu.worcester.cs499summer2012.service.TaskAlarm;
 import edu.worcester.cs499summer2012.service.TaskButlerService;
+import edu.worcester.cs499summer2012.service.TaskButlerWidgetProvider;
 import edu.worcester.cs499summer2012.service.WakefulIntentService;
 import edu.worcester.cs499summer2012.task.Category;
 import edu.worcester.cs499summer2012.task.Task;
@@ -203,7 +204,7 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 		getListView().setOnItemLongClickListener(this);
 		getListView().setOnTouchListener(this);
 
-		//Start service to check for alarms TODO: after testing decide if this is needed
+		//Start service to check for alarms
 		WakefulIntentService.acquireStaticLock(this);
 		this.startService(new Intent(this, TaskButlerService.class));
 	}
@@ -225,6 +226,8 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 		// Set sort type and sort the list
 		adapter.setSortType(prefs.getInt(SettingsActivity.SORT_TYPE, TaskListAdapter.AUTO_SORT));
 		adapter.sort();
+		
+		adapter.setActivity(this);
 
 		createCategoryBar(display_category);
 	}
@@ -442,7 +445,7 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 		int current_index = categories.indexOf(current_category);
 		int new_index;
 
-		if (velocityX <= -500) {
+		if (velocityX <= -500 && velocityY > -200 && velocityY < 200) {
 			// Swipe left: increase index by 1
 
 			// Check if we are at the end of the list
@@ -450,7 +453,7 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 				return true;
 
 			new_index = current_index + 1;
-		} else if (velocityX >= 500) {
+		} else if (velocityX >= 500 && velocityY > -200 && velocityY < 200) {
 			// Swipe right: decrease index by 1
 
 			// Check if we are at the beginning of the list
@@ -525,6 +528,9 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 			data_source.deleteTask(task);
 			adapter.remove(task);
 			toast("Task deleted");
+			
+			// Update homescreen widget (after change has been saved to DB)
+			TaskButlerWidgetProvider.updateWidget(this);
 		}
 				
 		int display_category = prefs.getInt(SettingsActivity.DISPLAY_CATEGORY, DISPLAY_ALL_CATEGORIES);

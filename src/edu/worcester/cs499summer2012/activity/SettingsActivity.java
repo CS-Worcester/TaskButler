@@ -21,6 +21,7 @@ package edu.worcester.cs499summer2012.activity;
 
 import java.util.ArrayList;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -47,6 +48,7 @@ import edu.worcester.cs499summer2012.adapter.TaskListAdapter;
 import edu.worcester.cs499summer2012.database.TasksDataSource;
 import edu.worcester.cs499summer2012.service.TaskAlarm;
 import edu.worcester.cs499summer2012.service.TaskButlerService;
+import edu.worcester.cs499summer2012.service.TaskButlerWidgetProvider;
 import edu.worcester.cs499summer2012.service.WakefulIntentService;
 import edu.worcester.cs499summer2012.task.BackupManager;
 import edu.worcester.cs499summer2012.task.Task;
@@ -80,6 +82,7 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
 	private TasksDataSource data_source;
 	private SharedPreferences prefs;
 	private SharedPreferences.Editor prefs_editor;
+	private Activity activity;
 	private Context context;
 	private int delete_mode;
 	
@@ -100,6 +103,7 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.layout.preferences);
+        activity = this;
         context = this;
         
         // Allow Action bar icon to act as a button
@@ -224,6 +228,9 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
         	cbp_custom_sort.setChecked(false);
         	prefs_editor.putInt(SORT_TYPE, TaskListAdapter.AUTO_SORT);
         	prefs_editor.commit();
+        	
+			// Update homescreen widget (after change has been saved to DB)
+			TaskButlerWidgetProvider.updateWidget(this);
 			return true;
 		}
 		
@@ -287,6 +294,12 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
 					
 					String result = backup_manager.restore();
 					toast(BackupManager.interpretStringCode(result));
+					
+					if (result.equals(BackupManager.RESTORE_OK)) {
+						// Update homescreen widget (after change has been saved to DB)
+						TaskButlerWidgetProvider.updateWidget(activity);
+					}
+					
 					dialog.dismiss();
 				}
 				
@@ -344,7 +357,9 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
 			
 			deleted_tasks = data_source.deleteAllTasks();
 			toastDeletedTasks(deleted_tasks);
-			break;
+			
+			// Update homescreen widget (after change has been saved to DB)
+			TaskButlerWidgetProvider.updateWidget(this);
 		}
 	}
 	

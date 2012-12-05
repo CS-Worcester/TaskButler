@@ -45,6 +45,7 @@ import com.actionbarsherlock.view.MenuItem;
 import edu.worcester.cs499summer2012.R;
 import edu.worcester.cs499summer2012.database.TasksDataSource;
 import edu.worcester.cs499summer2012.service.TaskAlarm;
+import edu.worcester.cs499summer2012.service.TaskButlerWidgetProvider;
 import edu.worcester.cs499summer2012.task.Category;
 import edu.worcester.cs499summer2012.task.Task;
 import edu.worcester.cs499summer2012.task.ToastMaker;
@@ -297,6 +298,9 @@ DialogInterface.OnClickListener {
 				if (task.hasDateDue() && !task.isPastDue())
 					alarm.setAlarm(this, task);
 			}
+			
+			// Update homescreen widget (after change has been saved to DB)
+			TaskButlerWidgetProvider.updateWidget(this);
 		}
 
 		intent = new Intent(this, MainActivity.class);
@@ -322,6 +326,10 @@ DialogInterface.OnClickListener {
 			alarm.cancelNotification(this, task.getID());
 			
 			data_source.deleteTask(task);
+			
+			// Update homescreen widget (after change has been saved to DB)
+			TaskButlerWidgetProvider.updateWidget(this);
+			
 			toast("Task deleted");
 			finish();
 			break;

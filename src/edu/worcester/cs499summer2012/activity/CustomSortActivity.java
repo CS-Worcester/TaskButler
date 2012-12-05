@@ -34,6 +34,7 @@ import com.actionbarsherlock.view.MenuItem;
 import edu.worcester.cs499summer2012.R;
 import edu.worcester.cs499summer2012.adapter.ComparatorListAdapter;
 import edu.worcester.cs499summer2012.database.TasksDataSource;
+import edu.worcester.cs499summer2012.service.TaskButlerWidgetProvider;
 import edu.worcester.cs499summer2012.task.Comparator;
 
 /**
@@ -80,6 +81,14 @@ public final class CustomSortActivity extends SherlockListActivity {
         action_bar.setIcon(R.drawable.ic_settings);
         action_bar.setHomeButtonEnabled(true);
         action_bar.setDisplayHomeAsUpEnabled(true);
+	}
+	
+	@Override
+	public void onStop() {
+		// Update homescreen widget (after change has been saved to DB)
+		TaskButlerWidgetProvider.updateWidget(this);
+		
+		super.onStop();
 	}
 
 	@Override

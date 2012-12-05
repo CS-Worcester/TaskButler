@@ -24,6 +24,7 @@ import android.os.Bundle;
 import android.widget.Toast;
 import edu.worcester.cs499summer2012.database.DatabaseHandler;
 import edu.worcester.cs499summer2012.service.TaskAlarm;
+import edu.worcester.cs499summer2012.service.TaskButlerWidgetProvider;
 import edu.worcester.cs499summer2012.task.Category;
 import edu.worcester.cs499summer2012.task.Task;
 
@@ -111,6 +112,9 @@ public class AddTaskActivity extends BaseTaskActivity {
     		TaskAlarm alarm = new TaskAlarm();
     		alarm.setAlarm(this, task);
     	}
+    	
+		// Update homescreen widget (after change has been saved to DB)
+		TaskButlerWidgetProvider.updateWidget(this);
     	
     	// Create the return intent and add the task ID
     	intent = new Intent(this, MainActivity.class);    	
