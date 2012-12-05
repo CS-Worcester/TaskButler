@@ -47,10 +47,10 @@ public class BackupManager {
 	
 	public static String interpretStringCode(String code) {
 		if (code.equals(BACKUP_OK))
-			return "Backup successfull!";
+			return "Backup successful!";
 		
 		if (code.equals(RESTORE_OK))
-			return "Restore successfull!";
+			return "Restore successful!";
 		
 		if (code.equals(NO_RESTORE_EXISTS))
 			return "No backup exists!";

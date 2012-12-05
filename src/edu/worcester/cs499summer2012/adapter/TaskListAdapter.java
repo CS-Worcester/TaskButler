@@ -37,7 +37,6 @@ import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 import edu.worcester.cs499summer2012.R;
 import edu.worcester.cs499summer2012.activity.SettingsActivity;
 import edu.worcester.cs499summer2012.comparator.TaskAutoComparator;
@@ -160,17 +159,17 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 					alarm.cancelAlarm(context, task.getID());
 					alarm.cancelNotification(context, task.getID());
 					if (task.isCompleted()) {
-						toast(R.string.toast_task_completed);
+						ToastMaker.toast(context, R.string.toast_task_completed);
 						if (task.isRepeating()) {
 							task = alarm.setRepeatingAlarm(context, task.getID());
 							
 							if (!task.isCompleted()) {
 								alarm.setAlarm(context, task);
-								toast(ToastMaker.getRepeatMessage(context, 
+								ToastMaker.toast(context, ToastMaker.getRepeatMessage(context, 
 										R.string.toast_task_repeated, 
 										task.getDateDueCal()));
 							} else {
-								toast(ToastMaker.getRepeatMessage(context, 
+								ToastMaker.toast(context, ToastMaker.getRepeatMessage(context, 
 										R.string.toast_task_repeat_delayed, 
 										task.getDateDueCal()));
 							}
@@ -333,19 +332,5 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 	
 	public void setActivity(Activity activity) {
 		this.activity = activity;
-	}
-	
-	/**
-	 * Displays a message in a Toast notification for a short duration.
-	 */
-	private void toast(String message) {
-		Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
-	}
-	
-	/**
-	 * Displays a message in a Toast notification for a short duration.
-	 */
-	private void toast(int message) {
-		Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
 	}
 }

@@ -99,7 +99,7 @@
     <string name="pref_hide_completed">Hide completed tasks</string>
     <string name="pref_default_hour">Default time of day</string>
     <string name="pref_default_hour_dialog">Set default time</string>
-    <string name="pref_delete_finished_tasks">Delete finished tasks</string>
+    <string name="pref_delete_finished_tasks">Delete completed tasks</string>
     <string name="pref_delete_all_tasks">Delete all tasks</string>
     <string name="pref_vibrate">Vibrate on alarm</string>
     <string name="pref_reminder_time">Normal alarm</string>
