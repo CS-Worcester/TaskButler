@@ -50,18 +50,5 @@
 	    	    android:entryValues="@array/pref_default_hour_values" />	    
     	    
     	</PreferenceCategory>
-    	
-    	<PreferenceCategory
-    	    android:title="@string/pref_category_backup">
-    	    
-    	    <PreferenceScreen
-	   	    	android:key="backup"
-	   	    	android:title="@string/pref_backup"/>
-	   	    	
-    	    <PreferenceScreen
-	   	    	android:key="restore"
-	   	    	android:title="@string/pref_restore"/>
-    	    
-    	</PreferenceCategory>
  
 </PreferenceScreen>

@@ -80,6 +80,8 @@
     <string name="image_down">Down</string>
     
     <!-- Dialog items -->
+    <string name="dialog_last_backup">Last backup:</string>
+    <string name="dialog_no_backup">Never</string>
     <string name="dialog_new_category_title">Set name</string>
     <string name="dialog_about_title">About Task Butler</string>
     <string name="dialog_about">Copyright 2012 Jonathan Hasenzahl, James Celona, Dhimitraq Jorgji.\n\nTask Butler is distributed under the GNU General Public License.</string>
@@ -96,7 +98,6 @@
     <!-- Preferences items -->
     <string name="pref_category_tasks">Task List</string>
     <string name="pref_category_reminders">Alarms</string>
-    <string name="pref_category_backup">Backup &amp; Restore</string>
     <string name="pref_auto_sort">Auto sort</string>
     <string name="pref_custom_sort">Custom sort</string>
     <string name="pref_hide_completed">Hide completed tasks</string>
@@ -106,8 +107,6 @@
     <string name="pref_reminder_time">Normal alarm</string>
     <string name="pref_alarm_time">Procrastination alarm</string>
     <string name="pref_alarm_dialog">Set alarm time</string>
-    <string name="pref_backup">Backup to SD card</string>
-    <string name="pref_restore">Restore from SD card</string>
     
     <!-- Preferences arrays -->
     <string-array name="pref_reminder_times">

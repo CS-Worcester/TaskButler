@@ -36,25 +36,10 @@
     </item>
     
     <item
-        android:id="@+id/menu_backup_submenu"
+        android:id="@+id/menu_backup_restore"
         android:title="@string/menu_backup_restore"
         android:showAsAction="never"
-        android:orderInCategory="3">
-        
-        <menu>
-            <group>
-                <item
-                    android:id="@+id/menu_backup"
-                    android:title="@string/menu_backup"
-                    android:orderInCategory="0"/>
-                <item
-                    android:id="@+id/menu_restore"
-                    android:title="@string/menu_restore"
-                    android:orderInCategory="1"/>
-            </group>
-        </menu>
-        
-    </item>    	
+        android:orderInCategory="3" />
     
     <item
         android:id="@+id/menu_main_settings"

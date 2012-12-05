@@ -39,6 +39,7 @@ public class BackupManager {
 	public static final String RESTORE_OK = "restore_ok";
 	public static final String RESTORE_EXCEPTION = "restore_exception";
 	public static final String NO_RESTORE_EXISTS = "no_restore_exists";
+	public static final long NO_BACKUP_EXISTS = 0L;
 	
 	private static final String PACKAGE_NAME = "edu.worcester.cs499summer2012";
 	private static final String DB_FILENAME = DatabaseHandler.DATABASE_NAME;
@@ -53,7 +54,7 @@ public class BackupManager {
 			return "Restore successful!";
 		
 		if (code.equals(NO_RESTORE_EXISTS))
-			return "No backup exists!";
+			return "No backup exists";
 		
 		if (code.equals(BACKUP_EXCEPTION))
 			return "The backup failed unexpectedly";
@@ -91,29 +92,28 @@ public class BackupManager {
 	public BackupManager() {}
 	
 	/**
-	 * Checks if a backup file exists.
-	 * @return true if a backup exists, false otherwise
+	 * Returns the date in ms of the backup file.
+	 * @return the date in ms of the backup file, or -1 if backup does not exist
 	 */
-	public boolean doesBackupExist() {
+	public long getBackupDate() {
 		String media_state = Environment.getExternalStorageState();
 		
 		// Check for read access
 		if (!media_state.equals(Environment.MEDIA_MOUNTED) && 
 				!media_state.equals(Environment.MEDIA_MOUNTED_READ_ONLY))
-			return false;
+			return NO_BACKUP_EXISTS;
 		
 		try {
 			File sd_card = Environment.getExternalStorageDirectory();
 			
 			if (sd_card.canRead()) {
-				// Restore database
 				File backup = new File(sd_card, DB_EXTERNAL_PATH + DB_FILENAME);
-				return backup.exists();
+				return backup.lastModified();
 			} else
-				return false;
+				return NO_BACKUP_EXISTS;
 			
 		} catch (Exception e) {
-			return false;
+			return NO_BACKUP_EXISTS;
 		}
 	}
 	

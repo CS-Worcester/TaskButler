@@ -21,7 +21,9 @@ package edu.worcester.cs499summer2012.activity;
 
 import java.util.ArrayList;
 
+import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -31,6 +33,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.text.format.DateFormat;
 import android.view.GestureDetector;
 import android.view.GestureDetector.OnGestureListener;
 import android.view.LayoutInflater;
@@ -58,6 +61,7 @@ import edu.worcester.cs499summer2012.service.TaskAlarm;
 import edu.worcester.cs499summer2012.service.TaskButlerService;
 import edu.worcester.cs499summer2012.service.TaskButlerWidgetProvider;
 import edu.worcester.cs499summer2012.service.WakefulIntentService;
+import edu.worcester.cs499summer2012.task.BackupManager;
 import edu.worcester.cs499summer2012.task.Category;
 import edu.worcester.cs499summer2012.task.Task;
 import edu.worcester.cs499summer2012.task.ToastMaker;
@@ -93,11 +97,14 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 	private SharedPreferences prefs;
 	private SharedPreferences.Editor prefs_editor;
 	private static TaskListAdapter adapter;
+	private BackupManager backup_manager;
 	private GestureDetector gesture_detector;
 	private Object action_mode;
 	private int selected_task;
 	private int delete_mode;
 	private ArrayList<Category> categories;
+	private Context context;
+	private Activity activity;
 
 	/**************************************************************************
 	 * Class methods                                                          *
@@ -197,6 +204,8 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 
 		// Assign the layout to this activity
 		setContentView(R.layout.activity_main);
+		activity = this;
+		context = this;
 
 		// Open the database
 		data_source = TasksDataSource.getInstance(this);
@@ -271,11 +280,118 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 			return true;
 			
 		case R.id.menu_delete_finished:
-			this.deleteAlert(R.string.dialog_delete_completed, DELETE_MODE_FINISHED);
+			deleteAlert(R.string.dialog_delete_completed, DELETE_MODE_FINISHED);
 			return true;
 			
 		case R.id.menu_delete_all:
-			this.deleteAlert(R.string.dialog_delete_all, DELETE_MODE_ALL);
+			deleteAlert(R.string.dialog_delete_all, DELETE_MODE_ALL);
+			return true;
+			
+		case R.id.menu_backup_restore:
+			backup_manager = new BackupManager();
+			StringBuilder message = new StringBuilder();
+			
+			message.append(getString(R.string.dialog_last_backup));
+			message.append(' ');
+			long date = backup_manager.getBackupDate();
+			message.append(date == BackupManager.NO_BACKUP_EXISTS ? 
+					getString(R.string.dialog_no_backup) :
+					DateFormat.format("M/d/yy h:mmaa", date));
+			
+			AlertDialog.Builder backup_builder = new AlertDialog.Builder(this);
+			backup_builder.setTitle(R.string.menu_backup_restore)
+					.setMessage(message.toString())
+					.setCancelable(true)
+					.setPositiveButton(R.string.menu_backup, new DialogInterface.OnClickListener() {
+						
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							ToastMaker.toast(context, BackupManager.interpretStringCode(backup_manager.backup()));
+							dialog.dismiss();
+						}
+					})
+					.setNeutralButton(R.string.menu_restore, new DialogInterface.OnClickListener() {
+						
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							if (backup_manager.getBackupDate() == BackupManager.NO_BACKUP_EXISTS) {
+								ToastMaker.toast(context, BackupManager.interpretStringCode(BackupManager.NO_RESTORE_EXISTS));
+								dialog.dismiss();
+								return;
+							}
+							
+							AlertDialog.Builder restore_builder = new AlertDialog.Builder(context);
+							restore_builder.setMessage(R.string.dialog_restore_backup)
+									.setCancelable(true)
+									.setPositiveButton(R.string.menu_restore, new DialogInterface.OnClickListener() {
+										
+										@Override
+										public void onClick(DialogInterface dialog, int which) {
+											// Alarm logic: Restore database
+											// * Iterate through list of tasks
+											// * 	Cancel alarm
+											// *    Cancel existing notifications
+											ArrayList<Task> tasks = data_source.getTasks(true, null);
+											TaskAlarm alarm = new TaskAlarm();
+											for (Task task : tasks) {
+												alarm.cancelAlarm(context, task.getID());
+												alarm.cancelNotification(context, task.getID());
+											}
+											
+											// Disconnect database
+											data_source = null;
+											
+											// Restore tasks and inform the user
+											String result = backup_manager.restore();
+											ToastMaker.toast(context, BackupManager.interpretStringCode(result));
+											
+											// Reconnect database
+											data_source = TasksDataSource.getInstance(context);
+											
+											// Remake the task list
+											adapter.clear();
+											boolean hide_completed = prefs.getBoolean(SettingsActivity.HIDE_COMPLETED, true);
+											if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+												adapter.addAll(data_source.getTasks(!hide_completed, null));
+											} else {
+												// addAll is not supported in under API 11
+												for (Task task : data_source.getTasks(!hide_completed, null))
+														adapter.add(task);
+											}
+											adapter.sort();
+											
+											// Remake categories bar and set "all categories" to be the default
+											createCategoryBar(DISPLAY_ALL_CATEGORIES);
+											prefs_editor.putInt(SettingsActivity.DISPLAY_CATEGORY, DISPLAY_ALL_CATEGORIES);
+											prefs_editor.commit();
+											
+											// Update widget
+											if (result.equals(BackupManager.RESTORE_OK)) {
+												// Update homescreen widget (after change has been saved to DB)
+												TaskButlerWidgetProvider.updateWidget(activity);
+											}
+										}
+									})
+									.setNegativeButton(R.string.menu_cancel, new DialogInterface.OnClickListener() {
+										
+										@Override
+										public void onClick(DialogInterface dialog, int which) {
+											dialog.cancel();
+										}
+									});
+							
+							restore_builder.create().show();
+							dialog.dismiss();
+						}
+					})
+					.setNegativeButton(R.string.menu_cancel, new DialogInterface.OnClickListener() {
+						
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							dialog.cancel();
+						}
+					});
+			backup_builder.show();
 			return true;
 
 		case R.id.menu_main_settings:
