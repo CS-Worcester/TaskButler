@@ -74,7 +74,7 @@
             android:label="@string/title_activity_custom_sort" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="edu.worcester.cs499summer2012.MainActivity" />
+                android:value="edu.worcester.cs499summer2012.SettingsActivity" />
         </activity>
         
         <activity
@@ -90,7 +90,7 @@
             android:label="@string/title_activity_edit_categories" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="edu.worcester.cs499summer2012.SettingsActivity" />
+                android:value="edu.worcester.cs499summer2012.MainActivity" />
         </activity>
         
         <receiver android:name=".service.TaskButlerWidgetProvider">

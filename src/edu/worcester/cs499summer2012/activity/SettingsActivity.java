@@ -25,7 +25,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -54,15 +53,12 @@ import edu.worcester.cs499summer2012.task.Task;
 import edu.worcester.cs499summer2012.task.ToastMaker;
 
 public class SettingsActivity extends SherlockPreferenceActivity implements 
-	OnPreferenceClickListener, OnClickListener, OnPreferenceChangeListener {
+	OnPreferenceClickListener, OnPreferenceChangeListener {
 
-	public static final String EDIT_CATEGORIES = "edit_categories";
 	public static final String AUTO_SORT = "auto_sort";
 	public static final String CUSTOM_SORT = "custom_sort";
 	public static final String HIDE_COMPLETED = "hide_completed";
 	public static final String DEFAULT_HOUR = "default_hour";
-	public static final String DELETE_FINISHED_TASKS = "delete_finished_tasks";
-	public static final String DELETE_ALL_TASKS = "delete_all_tasks";
 	public static final String VIBRATE_ON_ALARM = "vibrate_on_alarm";
 	public static final String REMINDER_TIME = "reminder_time";
 	public static final String ALARM_TIME = "alarm_time";
@@ -76,22 +72,16 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
 	public static final String DEFAULT_ALARM_TIME = "15";
 	public static final String DEFAULT_HOUR_VALUE = "12";
 	public static final long DEFAULT_LAST_BACKUP = 0;
-	private static final int DELETE_MODE_FINISHED = 0;
-	private static final int DELETE_MODE_ALL = 1;
 	
 	private TasksDataSource data_source;
 	private SharedPreferences prefs;
 	private SharedPreferences.Editor prefs_editor;
 	private Activity activity;
 	private Context context;
-	private int delete_mode;
 	
-	private PreferenceScreen ps_edit_categories;
 	private CheckBoxPreference cbp_auto_sort;
 	private CheckBoxPreference cbp_custom_sort;
 	private CheckBoxPreference cpb_vibrate;
-	private PreferenceScreen ps_delete_finished_tasks;
-	private PreferenceScreen ps_delete_all_tasks;
 	private ListPreference lp_reminder_time;
 	private ListPreference lp_alarm_time;
 	private ListPreference lp_default_hour;
@@ -120,12 +110,9 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
 		prefs_editor = prefs.edit();
         
 		// Initialize preferences objects
-        ps_edit_categories = (PreferenceScreen) this.findPreference(EDIT_CATEGORIES);
         cbp_auto_sort = (CheckBoxPreference) this.findPreference(AUTO_SORT);
         cbp_custom_sort = (CheckBoxPreference) this.findPreference(CUSTOM_SORT);
         cpb_vibrate = (CheckBoxPreference) this.findPreference(VIBRATE_ON_ALARM);
-        ps_delete_finished_tasks = (PreferenceScreen) this.findPreference(DELETE_FINISHED_TASKS);
-        ps_delete_all_tasks = (PreferenceScreen) this.findPreference(DELETE_ALL_TASKS);
         lp_reminder_time = (ListPreference) this.findPreference(REMINDER_TIME);
         lp_alarm_time = (ListPreference) this.findPreference(ALARM_TIME);
         lp_default_hour = (ListPreference) this.findPreference(DEFAULT_HOUR);
@@ -133,11 +120,8 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
         ps_restore = (PreferenceScreen) this.findPreference(RESTORE);
         
         // Set listeners
-        ps_edit_categories.setOnPreferenceClickListener(this);
         cbp_auto_sort.setOnPreferenceClickListener(this);
         cbp_custom_sort.setOnPreferenceClickListener(this);
-        ps_delete_finished_tasks.setOnPreferenceClickListener(this);
-        ps_delete_all_tasks.setOnPreferenceClickListener(this);
         ps_backup.setOnPreferenceClickListener(this);
         ps_restore.setOnPreferenceClickListener(this);
         lp_reminder_time.setOnPreferenceChangeListener(this);
@@ -217,12 +201,6 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
 	public boolean onPreferenceClick(Preference p) {
 		String key = p.getKey();
 		
-		if (key.equals(EDIT_CATEGORIES)) {
-			Intent intent = new Intent(this, EditCategoriesActivity.class);
-			startActivity(intent);
-			return true;
-		}
-		
 		if (key.equals(AUTO_SORT)) {
         	cbp_auto_sort.setChecked(true);
         	cbp_custom_sort.setChecked(false);
@@ -240,16 +218,6 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
         	prefs_editor.putInt(SORT_TYPE, TaskListAdapter.CUSTOM_SORT);
         	prefs_editor.commit();
         	startActivity(new Intent(this, CustomSortActivity.class));
-			return true;
-		}
-		
-		if (key.equals(DELETE_FINISHED_TASKS)) {
-			deleteAlert(R.string.dialog_delete_completed, DELETE_MODE_FINISHED);
-			return true;
-		}
-		
-		if (key.equals(DELETE_ALL_TASKS)) {
-			deleteAlert(R.string.dialog_delete_all, DELETE_MODE_ALL);
 			return true;
 		}
 		
@@ -312,66 +280,6 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
 		}
 		
 		return false;
-	}
-	
-	private void deleteAlert(int resId, final int mode) {
-		delete_mode = mode;
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setMessage(resId)
-		.setCancelable(true)
-		.setPositiveButton(R.string.menu_delete_task, this)
-		.setNegativeButton(R.string.menu_cancel, new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int id) {
-				dialog.cancel();
-			}
-		});
-		builder.create().show();
-	}
-
-	@Override
-	public void onClick(DialogInterface dialog, int which) {
-		int deleted_tasks;
-		
-		switch (delete_mode) {
-		case DELETE_MODE_FINISHED:
-			deleted_tasks = data_source.deleteFinishedTasks();
-			toastDeletedTasks(deleted_tasks);
-			break;
-
-		case DELETE_MODE_ALL:
-			ArrayList<Task> tasks = data_source.getTasks(true, null);
-			
-			// Alarm logic: Delete several tasks (SettingsActivity)
-			// * Tasks must not be deleted from database yet!
-			// * Iterate through list of tasks to be deleted:
-			// * 	Cancel alarm
-			// *    Cancel existing notifications
-			TaskAlarm alarm = new TaskAlarm();
-			for (Task task : tasks) {
-				alarm.cancelAlarm(this, task.getID());
-				alarm.cancelNotification(this, task.getID());
-			}
-			
-			deleted_tasks = data_source.deleteAllTasks();
-			toastDeletedTasks(deleted_tasks);
-			
-			// Update homescreen widget (after change has been saved to DB)
-			TaskButlerWidgetProvider.updateWidget(this);
-		}
-	}
-	
-	/**
-	 * Displays a Toast notification informing the user about the number of
-	 * tasks deleted.
-	 * @param val the number of tasks deleted
-	 */
-	private void toastDeletedTasks(int val) {
-		if (val == 0)
-			ToastMaker.toast(this, R.string.toast_no_tasks_deleted);
-		else if (val == 1)
-			ToastMaker.toast(this, val + " task deleted");
-		else
-			ToastMaker.toast(this, val + " tasks deleted");
 	}
 
 	@Override

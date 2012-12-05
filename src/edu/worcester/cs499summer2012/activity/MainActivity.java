@@ -79,8 +79,11 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 	public static final int ADD_TASK_REQUEST = 0;
 	public static final int VIEW_TASK_REQUEST = 1;
 	public static final int EDIT_TASK_REQUEST = 2;
-	public static final int DELETE_MODE_SINGLE = 0;
 	public static final int DISPLAY_ALL_CATEGORIES = 1;
+	
+	private static final int DELETE_MODE_SINGLE = 0;
+	private static final int DELETE_MODE_FINISHED = 1;
+	private static final int DELETE_MODE_ALL = 2;
 
 	/**************************************************************************
 	 * Private fields                                                         *
@@ -112,6 +115,20 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 			}
 		});
 		builder.create().show();
+	}
+	
+	/**
+	 * Displays a Toast notification informing the user about the number of
+	 * tasks deleted.
+	 * @param val the number of tasks deleted
+	 */
+	private void toastDeletedTasks(int val) {
+		if (val == 0)
+			ToastMaker.toast(this, R.string.toast_no_tasks_deleted);
+		else if (val == 1)
+			ToastMaker.toast(this, val + " task deleted");
+		else
+			ToastMaker.toast(this, val + " tasks deleted");
 	}
 
 	public static synchronized TaskListAdapter getAdapter(){
@@ -247,6 +264,18 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 		case R.id.menu_main_add_task:
 			startActivityForResult(new Intent(this, AddTaskActivity.class), 
 					ADD_TASK_REQUEST);
+			return true;
+			
+		case R.id.menu_main_categories:
+			startActivity(new Intent(this, EditCategoriesActivity.class));
+			return true;
+			
+		case R.id.menu_delete_finished:
+			this.deleteAlert(R.string.dialog_delete_completed, DELETE_MODE_FINISHED);
+			return true;
+			
+		case R.id.menu_delete_all:
+			this.deleteAlert(R.string.dialog_delete_all, DELETE_MODE_ALL);
 			return true;
 
 		case R.id.menu_main_settings:
@@ -506,14 +535,17 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 
 	@Override
 	public void onClick(DialogInterface dialog, int which) {
-		if (delete_mode == DELETE_MODE_SINGLE) {
+		TaskAlarm alarm;
+		int deleted_tasks;
+		switch (delete_mode) {
+		case DELETE_MODE_SINGLE:
 			Task task = adapter.getItem(selected_task);
 			
 			// Alarm logic: Delete a task
 			// * Task must not be deleted from database yet!
 			// * Cancel alarm
 			// * Cancel existing notification
-			TaskAlarm alarm = new TaskAlarm();
+			alarm = new TaskAlarm();
 			alarm.cancelAlarm(this, task.getID());
 			alarm.cancelNotification(this, task.getID());
 			
@@ -523,6 +555,43 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 			
 			// Update homescreen widget (after change has been saved to DB)
 			TaskButlerWidgetProvider.updateWidget(this);
+			break;
+			
+		case DELETE_MODE_FINISHED:
+			deleted_tasks = data_source.deleteFinishedTasks();
+			
+			for (int i = 0; i < adapter.getCount(); i++) {
+				if (adapter.getItem(i).isCompleted()) {
+					adapter.remove(adapter.getItem(i));
+					i--;
+				}
+			}
+			
+			ToastMaker.toast(this, R.string.toast_task_deleted);
+			toastDeletedTasks(deleted_tasks);
+			break;
+			
+		case DELETE_MODE_ALL:
+			ArrayList<Task> tasks = data_source.getTasks(true, null);
+			
+			// Alarm logic: Delete several tasks (SettingsActivity)
+			// * Tasks must not be deleted from database yet!
+			// * Iterate through list of tasks to be deleted:
+			// * 	Cancel alarm
+			// *    Cancel existing notifications
+			alarm = new TaskAlarm();
+			for (Task t : tasks) {
+				alarm.cancelAlarm(this, t.getID());
+				alarm.cancelNotification(this, t.getID());
+			}
+			
+			deleted_tasks = data_source.deleteAllTasks();
+			adapter.clear();
+			toastDeletedTasks(deleted_tasks);
+			
+			// Update homescreen widget (after change has been saved to DB)
+			TaskButlerWidgetProvider.updateWidget(this);
+			break;
 		}
 				
 		int display_category = prefs.getInt(SettingsActivity.DISPLAY_CATEGORY, DISPLAY_ALL_CATEGORIES);
