@@ -178,6 +178,10 @@ public class ComparatorListAdapter extends ArrayAdapter<Comparator> {
 		holder.name.setText(comparator.getName());
 		holder.name.setEnabled(is_enabled);
 		
+		// Set arrows
+		holder.up.setImageResource(is_enabled ? R.drawable.ic_up_active : R.drawable.ic_up_inactive);
+		holder.down.setImageResource(is_enabled ? R.drawable.ic_down_active : R.drawable.ic_down_inactive);
+		
 		return view;
 	}
 }

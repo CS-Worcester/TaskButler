@@ -19,6 +19,9 @@
 
 package edu.worcester.cs499summer2012.activity;
 
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -27,10 +30,10 @@ import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.CheckBox;
+import android.widget.CheckedTextView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockActivity;
@@ -41,8 +44,10 @@ import com.actionbarsherlock.view.MenuItem;
 import edu.worcester.cs499summer2012.R;
 import edu.worcester.cs499summer2012.database.TasksDataSource;
 import edu.worcester.cs499summer2012.service.TaskAlarm;
+import edu.worcester.cs499summer2012.service.TaskButlerWidgetProvider;
 import edu.worcester.cs499summer2012.task.Category;
 import edu.worcester.cs499summer2012.task.Task;
+import edu.worcester.cs499summer2012.task.ToastMaker;
 
 /**
  * Activity for adding a new task.
@@ -62,6 +67,9 @@ DialogInterface.OnClickListener {
 	private TasksDataSource data_source;
 	private Task task;
 	private Intent intent;
+	private ActionBar action_bar;
+	
+	private CheckedTextView name;
 
 	/**************************************************************************
 	 * Class methods                                                          *
@@ -69,15 +77,11 @@ DialogInterface.OnClickListener {
 
 	private void displayTask() {
 		// Set name
-		((TextView) findViewById(R.id.text_view_task_name)).setText(task.getName());
-
-		// Set completion checkbox
-		CheckBox checkbox = (CheckBox) findViewById(R.id.checkbox_complete_task);
-		checkbox.setChecked(task.isCompleted());
-		checkbox.setOnClickListener(this);
-
-		// Set priority
-		((TextView) findViewById(R.id.text_priority)).setText(Task.PRIORITY_LABELS[task.getPriority()]);
+		name = (CheckedTextView) findViewById(R.id.text_view_task_name);
+		name.setText(task.getName());
+		name.setChecked(task.isCompleted());
+		name.setOnClickListener(this);
+		name.setTextColor(name.isChecked() ? Color.GRAY : Color.WHITE);
 
 		// Set priority icon
 		switch (task.getPriority()) {
@@ -91,82 +95,65 @@ DialogInterface.OnClickListener {
 			((ImageView) findViewById(R.id.image_priority)).setImageResource(R.drawable.ic_trivial);
 			break;
 		}
-
-		// Set category (if category ID is not 1, i.e. no category)
-		View v_category_color = (View) findViewById(R.id.view_category);
-		TextView tv_category_name = (TextView) findViewById(R.id.text_category);
-		if (task.getCategory() != 1) {
-			v_category_color.setVisibility(View.VISIBLE);
-			tv_category_name.setVisibility(View.VISIBLE);
+		
+		// Set category
+		if (task.getCategory() != Category.NO_CATEGORY) {
 			Category category = data_source.getCategory(task.getCategory());
-			v_category_color.setBackgroundColor(category.getColor());
-			tv_category_name.setText(category.getName());
+			action_bar.setTitle(category.getName());
+			((View) findViewById(R.id.view_category)).setBackgroundColor(category.getColor());
 		} else {
-			v_category_color.setVisibility(View.GONE);
-			tv_category_name.setVisibility(View.GONE);
+			action_bar.setTitle(R.string.title_activity_view_task);
+			((View) findViewById(R.id.view_category)).setBackgroundColor(Color.parseColor("#33B5E5"));
 		}
 
 		// Set due date
 		if (task.hasDateDue()) {
-			((ImageView) findViewById(R.id.image_date)).setVisibility(View.VISIBLE);
-			TextView date_due = ((TextView) findViewById(R.id.text_date_due));
-			date_due.setVisibility(View.VISIBLE);
-			date_due.setText(DateFormat.format("'Due' MM/dd/yy 'at' h:mm AA", task.getDateDueCal()));
-
-			if (task.isPastDue())
-				date_due.setTextColor(Color.RED);
-			else
-				date_due.setTextColor(Color.LTGRAY);
-		} else {
-			((TextView) findViewById(R.id.text_date_due)).setVisibility(View.GONE);
-			((ImageView) findViewById(R.id.image_date)).setVisibility(View.GONE);
-		}
-
-		// Set final due date
-		if (task.hasFinalDateDue())
-			((ImageView) findViewById(R.id.image_alarm)).setVisibility(View.VISIBLE);
-		else
-			((ImageView) findViewById(R.id.image_alarm)).setVisibility(View.GONE);
-
-		// Set repetition
-		if (task.isRepeating()) {
-			((ImageView) findViewById(R.id.image_repeat)).setVisibility(View.VISIBLE);
-			TextView repeat_text = (TextView) findViewById(R.id.text_repeat);
-			repeat_text.setVisibility(View.VISIBLE);
+			((LinearLayout) findViewById(R.id.due_date_bar)).setVisibility(View.VISIBLE);
 			
-			repeat_text.setText("Repeat every " + task.getRepeatInterval() + ' ' + Task.REPEAT_LABELS[task.getRepeatType()]);
-		} else {
-			((TextView) findViewById(R.id.text_repeat)).setVisibility(View.GONE);
-			((ImageView) findViewById(R.id.image_repeat)).setVisibility(View.GONE);
-		}
+			TextView due_date = (TextView) findViewById(R.id.text_date_due);
+			
+			if (task.isPastDue())
+				due_date.setTextColor(Color.RED);
+			else
+				due_date.setTextColor(Color.LTGRAY);
+			
+			Calendar current_cal = GregorianCalendar.getInstance();
+			Calendar due_cal = task.getDateDueCal();
+			if (due_cal.getTimeInMillis() >= current_cal.getTimeInMillis()) {
+				// Due date is in the future
+				// Same year?
+				if (due_cal.get(Calendar.YEAR) == current_cal.get(Calendar.YEAR))
+					due_date.setText(DateFormat.format("'Due' MMMM d 'at' h:mmaa", due_cal));
+				else
+					due_date.setText(DateFormat.format("'Due' MMMM d, yyyy 'at' h:mmaa", due_cal));
+			} else {
+				// Due date is in the past
+				// Same year?
+				if (due_cal.get(Calendar.YEAR) == current_cal.get(Calendar.YEAR))
+					due_date.setText(DateFormat.format("'Was due' MMMM d 'at' h:mmaa", due_cal));
+				else
+					due_date.setText(DateFormat.format("'Was due' MMMM d, yyyy 'at' h:mmaa", due_cal));
+			}
+			
+			// Set repetition
+			if (task.isRepeating()) {
+				((ImageView) findViewById(R.id.image_repeat)).setVisibility(View.VISIBLE);
+			} else {
+				((ImageView) findViewById(R.id.image_repeat)).setVisibility(View.GONE);
+			}
+			
+			// Set procrastinator alarm
+			if (task.hasFinalDateDue()) {
+				((ImageView) findViewById(R.id.image_alarm)).setVisibility(View.VISIBLE);
+			} else {
+				((ImageView) findViewById(R.id.image_alarm)).setVisibility(View.GONE);
+			}
+
+		} else
+			((LinearLayout) findViewById(R.id.due_date_bar)).setVisibility(View.GONE);
 
 		// Set notes
-		String notes = task.getNotes();
-		if (!notes.equals("")) {
-			((ImageView) findViewById(R.id.image_notes)).setVisibility(View.VISIBLE);
-			TextView notes_text = (TextView) findViewById(R.id.text_notes);
-			notes_text.setVisibility(View.VISIBLE);
-			notes_text.setText(notes);
-		} else {
-			((TextView) findViewById(R.id.text_notes)).setVisibility(View.GONE);
-			((ImageView) findViewById(R.id.image_notes)).setVisibility(View.GONE);
-		}
-	}
-
-	/**
-	 * Displays a message in a Toast notification for a short duration.
-	 */
-	private void toast(String message)
-	{
-		Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-	}
-	
-	/**
-	 * Displays a message in a Toast notification for a short duration.
-	 */
-	private void toast(int message)
-	{
-		Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+		((TextView) findViewById(R.id.text_notes)).setText(task.getNotes());
 	}
 
 	/**************************************************************************
@@ -179,7 +166,7 @@ DialogInterface.OnClickListener {
 		setContentView(R.layout.activity_view_task);
 
 		// Allow Action bar icon to act as a button
-		ActionBar action_bar = getSupportActionBar();
+		action_bar = getSupportActionBar();
 		action_bar.setHomeButtonEnabled(true);
 		action_bar.setDisplayHomeAsUpEnabled(true);
 
@@ -201,7 +188,7 @@ DialogInterface.OnClickListener {
 		
 		// Exit the task if it no longer exists (has been deleted)
 		if (task == null) {
-			toast("This task has been deleted!");
+			ToastMaker.toast(this, R.string.toast_error_no_task);
 			finish();
 			return;
 		}
@@ -233,10 +220,10 @@ DialogInterface.OnClickListener {
 
 		case R.id.menu_view_task_delete:
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			builder.setMessage("Are you sure you want to delete this task?");
+			builder.setMessage(R.string.dialog_delete_single);
 			builder.setCancelable(true);
-			builder.setPositiveButton("Yes", this);
-			builder.setNegativeButton("No", this);
+			builder.setPositiveButton(R.string.menu_delete_task, this);
+			builder.setNegativeButton(R.string.menu_cancel, this);
 			builder.create().show();
 			return true;
 
@@ -251,8 +238,9 @@ DialogInterface.OnClickListener {
 
 	@Override
 	public void onClick(View v) {	
-		if (v.getId() == R.id.checkbox_complete_task) {
+		if (v.getId() == R.id.text_view_task_name) {
 			task.toggleIsCompleted();
+			name.setChecked(task.isCompleted());
 			task.setDateModified(System.currentTimeMillis());
 			data_source.updateTask(task);
 			
@@ -260,6 +248,7 @@ DialogInterface.OnClickListener {
 			// * Don't forget to update date modified!
 			// * Task must be updated in database first
 			// * Cancel alarm first to be safe
+			// * Cancel an existing notification
 			// * If user completed the task:
 			// *	If is repeating:
 			// *		Set repeating alarm to get new due date (possibly uncompletes the task)
@@ -271,29 +260,31 @@ DialogInterface.OnClickListener {
 			// *		Set alarm
 			TaskAlarm alarm = new TaskAlarm();
 			alarm.cancelAlarm(this, task.getID());
+			alarm.cancelNotification(this, task.getID());
 			if (task.isCompleted()) {
-				toast(R.string.toast_task_completed);
+				ToastMaker.toast(this, R.string.toast_task_completed);
 				if (task.isRepeating()) {
 					task = alarm.setRepeatingAlarm(this, task.getID());
 										
 					if (!task.isCompleted()) {
 						alarm.setAlarm(this, task);
-						StringBuilder repeat_message = new StringBuilder(); 
-						repeat_message.append(this.getString(R.string.toast_task_repeated));
-						repeat_message.append(DateFormat.format(" MMM d", task.getDateDueCal()));
-						repeat_message.append('.');
-						toast(repeat_message.toString());
+						ToastMaker.toast(this, ToastMaker.getRepeatMessage(this, 
+								R.string.toast_task_repeated, 
+								task.getDateDueCal()));
 					} else {
-						toast(R.string.toast_task_repeat_delayed);
+						ToastMaker.toast(this, ToastMaker.getRepeatMessage(this, 
+								R.string.toast_task_repeat_delayed, 
+								task.getDateDueCal()));
 					}
 				}
 			} else {
 				if (task.hasDateDue() && !task.isPastDue())
 					alarm.setAlarm(this, task);
 			}
+			
+			// Update homescreen widget (after change has been saved to DB)
+			TaskButlerWidgetProvider.updateWidget(this);
 		}
-
-		
 
 		intent = new Intent(this, MainActivity.class);
 		intent.putExtra(Task.EXTRA_TASK_ID, task.getID());
@@ -312,10 +303,17 @@ DialogInterface.OnClickListener {
 			// Alarm logic: Delete a task (ViewTaskActivity)
 			// * Task must not be deleted from database yet!
 			// * Cancel alarm
-			(new TaskAlarm()).cancelAlarm(this, task.getID());
+			// * Cancel an existing notification
+			TaskAlarm alarm = new TaskAlarm();
+			alarm.cancelAlarm(this, task.getID());
+			alarm.cancelNotification(this, task.getID());
 			
 			data_source.deleteTask(task);
-			toast("Task deleted");
+			
+			// Update homescreen widget (after change has been saved to DB)
+			TaskButlerWidgetProvider.updateWidget(this);
+			
+			ToastMaker.toast(this, R.string.toast_task_deleted);
 			finish();
 			break;
 

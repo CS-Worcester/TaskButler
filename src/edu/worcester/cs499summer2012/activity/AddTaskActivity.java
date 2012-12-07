@@ -21,13 +21,13 @@ package edu.worcester.cs499summer2012.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.EditText;
-import android.widget.Toast;
 import edu.worcester.cs499summer2012.R;
 import edu.worcester.cs499summer2012.database.DatabaseHandler;
 import edu.worcester.cs499summer2012.service.TaskAlarm;
+import edu.worcester.cs499summer2012.service.TaskButlerWidgetProvider;
 import edu.worcester.cs499summer2012.task.Category;
 import edu.worcester.cs499summer2012.task.Task;
+import edu.worcester.cs499summer2012.task.ToastMaker;
 
 /**
  * Activity for adding a new task.
@@ -53,13 +53,12 @@ public class AddTaskActivity extends BaseTaskActivity {
 
 	protected boolean addTask() {
     	// Get task name
-    	EditText et_name = (EditText) findViewById(R.id.edit_add_task_name);
     	String name = et_name.getText().toString().trim();
     	
     	// If there is no task name, don't create the task
     	if (name.equals(""))
     	{
-    		Toast.makeText(this, "Task needs a name!", Toast.LENGTH_SHORT).show();
+    		ToastMaker.toast(this, R.string.toast_task_no_name);
     		return false;
     	}
     	
@@ -79,9 +78,6 @@ public class AddTaskActivity extends BaseTaskActivity {
     	long due_date_ms = 0;
     	if (cb_due_date.isChecked())
     		due_date_ms = due_date_cal.getTimeInMillis();
-    	
-    	// Get task notes
-    	EditText notes = (EditText) findViewById(R.id.edit_add_task_notes);
     	    	
     	// Current time
     	long current_time = System.currentTimeMillis();
@@ -102,7 +98,7 @@ public class AddTaskActivity extends BaseTaskActivity {
     			current_time,
     			due_date_ms,
     			"",
-    			notes.getText().toString());
+    			et_notes.getText().toString());
     	
     	// Assign the task a unique ID and store it in the database
     	task.setID(data_source.getNextID(DatabaseHandler.TABLE_TASKS));
@@ -113,10 +109,13 @@ public class AddTaskActivity extends BaseTaskActivity {
     	// * If has due date:
     	// *	Set alarm
     	// * 	(Repeating due date will be handled by the service after alarm rings)
-    	if (task.hasDateDue()) {
+    	if (task.hasDateDue() && !task.isPastDue()) {
     		TaskAlarm alarm = new TaskAlarm();
     		alarm.setAlarm(this, task);
     	}
+    	
+		// Update homescreen widget (after change has been saved to DB)
+		TaskButlerWidgetProvider.updateWidget(this);
     	
     	// Create the return intent and add the task ID
     	intent = new Intent(this, MainActivity.class);    	
