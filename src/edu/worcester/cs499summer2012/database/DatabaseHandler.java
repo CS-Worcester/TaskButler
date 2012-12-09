@@ -43,7 +43,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private static final int RC1_DATABASE = 7;
 
 	// Database Name
-	private static final String DATABASE_NAME = "TaskButler.db";
+	public static final String DATABASE_NAME = "TaskButler.db";
 
 	// Table names
 	public static final String TABLE_TASKS = "tasks";

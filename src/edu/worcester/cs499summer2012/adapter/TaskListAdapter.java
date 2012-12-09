@@ -24,6 +24,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.preference.PreferenceManager;
@@ -36,7 +37,6 @@ import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 import edu.worcester.cs499summer2012.R;
 import edu.worcester.cs499summer2012.activity.SettingsActivity;
 import edu.worcester.cs499summer2012.comparator.TaskAutoComparator;
@@ -49,7 +49,9 @@ import edu.worcester.cs499summer2012.comparator.TaskNameComparator;
 import edu.worcester.cs499summer2012.comparator.TaskPriorityComparator;
 import edu.worcester.cs499summer2012.database.TasksDataSource;
 import edu.worcester.cs499summer2012.service.TaskAlarm;
+import edu.worcester.cs499summer2012.service.TaskButlerWidgetProvider;
 import edu.worcester.cs499summer2012.task.Task;
+import edu.worcester.cs499summer2012.task.ToastMaker;
 
 /**
  * ListView adapter for the TaskList container. Enables tasks in a TaskList
@@ -78,7 +80,8 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 	 * Private fields                                                         *
 	 **************************************************************************/
 	
-	private final Activity activity;
+	private Activity activity = null;
+	private final Context context;
 	private final ArrayList<Task> tasks;
 	private TasksDataSource data_source;
 	private SharedPreferences prefs;
@@ -94,19 +97,19 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 	 * @param activity the Activity that owns this adapter
 	 * @param tasks the TaskList handled by this adapter
 	 */
-	public TaskListAdapter(Activity activity, ArrayList<Task> tasks) {
-		super(activity, R.layout.row_task, tasks);
-		this.activity = activity;
+	public TaskListAdapter(Context context, ArrayList<Task> tasks) {
+		super(context, R.layout.row_task, tasks);
+		this.context = context;
 		this.tasks = tasks;
-		data_source = TasksDataSource.getInstance(this.activity);
-		prefs = PreferenceManager.getDefaultSharedPreferences(this.activity);
+		data_source = TasksDataSource.getInstance(this.context);
+		prefs = PreferenceManager.getDefaultSharedPreferences(this.context);
 		setNotifyOnChange(true);
 	}
 	
 	/**************************************************************************
 	 * Overridden parent methods                                              *
 	 **************************************************************************/
-	
+
 	/**
 	 * This method is called automatically when the user scrolls the ListView.
 	 * Updates the View of a single visible row, reflecting the list being 
@@ -122,7 +125,7 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 		Task task = tasks.get(position);
 		
 		if (view == null) {		
-			LayoutInflater inflater = activity.getLayoutInflater();
+			LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			view = inflater.inflate(R.layout.row_task, null);
 			
 			final ViewHolder view_holder = new ViewHolder();
@@ -142,6 +145,7 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 					// * Don't forget to update date modified!
 					// * Task must be updated in database first
 					// * Cancel alarm first to be safe
+					// * Cancel an existing notification
 					// * If user completed the task:
 					// *	If is repeating:
 					// *		Set repeating alarm to get new due date (possibly uncompletes the task)
@@ -152,31 +156,36 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 					// *	If has due date and is not past due:
 					// *		Set alarm
 					TaskAlarm alarm = new TaskAlarm();
-					alarm.cancelAlarm(activity, task.getID());
+					alarm.cancelAlarm(context, task.getID());
+					alarm.cancelNotification(context, task.getID());
 					if (task.isCompleted()) {
-						toast(R.string.toast_task_completed);
+						ToastMaker.toast(context, R.string.toast_task_completed);
 						if (task.isRepeating()) {
-							task = alarm.setRepeatingAlarm(activity, task.getID());
+							task = alarm.setRepeatingAlarm(context, task.getID());
 							
 							if (!task.isCompleted()) {
-								alarm.setAlarm(activity, task);
-								StringBuilder repeat_message = new StringBuilder(); 
-								repeat_message.append(activity.getString(R.string.toast_task_repeated));
-								repeat_message.append(DateFormat.format(" MMM d", task.getDateDueCal()));
-								repeat_message.append('.');
-								toast(repeat_message.toString());
+								alarm.setAlarm(context, task);
+								ToastMaker.toast(context, ToastMaker.getRepeatMessage(context, 
+										R.string.toast_task_repeated, 
+										task.getDateDueCal()));
 							} else {
-								toast(R.string.toast_task_repeat_delayed);
+								ToastMaker.toast(context, ToastMaker.getRepeatMessage(context, 
+										R.string.toast_task_repeat_delayed, 
+										task.getDateDueCal()));
 							}
 						}
 					} else {
 						if (task.hasDateDue() && !task.isPastDue())
-							alarm.setAlarm(activity, task);
+							alarm.setAlarm(context, task);
 					}
 					
 					// If "hide completed tasks" option, then remove the task from the adapter
 					if (prefs.getBoolean(SettingsActivity.HIDE_COMPLETED, true) && task.isCompleted())
 							tasks.remove(task);
+					
+					// Update homescreen widget (after change has been saved to DB)
+					// This currently doesn't work for non-activities
+					TaskButlerWidgetProvider.updateWidget(activity);
 					
 					sort();
 				}
@@ -236,7 +245,12 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 				Calendar current_date = GregorianCalendar.getInstance();
 				Calendar due_date = task.getDateDueCal();
 				
-				if (due_date.get(Calendar.YEAR) > current_date.get(Calendar.YEAR)) {
+				if (due_date.before(current_date))
+				{
+					// Due date is past
+					holder.due_date.setText("Past due");
+					holder.due_date.setTextColor(Color.RED);
+				} else if (due_date.get(Calendar.YEAR) > current_date.get(Calendar.YEAR)) {
 					// Due date is in a future year
 					holder.due_date.setText(DateFormat.format("MMM d'\n'yyyy", due_date));
 				} else if (due_date.get(Calendar.DAY_OF_YEAR) - current_date.get(Calendar.DAY_OF_YEAR) > 6) {
@@ -245,14 +259,10 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 				} else if (due_date.get(Calendar.DAY_OF_YEAR) > current_date.get(Calendar.DAY_OF_YEAR)) {
 					// Due date is after today
 					holder.due_date.setText(DateFormat.format("E'\n'h:mmaa", due_date));
-				} else if (!task.isPastDue()) {
+				} else {
 					// Due date is today
 					holder.due_date.setText(DateFormat.format("'Today\n'h:mmaa", due_date));
-				} else {
-					// Due date is past
-					holder.due_date.setText("Past due");
-					holder.due_date.setTextColor(Color.RED);
-				}	
+				}
 			} else
 				holder.due_date.setText("");
 		}
@@ -320,17 +330,7 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 			this.sort_type = sort_type;
 	}
 	
-	/**
-	 * Displays a message in a Toast notification for a short duration.
-	 */
-	private void toast(String message) {
-		Toast.makeText(activity, message, Toast.LENGTH_SHORT).show();
-	}
-	
-	/**
-	 * Displays a message in a Toast notification for a short duration.
-	 */
-	private void toast(int message) {
-		Toast.makeText(activity, message, Toast.LENGTH_SHORT).show();
+	public void setActivity(Activity activity) {
+		this.activity = activity;
 	}
 }

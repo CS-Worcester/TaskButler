@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="edu.worcester.cs499summer2012"
-    android:versionCode="1"
-    android:versionName="RC1" >
+    android:versionCode="4"
+    android:versionName="1.0.1" >
 
     <uses-sdk
         android:minSdkVersion="8"
@@ -10,6 +10,7 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     
     <application
         android:icon="@drawable/ic_launcher"
@@ -73,7 +74,7 @@
             android:label="@string/title_activity_custom_sort" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="edu.worcester.cs499summer2012.MainActivity" />
+                android:value="edu.worcester.cs499summer2012.SettingsActivity" />
         </activity>
         
         <activity
@@ -89,7 +90,16 @@
             android:label="@string/title_activity_edit_categories" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="edu.worcester.cs499summer2012.SettingsActivity" />
+                android:value="edu.worcester.cs499summer2012.MainActivity" />
         </activity>
+        
+        <receiver android:name=".service.TaskButlerWidgetProvider">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider"
+                android:resource="@xml/widget_info" />
+        </receiver>
+        
     </application>
 </manifest>

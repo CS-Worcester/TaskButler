@@ -26,7 +26,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.util.Log;
 
 import edu.worcester.cs499summer2012.activity.SettingsActivity;
 import edu.worcester.cs499summer2012.database.TasksDataSource;
@@ -42,10 +41,6 @@ public class TaskAlarm {
 	public static final String ALARM_EXTRA ="edu.worcester.cs499summer2012.TaskAlarm";
 	public static final int REPEATING_ALARM = 1;
 	public static final int PROCRASTINATOR_ALARM =2;
-	
-	private final long HOUR = 3600000;
-	private static final String DEFAULT_REMINDER_TIME = "24";
-	private static final String DEFAULT_ALARM_TIME = "15";
 
 	/**
 	 * Cancel alarm using the task id, PendingIntent is created using the Task id
@@ -75,6 +70,16 @@ public class TaskAlarm {
 		pi = PendingIntent.getBroadcast(context, id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 		alarmManager.cancel(pi);
 		pi.cancel();
+	}
+	
+	/**
+	 * Use this call in activity code to cancel existing notifications
+	 * @param context
+	 * @param id The ID of the task
+	 */
+	public void cancelNotification(Context context, int id) {
+		NotificationHelper cancel = new NotificationHelper();
+		cancel.cancelNotification(context, id);
 	}
 
 	/**
@@ -127,7 +132,6 @@ public class TaskAlarm {
 		if (newDateDue.getTimeInMillis() <= System.currentTimeMillis()) {
 			while(newDateDue.getTimeInMillis() <= System.currentTimeMillis()){
 				newDateDue.add(repeatType, task.getRepeatInterval());
-				Log.d("in IF ",""+ newDateDue + " < " + task.getDateDue());
 			}
 		} else {
 			// Due date is ahead of current time, task was finished early
@@ -151,14 +155,14 @@ public class TaskAlarm {
 	}
 	
 	/**
-	 * Reads preferences, and schedule a procrastinator alarm.
+	 * Reads preferences, and schedule a procrastinator alarm for a past due task.
 	 * @param context
 	 * @param id
+	 * @deprecated Use setReminder for procrastinator alarms
 	 */
 	public void setProcrastinatorAlarm(Context context, int id){
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-		String strAlarm = prefs.getString(SettingsActivity.ALARM_TIME, DEFAULT_ALARM_TIME);
-		Log.d("String value of settings", strAlarm);
+		String strAlarm = prefs.getString(SettingsActivity.ALARM_TIME, SettingsActivity.DEFAULT_ALARM_TIME);
 		Calendar cal = Calendar.getInstance();    	
 		int iAlarm = Integer.parseInt(strAlarm);
 		cal.add(Calendar.MINUTE, iAlarm);
@@ -172,26 +176,44 @@ public class TaskAlarm {
 		am.set(AlarmManager.RTC_WAKEUP, lAlarm, PendingIntent.getBroadcast(context, id, intent, PendingIntent.FLAG_UPDATE_CURRENT));
 	}
 	
-	//not done yet
+	/**
+	 * Reads preferences, and schedule a reminder alarm for a past due task
+	 * @param context
+	 * @param id
+	 */
 	public void setReminder(Context context, int id){
 		TasksDataSource db = TasksDataSource.getInstance(context);
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-		String strReminder = prefs.getString(SettingsActivity.REMINDER_TIME, DEFAULT_REMINDER_TIME); 
-		Log.d("String value of settings", strReminder);
+
 		Task task = db.getTask(id);
-		int iReminder = Integer.parseInt(strReminder);
-		long lReminder = task.getDateDue();
+		Calendar dueCal = task.getDateDueCal();
+		boolean isProcrastinator = task.hasFinalDateDue();
 		
-		do{
-			lReminder += HOUR * iReminder;
-		}while(lReminder < System.currentTimeMillis());
+		String strReminder;
+		int iInterval;
+		
+		if (isProcrastinator) {
+			// Procrastinator alarm
+			strReminder = prefs.getString(SettingsActivity.ALARM_TIME, SettingsActivity.DEFAULT_ALARM_TIME);
+			iInterval = Calendar.MINUTE;
+		} else {
+			// Regular alarm
+			strReminder = prefs.getString(SettingsActivity.REMINDER_TIME, SettingsActivity.DEFAULT_REMINDER_TIME);
+			iInterval = Calendar.HOUR;
+		}
+		
+		int iReminder = Integer.parseInt(strReminder);
+		
+		do {
+			dueCal.add(iInterval, iReminder);
+		} while(dueCal.getTimeInMillis() < System.currentTimeMillis());
 		
 		Intent intent =  new Intent(context, OnAlarmReceiver.class)
 			.putExtra(Task.EXTRA_TASK_ID, id)
-			.putExtra(TaskAlarm.ALARM_EXTRA, SettingsActivity.REMINDER_TIME);
+			.putExtra(TaskAlarm.ALARM_EXTRA, isProcrastinator ? SettingsActivity.ALARM_TIME : SettingsActivity.REMINDER_TIME);
 		
 		AlarmManager am=(AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
-		am.set(AlarmManager.RTC_WAKEUP, lReminder, PendingIntent.getBroadcast(context, id, intent, PendingIntent.FLAG_UPDATE_CURRENT));
+		am.set(AlarmManager.RTC_WAKEUP, dueCal.getTimeInMillis(), PendingIntent.getBroadcast(context, id, intent, PendingIntent.FLAG_UPDATE_CURRENT));
 	}
 
 	//get a PendingIntent 

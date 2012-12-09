@@ -17,7 +17,6 @@
     <item 
         android:id="@+id/menu_add_task_help"
         android:title="@string/menu_help"
-        android:icon="@drawable/ic_help"
         android:showAsAction="never" 
         android:orderInCategory="2"/>
     

@@ -75,13 +75,13 @@ public class PriorityListAdapter extends ArrayAdapter<String> {
 		
 		switch (position) {
 		case Task.TRIVIAL:
-			icon.setImageResource(R.drawable.ic_trivial);
+			icon.setImageResource(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB ? R.drawable.ic_trivial : R.drawable.ic_trivial_deprecated);
 			break;
 		case Task.NORMAL:
-			icon.setImageResource(R.drawable.ic_normal);
+			icon.setImageResource(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB ? R.drawable.ic_normal : R.drawable.ic_normal_deprecated);
 			break;
 		case Task.URGENT:
-			icon.setImageResource(R.drawable.ic_urgent);
+			icon.setImageResource(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB ? R.drawable.ic_urgent : R.drawable.ic_urgent_deprecated);
 			break;
 		}
 		
