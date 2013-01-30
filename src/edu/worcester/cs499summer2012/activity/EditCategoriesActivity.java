@@ -28,9 +28,11 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
@@ -269,10 +271,20 @@ public class EditCategoriesActivity extends SherlockListActivity implements Acti
 		case DELETE_DIALOG:
 			switch (which) {
 			case DialogInterface.BUTTON_POSITIVE:
-				// Delete the task from the adapter and database
+				// Delete the category from the adapter and database
 				adapter.remove(selected_category);
 				adapter.notifyDataSetChanged();
 				data_source.deleteCategory(selected_category);
+				
+				// Check prefs to see if the deleted category is the displayed 
+				// category. If it is, set prefs to "display all categories".
+				SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+				if (prefs.getInt(SettingsActivity.DISPLAY_CATEGORY, MainActivity.DISPLAY_ALL_CATEGORIES) == selected_category.getID())
+				{
+					SharedPreferences.Editor prefs_editor = prefs.edit();
+					prefs_editor.putInt(SettingsActivity.DISPLAY_CATEGORY, MainActivity.DISPLAY_ALL_CATEGORIES);
+					prefs_editor.commit();
+				}
 				
 				// Update any tasks that had this category
 				ArrayList<Task> tasks = data_source.getTasks(true, selected_category);
