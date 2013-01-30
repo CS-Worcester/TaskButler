@@ -238,8 +238,19 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 		int display_category = prefs.getInt(SettingsActivity.DISPLAY_CATEGORY, DISPLAY_ALL_CATEGORIES);
 		if (display_category == DISPLAY_ALL_CATEGORIES)
 			adapter = new TaskListAdapter(this, data_source.getTasks(!hide_completed, null));
-		else
-			adapter = new TaskListAdapter(this, data_source.getTasks(!hide_completed, data_source.getCategory(display_category)));
+		else {
+			Category cat = data_source.getCategory(display_category);
+			if (cat != null)
+				adapter = new TaskListAdapter(this, data_source.getTasks(!hide_completed, cat));
+			else {
+				// Bug fix: trying to load a category that doesn't exist (has been deleted)
+				// will crash the app.
+				prefs_editor.putInt(SettingsActivity.DISPLAY_CATEGORY, DISPLAY_ALL_CATEGORIES);
+				prefs_editor.commit();
+				display_category = DISPLAY_ALL_CATEGORIES;
+				adapter = new TaskListAdapter(this, data_source.getTasks(!hide_completed, null));
+			}
+		}
 		setListAdapter(adapter);
 
 		// Set sort type and sort the list

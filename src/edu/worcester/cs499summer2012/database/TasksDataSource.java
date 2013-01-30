@@ -416,8 +416,8 @@ public class TasksDataSource {
 				DatabaseHandler.KEY_G_ID}, 
 				DatabaseHandler.KEY_ID + " = " + id,
 				null, null, null, null);
-		if (cursor != null)
-			cursor.moveToFirst();
+		if (!cursor.moveToFirst())
+			return null;
 		Category c = new Category(
 				cursor.getInt(0),
 				cursor.getString(1),
