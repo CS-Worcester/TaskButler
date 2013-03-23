@@ -78,6 +78,7 @@ public class NotificationHelper{
 					R.drawable.ic_notification : R.drawable.ic_notification_deprecated)
 			.setTicker(task.getName())
 			.setWhen(System.currentTimeMillis());
+		@SuppressWarnings("deprecation")
 		Notification notification = builder.getNotification();
 		NotificationManager notificationManager = getNotificationManager(context);
 		notificationManager.notify(task.getID(), notification);
