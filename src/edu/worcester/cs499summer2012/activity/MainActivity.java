@@ -142,13 +142,14 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 		return adapter;
 	}
 
-	private void createCategoryBar(int display_category) {
+	private void createCategoryBar(int display_category, boolean only_unfinished) {
 		// Populate bottom category bar
 		ArrayList<Category> all_categories = data_source.getCategories();
 		categories = new ArrayList<Category>(all_categories);
 		
 		for (Category category : all_categories) {
-			if (!data_source.categoryHasTasks(category) && category.getID() != Category.NO_CATEGORY)
+			if (!data_source.categoryHasTasks(category, only_unfinished) && 
+					category.getID() != Category.NO_CATEGORY)
 				categories.remove(category);
 		}
 
@@ -259,7 +260,7 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 		
 		adapter.setActivity(this);
 
-		createCategoryBar(display_category);
+		createCategoryBar(display_category, hide_completed);
 	}
 
 	@Override
@@ -372,7 +373,7 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 											adapter.sort();
 											
 											// Remake categories bar and set "all categories" to be the default
-											createCategoryBar(DISPLAY_ALL_CATEGORIES);
+											createCategoryBar(DISPLAY_ALL_CATEGORIES, hide_completed);
 											prefs_editor.putInt(SettingsActivity.DISPLAY_CATEGORY, DISPLAY_ALL_CATEGORIES);
 											prefs_editor.commit();
 											
@@ -553,7 +554,7 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 
 		adapter.sort();
 
-		createCategoryBar(category.getID());
+		createCategoryBar(category.getID(), hide_completed);
 
 		prefs_editor.putInt(SettingsActivity.DISPLAY_CATEGORY, category.getID());
 		prefs_editor.commit();
@@ -725,6 +726,7 @@ OnItemLongClickListener, ActionMode.Callback, OnClickListener, OnGestureListener
 		}
 				
 		int display_category = prefs.getInt(SettingsActivity.DISPLAY_CATEGORY, DISPLAY_ALL_CATEGORIES);
-		createCategoryBar(display_category);
+		boolean hide_completed = prefs.getBoolean(SettingsActivity.HIDE_COMPLETED, true);
+		createCategoryBar(display_category, hide_completed);
 	}
 }

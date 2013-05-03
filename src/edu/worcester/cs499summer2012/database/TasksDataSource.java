@@ -489,16 +489,35 @@ public class TasksDataSource {
 		return category;
 	}
 	
-	public boolean categoryHasTasks(Category c) {
-		// Select All Query
-		String selectQuery = "SELECT * FROM " + 
+	/**
+	 * Checks if a category has any tasks assigned to it.
+	 * @param c the category to be checked
+	 * @param onlyUnfinished whether to only consider unfinished tasks
+	 * @return true if the category has tasks, false otherwise
+	 */
+	public boolean categoryHasTasks(Category c, boolean onlyUnfinished) {
+		/*String a = "SELECT * FROM ";
+		String queryBuilder = "SELECT * FROM " + 
 				DatabaseHandler.TABLE_TASKS + " WHERE " +
-				DatabaseHandler.KEY_CATEGORY + " = " + c.getID();
+				DatabaseHandler.KEY_CATEGORY + " = " + c.getID();*/
+				
+		StringBuilder selectionBuilder = new StringBuilder();
+		
+		selectionBuilder.append(DatabaseHandler.KEY_CATEGORY)
+				.append(" = ").append(c.getID());
+		
+		if (onlyUnfinished) {
+			selectionBuilder.append(" AND ")
+					.append(DatabaseHandler.KEY_COMPLETION).append(" = 0");
+		}
 		
 		boolean exists = false;
 		
 		open();
-		Cursor cursor = db.rawQuery(selectQuery, null);
+		Cursor cursor = db.query(DatabaseHandler.TABLE_TASKS, 
+				new String[] { DatabaseHandler.KEY_ID },
+				selectionBuilder.toString(), 
+				null, null, null, null);
 
 		if (cursor.moveToFirst()) {
 			exists = true;
